@@ -1,2 +1,10 @@
-# CloudDebugger
-CloudDebugger - the exploration tool for Azure cloud developers
+# CloudDebugger - the exploration tool and debugger for Azure cloud developers
+
+
+
+
+
+
+
+
+Microsoft, Azure and .NET are trademarks of the Microsoft group of companies.

@@ -1,0 +1,60 @@
+﻿@model CloudDebugger.Features.EventHub.SendEventHubModel
+@{
+    ViewData["Title"] = "CloudDebugger - Send events to Event Hub";
+}
+
+<h3>Send Events to Event Hub</h3>
+
+
+<form asp-controller="EventHub" asp-action="SendEvents" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">Connection String</td>
+            <td class="col-md-10">
+                <input asp-for="ConnectionString" style="min-width:75%"><br />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Start event number</td>
+            <td class="col-md-2">
+                <input asp-for="StartNumber">
+                <span asp-validation-for="StartNumber"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Number of events to send</td>
+            <td class="col-md-2">
+                <input asp-for="NumberOfEvents">
+                <span asp-validation-for="NumberOfEvents"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+
+    </table>
+
+
+    <br>
+    <input type="submit" name="submit" value="Produce Events" /><br />
+
+    @if(String.IsNullOrWhiteSpace(Model.Exception) == false)
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (String.IsNullOrWhiteSpace(Model.Message) == false)
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+      

@@ -1,0 +1,131 @@
+﻿@using Microsoft.AspNetCore.MyHttpLogging
+@model Microsoft.AspNetCore.MyHttpLogging.RequestLogEntry
+
+@{
+    ViewData["Title"] = "RequestDetails";
+}
+
+<h3>HTTP Request details</h3>
+<a href="/RequestLogger/RequestList">Back</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table table-borderless">
+        <tr>
+            <td class="col-md-2">
+                @if (RequestLog.LookupLogEntry(Model.RequestNumber - 1) != null)
+                {
+                    int previousRequest = Model.RequestNumber - 1;
+                    <a href="/requestlogger/requestdetails/@previousRequest">&lt;&lt;&lt;Previous</a>
+                }
+            </td>
+
+            <td class="col-md-2">
+                @if (RequestLog.LookupLogEntry(Model.RequestNumber + 1) != null)
+                {
+                    int nextRequest = Model.RequestNumber + 1;
+                    <a href="/requestlogger/requestdetails/@nextRequest">Next&gt;&gt;&gt;</a>
+                }
+            </td>
+            <td class="col-md-8">
+            </td>
+        </tr>
+    </table>
+
+    <br />
+
+    //Make a table to display the model object
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">EntryTime</td>
+            <td class="col-md-10">@Model.EntryTime</td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Method</td>
+            <td class="col-md-10">@Model.Method</td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Path</td>
+            <td class="col-md-10">@Model.PathBase@Model.Path</td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Protocol</td>
+            <td class="col-md-10">@Model.Protocol</td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Duration</td>
+            <td class="col-md-10">@Model.Duration</td>
+        </tr>
+        <tr>
+            <td class="col-md-2">StatusCode</td>
+            <td class="col-md-10">
+                @if (Model.StatusCode != "404")
+                {
+                    @Model.StatusCode
+                }
+                else
+                {
+                    <span style="color:red"><b>404</b></span>
+                }
+            </td>
+        </tr>
+    </table>
+
+
+    <h4>Request headers and body</h4>
+
+    <table class="table table-borderless">
+        <tr>
+            <td>
+                <pre>
+                    @foreach (var header in Model.RequestHeaders)
+                    {
+                        @(header + "\r\n")
+                    }
+                 </pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <pre>@Model.RequestBody</pre>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <h4>Response headers and body</h4>
+    <table class="table table-borderless">
+        <tr>
+            <td>
+                @if (Model.ResponseHeaders.Count > 0)
+                {
+                    foreach (var header in Model.ResponseHeaders)
+                    {
+                        <pre>@(header + "\r\n")</pre>
+                    }
+                }
+                else
+                {
+                    <pre>No response headers...</pre>
+                }
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @if (String.IsNullOrEmpty(Model.ResponseBody))
+                {
+                    <pre>No response body...</pre>
+                }
+                else
+                {
+                    <pre>@(Model.ResponseBody)</pre>
+                }
+            </td>
+        </tr>
+    </table>
+}

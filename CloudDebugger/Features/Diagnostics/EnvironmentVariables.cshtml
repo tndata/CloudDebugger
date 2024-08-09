@@ -1,0 +1,49 @@
+﻿@using System.Collections
+
+@{
+    ViewData["Title"] = "CloudDebugger - EnvironmentVariables";
+}
+
+<h3>Environment variables</h3>
+<a href="/diagnostics">Back</a>
+<br />
+
+
+
+<table class="table table-hover table-bordered">
+
+
+    <thead>
+        <tr>
+            <th class="col-md-1">Variable</th>  
+            <th class="col-md-11">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+    @{
+        var vars = Environment.GetEnvironmentVariables();
+
+        if (vars != null)
+        {
+            var sortedDict = new SortedDictionary<string, string>();
+
+            foreach (DictionaryEntry entry in vars)
+            {
+                string? key = entry.Key?.ToString();
+                string? value = entry.Value?.ToString();
+
+                if (key != null && value != null)
+                    sortedDict.Add(key, value);
+            }
+
+            foreach (var entry in sortedDict)
+            {
+                <tr>
+                        <td class="col-md-2">@entry.Key</td>
+                        <td class="col-md-10">@entry.Value</td>
+                </tr>
+            }
+        }
+    }
+    </tbody>
+</table>

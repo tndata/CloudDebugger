@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNetCore.MyHttpLogging
+@model Microsoft.AspNetCore.MyHttpLogging.RequestLogEntry
+
+@{
+    ViewData["Title"] = "RequestLog";
+}
+
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+
+
+<h3>Requests log</h3>
+Here's a list of all the received requests to this service (with a few exceptions).
+<br />
+
+<a href="/RequestLogger">Back</a>
+<br />
+<br />
+
+<table class="table table-hover table-bordered">
+
+    <thead>
+        <tr>
+            <th class="col-md-1">Time</th>
+            <th class="col-md-1">Method</th>
+            <th class="col-md-10">Path</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in RequestLog.GetAllLogEntries())
+        {
+            <tr>
+                <td>
+                    @entry.EntryTime.ToString("hh:mm:ss")
+                </td>
+                <td>
+                    @entry.Method
+                </td>
+                <td>
+                    <a href="/requestlogger/requestdetails/@entry.RequestNumber">@entry.Path</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "CloudDebugger - Homepage";
+}
+
+<h3>Caching and CDN</h3>
+These functions are useful for testing CDN and browser caching. Do explore the response headers in Fiddler.<br><br />
+
+
+<a href="/Caching/GetTimeNoCacheControl/">Get time</a> ( with no cache control set)<br />
+<a href="/Caching/GetTimeWithCacheControl/">Get time</a> (with cache control, max-age 5 seconds)<br />
+<a href="/Caching/GetTimePrivateCacheControl/">Get time</a> (private, do not cache)<br />
+
+
+
+    

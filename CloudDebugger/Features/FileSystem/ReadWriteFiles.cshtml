@@ -1,0 +1,143 @@
+﻿@model CloudDebugger.Features.FileSystem.ReadWriteFilesModel
+@{
+    ViewData["Title"] = "CloudDebugger - File System - ReadWriteFiles";
+}
+
+<h5>File System - ReadWriteFiles</h5>
+
+
+<table class="table">
+    <tr>
+        <td class="col-md-1">HomePath:</td>
+        <td class="col-md-11">@Model.HomePath</td>
+    </tr>
+    <tr>
+        <td class="col-md-1">App Path:</td>
+        <td class="col-md-11">@Model.AppPath</td>
+    </tr>
+</table>
+
+<form asp-action="ReadWriteFiles" method="post">
+
+    <table class="table table-bordered">
+        <tr>
+            <td class="col-md-6">
+
+                <!-- First Column start -->
+
+                <table>
+                    <tr>
+                        <td>
+                            Path:
+                        </td>
+                        <td>
+                            <input asp-for="Path" />
+                            <button type="submit" name="button" value="changepath">Change path/refresh</button>
+                            &nbsp;&nbsp;<button type="submit" name="button" value="createfolder">Create folder</button>
+                            <br />
+                        </td>
+                    </tr>
+                </table>
+
+                <br />
+                <h5>Folders and files in this directory</h5>
+                <table class="table">
+
+                    @if (Model.DirectoryContent.Count > 0)
+                    {
+                        <tr>
+                            <td class="col-md-3">
+
+                                @foreach (var entry in Model.DirectoryContent)
+                                {
+                                    @if (entry.name.StartsWith("\\"))
+                                    {
+                                        <b>@entry.name</b>
+
+                                        <br />
+                                    }
+                                    else
+                                    {
+                                        @entry.name
+
+                                        <br />
+
+                                    }
+                                }
+                            </td>
+                            <td class="col-md-3">
+
+                                @foreach (var entry in Model.DirectoryContent)
+                                {
+                                    @entry.size
+
+                                    <br />
+                                }
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                No files or folders in this directory
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <!-- First column end -->
+            </td>
+
+            <td class="col-md-6">
+                <!-- Second column start -->
+                <table>
+                    <tr>
+                        <td>
+                            <input asp-for="FileName" />
+                            <button type="submit" name="button" value="loadfile">Load file</button>
+                            &nbsp;&nbsp;<button type="submit" name="button" value="writefile">Create file</button>
+                            <br />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @if (string.IsNullOrEmpty(Model.FileContent) == false)
+                            {
+                                <h5>File content</h5>
+                                <textarea asp-for="FileContent" rows="50" cols="50"></textarea>
+                            }
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Second column end -->
+            </td>
+
+   
+
+        
+        </tr>
+
+    
+    </table>
+
+
+</form> 
+
+
+
+
+
+
+@if (String.IsNullOrWhiteSpace(Model.ErrorMessage) == false)
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (String.IsNullOrWhiteSpace(Model.Message) == false)
+{
+    <b>@Model.Message</b>
+}

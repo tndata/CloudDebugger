@@ -1,0 +1,46 @@
+﻿@model CloudDebugger.Features.Logging.LoggingModel
+@{
+    ViewData["Title"] = "CloudDebugger - Write a message to the ILogger<T> log";
+}
+
+<h3>Write a message to the log</h3>
+
+This page will write a message to the log. The same message is written once per log level.
+Trace, Debug, Information, Warning, Error, Critical.
+
+<br>
+
+<form asp-controller="Logging" asp-action="WriteToLog" method="post">
+
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">Log Message</td>
+            <td class="col-md-2">
+                <textarea asp-for="LogMessage" rows="10" cols="50"></textarea>
+                <span asp-validation-for="LogMessage"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+    </table>
+
+    <br>
+    <input type="submit" name="submit" value="Write the messge to the log" /><br />
+
+    @if (String.IsNullOrWhiteSpace(Model.Message) == false)
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+
+<br>
+<br>
+<br>
+<br>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

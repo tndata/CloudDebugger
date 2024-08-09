@@ -1,0 +1,48 @@
+﻿@model CloudDebugger.Features.AppServices.BenchmarkModel
+
+@{
+    ViewData["Title"] = "Benchmark";
+
+    var localCacheReady = ViewData["localCacheReady"];
+}
+
+<h3>Benchmark</h3>
+<a href="/AppServices">Back</a>
+This path will benchmark the disk I/O time for the different folders. 
+
+<p>Local cache status: @localCacheReady (<a href="https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache">more info)</a>)</p>
+
+
+
+
+<table class="table">
+    <tr>
+        <td class="col-md-2">Cachable directory</td>
+        <td class="col-md-10">@Model.CachablePath</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Non-cachable directory</td>
+        <td class="col-md-10">@Model.NonCachablePath</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Temp Directory</td>
+        <td class="col-md-10">@Model.TempPath</td>
+    </tr>
+</table>
+
+
+@if (Model.ResultLog != null)
+{
+    <table class="table table-borderless">
+        <tr>
+            <td>
+                <pre>
+                    @foreach (var row in Model.ResultLog)
+                    {
+                        @(row + "\r\n")
+                    }
+                </pre>
+            </td>
+        </tr>
+    </table>
+}

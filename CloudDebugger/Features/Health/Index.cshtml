@@ -1,0 +1,79 @@
+﻿@using CloudDebugger.Features.Health
+@model HealthModel
+@{
+    ViewData["Title"] = "CloudDebugger - Homepage";
+
+    string currentHealthState = "";
+    string currentCustomHealthState = "";
+    switch(Model.CurrentServiceHealth)
+    {
+        case HealthStatusEnum.Healthy:
+            currentHealthState = "Healthy (Returns status code 200)";
+            break;
+        case HealthStatusEnum.Degraded:
+            currentHealthState = "Degraded (Returns status code 200)";
+            break;
+        case HealthStatusEnum.Unhealthy:
+            currentHealthState = "Unhealthy (Returns status code 503)";
+            break;
+        default:
+            currentHealthState = "Unknown";
+            break;
+    }
+
+    switch (Model.CurrentCustomHealth)
+    {
+        case CustomHealthStatusEnum.Healthy:
+            currentCustomHealthState = "Healthy";
+            break;
+        case CustomHealthStatusEnum.Delayed10s:
+            currentCustomHealthState = "Delayed 10 seconds";
+            break;
+        case CustomHealthStatusEnum.Delayed60s:
+            currentCustomHealthState = "Delayed 60 seconds";
+            break;
+        case CustomHealthStatusEnum.Error:
+            currentCustomHealthState = "Returns Server Error (500)";
+            break;
+    }
+}
+
+<h4>Health checks</h4>
+<h4>Healthcheck control</h4>
+Controls the status of the <a href="/health">/health</a> and <a href="/healthz">/healthz</a> endpoints.<br />
+<br />
+
+CurrentStatus: <b>@currentHealthState</b>
+<br /><br />
+
+Set new service health status:<br><br />
+@using (Html.BeginForm("SetServiceHealthMode", "Health", FormMethod.Post))
+{
+    <button name="mode" value="Healthy">Healthy</button> 
+    <button name="mode" value="Degraded">Degraded</button> 
+    <button name="mode" value="Unhealthy">Unhealthy</button>
+    <br />
+}
+<br />
+<br />
+
+
+<h4>Custom health endpoint</h4>
+Controls the health of the following custom endpoint <a href="/Health/CustomEndpoint">/Health/CustomEndpoint</a>.
+<br />
+
+CurrentStatus: <b>@currentCustomHealthState</b>
+<br />
+<br />
+
+Set new  health status:
+<br>
+@using (Html.BeginForm("SetCustomHealthMode", "Health", FormMethod.Post))
+{
+    <button name="mode" value="healthy">Healthy</button>
+    <button name="mode" value="delayed10s">Delayed 10s</button>
+    <button name="mode" value="delayed60s">Delayed 60s</button>
+    <button name="mode" value="error">Error (500)</button>
+    <br />
+}
+<br />

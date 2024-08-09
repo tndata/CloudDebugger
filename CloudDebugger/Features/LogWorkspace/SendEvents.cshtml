@@ -1,0 +1,69 @@
+﻿@model CloudDebugger.Features.LogWorkspace.LogWorkspaceModel
+@{
+    ViewData["Title"] = "CloudDebugger - Send events to Log Analytics Workspace";
+}
+
+<h3>Send data to a Log Analytics Workspace</h3>
+
+This page will send 10 log entries to a Log Analytics Workspace.
+<br>
+
+<form asp-controller="LogWorkSpace" asp-action="SendEvents" method="post">
+
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">WorkspaceId</td>
+            <td class="col-md-10">
+                <input asp-for="WorkspaceId" style="min-width:50%"><br />
+                <span asp-validation-for="WorkspaceId"></span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2">WorkspaceKey</td>
+            <td class="col-md-6">
+                <input asp-for="WorkspaceKey" style="min-width:90%"><br />
+                <span asp-validation-for="WorkspaceKey"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">LogMessage</td>
+            <td class="col-md-2">
+                <textarea asp-for="LogMessage" rows="10" cols="50"></textarea>
+                <span asp-validation-for="LogMessage"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+
+
+    </table>
+
+    <br>
+    <input type="submit" name="submit" value="Send log statements" /><br />
+
+    @if (String.IsNullOrWhiteSpace(Model.Exception) == false)
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (String.IsNullOrWhiteSpace(Model.Message) == false)
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+
+<br>
+<br>
+<br>
+<br>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

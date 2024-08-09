@@ -1,0 +1,119 @@
+﻿@model CloudDebugger.Features.AppServices.ShowFilesModel
+@{
+    ViewData["Title"] = "ShowFileSystem";
+}
+
+<h1>App Services - ShowFileSystem</h1>
+<a href="/AppServices">Back</a>
+<br />
+
+
+<table class="table">
+    <tr>
+        <td class="col-md-2">Operating System</td>
+        <td class="col-md-10">@Model.OperatingSystem</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Home Directory</td>
+        <td class="col-md-10">@Model.HomeDirectory</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Temp Directory</td>
+        <td class="col-md-10">@Model.TempDirectory</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Application Directory</td>
+        <td class="col-md-10">@Model.AppDirectory</td>
+    </tr>
+</table>
+
+<h3>App Service local cache details</h3>
+For more information, visit <a href="https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache">this link</a> and 
+<a href="https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings">this link</a>.
+<table class="table">
+    <tr>
+        <td class="col-md-2">LocalCache Enabled</td>
+        <td class="col-md-10">@Model.LocalCacheEnabled</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Ready</td>
+        <td class="col-md-10">@Model.LocalCacheReady (Read-only flag indicating if the app using local cache).</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Option</td>
+        <td class="col-md-10">@Model.LocalCacheOption (Default, Always, Diabled)</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Size</td>
+        <td class="col-md-10">@Model.LocalCacheSize MB (1-2000)</td>
+    </tr>
+</table>
+
+<br>
+
+<h3>Folders and files in the application directory</h3>
+<table class="table">
+    @foreach (var dir in Model.AppDirFolders)
+    {
+        <tr>
+            <td class="col-md-12">
+                <b>\@dir</b>
+            </td>
+        </tr>
+    }
+
+    @foreach (var file in Model.AppDirFiles)
+    {
+        <tr>
+            <td class="col-md-12">@file</td>
+        </tr>
+    }
+
+</table>
+
+<br>
+<br />
+
+
+<h3>Folders and files in the home directory</h3>
+<table class="table">
+    @foreach (var dir in Model.HomeDirFolders)
+    {
+        <tr>
+            <td class="col-md-12">
+                <b>\@dir</b>
+            </td>
+        </tr>   
+    }
+
+    @foreach (var file in Model.HomeDirFiles)
+    {
+        <tr>
+            <td class="col-md-12">@file</td>
+        </tr>
+    }
+
+</table>
+
+
+<br><br />
+
+<h3>Folders and files in the temp directory</h3>
+<table class="table">
+    @foreach (var dir in Model.TempDirFolders)
+    {
+        <tr>
+            <td class="col-md-12">
+                <b>\@dir</b>
+            </td>
+        </tr>
+    }
+
+    @foreach (var file in Model.TempDirFiles)
+    {
+        <tr>
+            <td class="col-md-12">@file</td>
+        </tr>
+    }
+
+</table>

@@ -1,0 +1,107 @@
+﻿@using Microsoft.AspNetCore.Server.Kestrel.Core.Features
+@using System.Net.Security
+@{
+    ViewData["Title"] = "CloudDebugger - Request headers";
+}
+
+<h3>Current HTTP Request details</h3>
+<a href="/RequestLogger">Back</a>
+<br />
+This page will show various details about the current request.
+<br />
+<br />
+
+
+<table class="table">
+    <tr>
+        <td class="col-md-2">Received protocol</td>
+        <td class="col-md-10">@Context.Request.Protocol</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Received scheme</td>
+        <td class="col-md-10">@Context.Request.Scheme</td>
+    </tr>
+</table>
+<br />
+@{
+    var sslStream = Context.Features.Get<SslStream>();
+    if (sslStream != null)
+    {
+        <h4>TLS/SSL details</h4>
+        <table class="table">
+            <tr>
+                <td class="col-md-2">Protocol</td>
+                <td class="col-md-10">@sslStream.SslProtocol</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">Cipher suite</td>
+                <td class="col-md-10">@sslStream.NegotiatedCipherSuite</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">Cipher strength</td>
+                <td class="col-md-2">@sslStream.CipherStrength</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">Cipher algorithm</td>
+                <td class="col-md-10">@sslStream.CipherAlgorithm.ToString()</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">KeyExchange algorithm</td>
+                <td class="col-md-10">
+                    @sslStream.KeyExchangeAlgorithm.ToString()
+                    @if((int)(sslStream.KeyExchangeAlgorithm) == 44550)
+                    {
+                        @:(DiffieHellman)
+                    }
+
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-2">KeyExchange strength</td>
+                <td class="col-md-10">@sslStream.KeyExchangeStrength</td>
+            </tr>
+
+            @if (sslStream.RemoteCertificate != null)
+            {
+                var cert = sslStream.RemoteCertificate;
+                <tr>
+                    <td class="col-md-2">Remote SSL certificate</td>
+                    <td class="col-md-10">@cert.Subject</td>
+                </tr>
+                <tr>
+                    <td class="col-md-2">Remote SSL Serial number</td>
+                    <td class="col-md-10">@cert.GetSerialNumberString()</td>
+                </tr>
+            }
+            @if (sslStream.LocalCertificate != null)
+            {
+                var cert2 = sslStream.LocalCertificate;
+                <tr>
+                    <td class="col-md-2">Local SSL certificate</td>
+                    <td class="col-md-10">@cert2.Subject</td>
+                </tr>
+                <tr>
+                    <td class="col-md-2">Local SSL Serial number</td>
+                    <td class="col-md-10">@cert2.GetSerialNumberString()</td>
+                </tr>
+            }
+        </table>
+    }
+}
+
+<h4>Request headers</h4>
+
+<table class="table">
+    @foreach (var header in Context.Request.Headers.OrderBy(h => h.Key))
+    {
+        <tr>
+            <td class="col-md-2">
+                @header.Key
+            </td>
+            <td class="col-md-10">
+                @header.Value
+            </td>
+        </tr>
+    }
+</table>
+

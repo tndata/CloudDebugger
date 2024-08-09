@@ -1,0 +1,158 @@
+﻿@model CloudDebugger.Features.EventHub.ConsumeEventHubModel
+@{
+    ViewData["Title"] = "CloudDebugger - Send events to Event Hub";
+}
+
+<h3>Consume Event Hub events</h3>
+
+
+<form asp-controller="EventHub" asp-action="ConsumeEvents" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">Connection String</td>
+            <td class="col-md-10">
+                <input asp-for="ConnectionString" style="min-width:100%"><br />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Consumer Group</td>
+            <td class="col-md-2">
+                <input asp-for="ConsumerGroup">
+                <span asp-validation-for="ConsumerGroup"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+        @*        <tr>
+        <td class="col-md-2">Number of events to send</td>
+        <td class="col-md-2">
+        <input asp-for="NumberOfEvents">
+        <span asp-validation-for="NumberOfEvents"></span>
+        </td>
+        <td class="col-md-8"></td>
+        </tr> *@
+
+    </table>
+
+
+    <br>
+    <input type="submit" name="submit" value="Consume Events" /><br />
+
+    @if (String.IsNullOrWhiteSpace(Model.Exception) == false)
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (String.IsNullOrWhiteSpace(Model.Message) == false)
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+
+@if (Model != null)
+{
+
+    if (Model.Events.Count > 0)
+    {
+        <table class="table table-bordered">
+            <tr>
+                <td class="col-md-6">
+                    <b>Partition 0</b><br />
+                    <table class="table">
+
+                        @foreach (var evnt in Model.Events.Where(e => e.PartitionId == "0"))
+                        {
+                            if (@evnt != null)
+                            {
+                            <tr>
+                                <td>
+                                    EntryTime: @evnt.EntryTime<br>
+                                    Offset: @evnt.Offset<br>
+                                    PartitionId: @evnt.PartitionId<br>
+                                    <br />
+                                    @if(@evnt.EventDetails != null)
+                                    {
+                                        @:Event Details:<br />
+                                        @foreach (var detail in @evnt.EventDetails)
+                                        {
+                                            @detail
+
+                                            <br />
+                                        }
+                                    }
+
+                                    <br>
+                                    @evnt.Body;
+
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </table>
+                </td>
+
+                <td class="col-md-6">
+                    <b>Partition 1</b><br />
+                    <table class="table">
+
+                        @foreach (var evnt in Model.Events.Where(e => e.PartitionId == "1"))
+                        {
+                            <tr>
+                                <td>
+                                    EntryTime: @evnt.EntryTime<br>
+                                    Offset: @evnt.Offset<br>
+                                    PartitionId: @evnt.PartitionId<br>
+                                    <br />
+
+                                    @if(@evnt.EventDetails != null)
+                                    {
+                                        @:Event Details:<br />
+                                        @foreach (var detail in @evnt.EventDetails)
+                                        {
+                                            @detail
+
+                                            <br />
+                                        }
+                                    }
+
+                                    <br>
+                                    @evnt.Body;
+
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+
+
+
+            </tr>
+        </table>
+
+    }
+    else
+    {
+        <b>No events found</b>
+    }
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

@@ -1,0 +1,162 @@
+﻿@using CloudDebugger.Features.WebHook
+@model CloudDebugger.Features.WebHook.WebHookLog
+@{
+    ViewData["Title"] = "CloudDebugger - Webhook page";
+    bool enableHookFailure = ViewData["HookFailureEnabled"] as bool? ?? false;
+    bool hideHeaders = ViewData["HideHeaders"] as bool? ?? false;
+    bool hideBody = ViewData["HideBody"] as bool? ?? false;
+    int HookId = ViewData["HookId"] as int? ?? 1;
+
+    string hookEndpoint= $"/webhook/hook{HookId}";
+}
+
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+
+
+<h3>Web hook #@HookId log</h3>
+<a href="/">Back</a>
+<br />
+
+Webhook #@HookId endpoint: <b>@hookEndpoint</b>
+<br />
+@{
+
+
+    <br>
+    if (enableHookFailure)
+    {
+        @:WebHook endpoint returns 500 server error: <a href="/Webhook/SetWebHookFailureMode/0?hookId=@HookId">(disable)</a>
+        <img src="/content/Info_icon_002.svg.png" width="24" id="icon2" />
+    }
+    else
+    {
+        @:WebHook endpoint: Functional <a href="/Webhook/SetWebHookFailureMode/1?hookId=@HookId">(make hook endpoint fail)</a>
+        <img src="/content/Info_icon_002.svg.png" width="24" id="icon2" />
+    }
+    <br />
+    if (hideHeaders)
+    {
+        @:Headers: <a href="/Webhook/SetHideHeadersMode/0?hookId=@HookId">show</a>
+             
+    }
+    else
+    {
+        @:Headers: <a href="/Webhook/SetHideHeadersMode/1?hookId=@HookId">hide</a>
+    } 
+    if (hideBody)
+    {
+        @:Body: <a href="/Webhook/SetHideBodyMode/0?hookId=@HookId">show</a>
+
+    }
+    else
+    {
+        @:Body: <a href="/Webhook/SetHideBodyMode/1?hookId=@HookId">hide</a>
+    }
+    <br>
+    <br>
+}
+
+<hr />
+<h4>Request log</h4>
+<a href="/Webhook/ClearWebHookLog?hookId=@HookId">Clear the log</a>
+
+
+
+<ul class="nav nav-tabs">
+    @if(HookId == 1)
+    {
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Webhook #1</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/WebHook/index?hookId=2">Webhook #2</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" href="/WebHook/index?hookId=1">Webhook #1</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Webhook #2</a>
+        </li>
+        
+    }
+</ul>
+
+
+
+<table class="table table-hover table-bordered">
+
+
+    <thead>
+        <tr>
+            <th class="col-md-1">Time</th>
+            <th class="col-md-11">Request</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @{
+            var log = Model.GetLog();
+
+            @if (log.Count > 0)
+            {
+                foreach (var entry in log)
+                {
+                    <tr>
+                        <td colspan="1">
+                            @entry.EntryTime.ToString("hh:mm:ss")
+                        </td>
+                        <td colspan="11">
+                            <b>@entry.HttpMethod @entry.Url</b> &nbsp;@entry.Subject
+                            <br />
+                            @if (String.IsNullOrWhiteSpace(entry.Comment) == false)
+                            {
+                                <b>@entry.Comment</b>
+                                <br />
+                            }
+                            
+                            @if (hideHeaders == false)
+                            {
+                                @foreach (var header in entry.Headers)
+                                {
+                                    @header.Key@:: @header.Value<br />
+                                }
+                            }
+                       
+                            @if (hideBody == false && entry.Body != null && entry.Body.Length > 0)
+                            {
+                                <br />
+                                <pre>@entry.Body</pre>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2">No requests have been logged yet.</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+
+@section scripts {
+    <script>
+        tippy('#icon1', {
+            content: 'When disabled, the webhook endpoint will not respond to validation requests. Some services require the webhook endpoint to respond to a validation request before they begin sending events to it.',
+        });
+        tippy('#icon2', {
+            content: 'When enabled, the hook endpoint will return a HTTP 500 (server error) status code. Useful for simulating delivery failures.',
+        });
+    </script>
+}
