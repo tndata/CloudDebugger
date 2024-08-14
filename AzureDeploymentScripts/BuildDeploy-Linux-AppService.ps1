@@ -45,28 +45,28 @@ Write-Host "App Service Plan created with id: ${planId}"
 
 #Step 6: Create the App Service
 Write-Host "`nCreating the Linux App Service '${AppServiceName_linux}'."
-# $AppService = az webapp create --name $AppServiceName_linux `
-#                                           --plan $AppServicePlan_linux `
-#                                           --resource-group $rgname `
-#                                           --runtime 'DOTNETCORE:8.0' `
-#                                           --assign-identity $identityId `
-#                                           --output json | ConvertFrom-Json
+$AppService = az webapp create --name $AppServiceName_linux `
+                                          --plan $AppServicePlan_linux `
+                                          --resource-group $rgname `
+                                          --runtime 'DOTNETCORE:8.0' `
+                                          --assign-identity $identityId `
+                                          --output json | ConvertFrom-Json
 # $appServiceID = $AppService.id
 # $hostName = $AppService.defaultHostName
 # Write-Host "App Service created, id: ${appServiceID}"
 
-# We use the New-AzWebApp cmdlet to create the App Service instead of 'az webapp create'.
-# We do this to avoid odd timeouts during the .ZIP deployment that we have experienced with 'az webapp create'.
-$AppService = New-AzWebApp -ResourceGroupName $rgName `
-             -Name $AppServiceName_linux `
-             -Location $location `
-             -AppServicePlan $AppServicePlan_linux
+# # We use the New-AzWebApp cmdlet to create the App Service instead of 'az webapp create'.
+# # We do this to avoid odd timeouts during the .ZIP deployment that we have experienced with 'az webapp create'.
+# $AppService = New-AzWebApp -ResourceGroupName $rgName `
+             # -Name $AppServiceName_linux `
+             # -Location $location `
+             # -AppServicePlan $AppServicePlan_linux
              
-Write-Host "Set the stack to .NET Core 8.0" 
-$tmp1 = az webapp config set --resource-group $rgname `
-                     --name $AppServiceName_linux `
-                     --use-32bit-worker-process false `
-                     --linux-fx-version 'DOTNETCORE"|"8.0'
+# Write-Host "Set the stack to .NET Core 8.0" 
+# $tmp1 = az webapp config set --resource-group $rgname `
+                     # --name $AppServiceName_linux `
+                     # --use-32bit-worker-process false `
+                     # --linux-fx-version 'DOTNETCORE"|"8.0'
                      
 Write-Host "Get App Service details"                    
 $AppService = Get-AzWebApp -ResourceGroupName $rgname -Name $AppServiceName_linux 

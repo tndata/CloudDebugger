@@ -37,17 +37,15 @@ public static class RequestLog
                 CheckForIgnoredPaths(logEntry.Path) == false &&
                 CheckForIgnoredExtensions(logEntry.Path) == false)
             {
-
-
                 LogRequest(logEntry);
             }
         }
     }
 
-    private static bool CheckForIgnoredResponseTypes(string? responseContentType)
-    {
-        throw new NotImplementedException();
-    }
+    //private static bool CheckForIgnoredResponseTypes(string? responseContentType)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     public static RequestLogEntry? LookupLogEntry(int requestNumber)
     {

@@ -30,6 +30,13 @@ namespace CloudDebugger.Features.RequestLogger
             return View();
         }
 
+        public IActionResult ClearRequestList()
+        {
+            RequestLog.ClearLog();
+
+            return RedirectToAction("RequestList");
+        }
+
         public IActionResult RequestDetails(int id)
         {
             var logEntry = RequestLog.LookupLogEntry(id);

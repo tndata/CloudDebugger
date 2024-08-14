@@ -37,7 +37,23 @@ internal static class HostingExtensions
         });
 
         // Add services to the container.
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllersWithViews().AddJsonOptions(o =>
+        {
+            o.JsonSerializerOptions.WriteIndented = true; //Return pretty JSON in the APIs
+        });
+
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: "MyCorsPolicy_wildcard",
+                                builder =>
+                                {
+                                    builder.AllowAnyOrigin()
+                                   .AllowAnyMethod()
+                                   .AllowAnyHeader();
+                                });
+        });
+
 
         return builder.Build();
     }
@@ -87,6 +103,8 @@ internal static class HostingExtensions
         }
 
         app.UseRouting();
+
+        app.UseCors();
 
         app.UseAuthorization();
 
