@@ -47,7 +47,7 @@ namespace CloudDebugger.Features.HomePage
                         model.FileContent = "";
                         break;
                     case "createfolder":
-                        CeateDirectory(model);
+                        CreateDirectory(model);
                         break;
                     case "loadfile":
                         model.FileContent = GetFileContent(model);
@@ -111,7 +111,7 @@ namespace CloudDebugger.Features.HomePage
             }
         }
 
-        private static void CeateDirectory(ReadWriteFilesModel model)
+        private static void CreateDirectory(ReadWriteFilesModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Path) == false)
             {

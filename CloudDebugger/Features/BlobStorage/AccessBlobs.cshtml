@@ -1,0 +1,151 @@
+﻿@model CloudDebugger.Features.BlobStorage.BlobStorageModel
+@{
+    ViewData["Title"] = "AccessBlobs";
+}
+
+<h1>AccessBlobs</h1>
+
+
+<form asp-controller="BlobStorage" asp-action="AccessBlobs" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Storage account name
+            </td>
+            <td class="col-md-10">
+                <input asp-for="StorageAccountName" style="min-width:30%">
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Container name</td>
+            <td class="col-md-6">
+                <input asp-for="ContainerName" style="min-width:30%">
+                <span asp-validation-for="ContainerName"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SAS Access key or<br /> SAS Token/URL</td>
+            <td class="col-md-10">
+                <input asp-for="SASToken" style="min-width:100%"><br />
+                (If missing it will authenticate using DefaultAzureCredential)
+            </td>
+        </tr>
+
+    </table>
+
+
+
+
+    <table class="table table-bordered">
+        <tr>
+            <td class="col-md-6">
+
+                <!-- First Column start -->
+
+
+                <br />
+                <h5>Blobs in this container</h5>
+                <table class="table table-bordered">
+
+                    @if (Model.ContainerContent.Count > 0)
+                    {
+                        <thead>
+
+                            <tr>
+                                <th>Name</th>
+                                <th>Size</th>
+                            </tr>
+
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-md-3">
+
+                                    @foreach (var entry in Model.ContainerContent)
+                                    {
+                                        @if (entry.name.StartsWith("\\"))
+                                        {
+                                            <b>@entry.name</b>
+
+                                            <br />
+                                        }
+                                        else
+                                        {
+                                            @entry.name
+
+                                            <br />
+
+                                        }
+                                    }
+                                </td>
+                                <td class="col-md-3">
+
+                                    @foreach (var entry in Model.ContainerContent)
+                                    {
+                                        @entry.size
+
+                                        <br />
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                No files or folders in this container
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <!-- First column end -->
+            </td>
+
+            <td class="col-md-6">
+                <!-- Second column start -->
+                <table>
+                    <tr>
+                        <td>
+                            <input asp-for="BlobName" />
+                            <button type="submit" name="button" value="loadblob">Load</button>
+                            &nbsp;&nbsp;<button type="submit" name="button" value="writeblob">Save</button>
+                            <br />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @if (string.IsNullOrEmpty(Model.FileContent) == false)
+                            {
+                                <h5>File content</h5>
+                                <textarea asp-for="FileContent" rows="20" cols="50"></textarea>
+                            }
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Second column end -->
+            </td>
+        </tr>
+    </table>
+
+
+    <br>
+
+    @if (String.IsNullOrWhiteSpace(Model?.ErrorMessage) == false)
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.ErrorMessage</pre>
+        </div>
+    }
+
+    @if (String.IsNullOrWhiteSpace(Model?.Message) == false)
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
