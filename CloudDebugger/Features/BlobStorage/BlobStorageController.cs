@@ -2,6 +2,7 @@ using Azure.MyIdentity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using CloudDebugger.Features.BlobStorage;
 using CloudDebugger.Features.FileSystem;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +20,84 @@ namespace CloudDebugger.Features.HomePage
 
         public IActionResult Index()
         {
-
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult GetUserDelegationSASToken()
+        {
+            var model = new UserDelegationModel();
+            return View(model);
+        }
+
+        /// <summary>
+        /// Resources:
+        /// https://learn.microsoft.com/en-us/azure/storage/common/storage-account-sas-create-dotnet
+        /// https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-dotnet
+        /// https://azure.microsoft.com/fr-fr/blog/announcing-user-delegation-sas-tokens-preview-for-azure-storage-blobs/ 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [HttpPost]
+        public IActionResult GetUserDelegationSASToken(UserDelegationModel model, string button)
+        {
+            if (model == null)
+                return View(new UserDelegationModel());
+
+            model.Message = "";
+            model.ErrorMessage = "";
+            model.SASToken = "";
+            model.DelegationKey = null;
+            ModelState.Clear();
+
+
+            try
+            {
+                var blobStorageUri = $"https://{model.StorageAccountName}.blob.core.windows.net";
+
+                // Step #1, get an authentication token from Entra ID
+                var credentials = new MyDefaultAzureCredential();
+
+                // Step #2, get a BlobServiceClient with these credentials
+                var client = new BlobServiceClient(new Uri(blobStorageUri), credentials);
+
+                // Step #3, get a user delegation key from Entra ID
+                var startsOn = DateTimeOffset.UtcNow.AddMinutes(-1); // To avoid clock skew issues
+                var expiresOn = startsOn.AddDays(1);                 // Max 7 days
+
+                var userDelegationKey = client.GetUserDelegationKey(startsOn, expiresOn);
+                model.DelegationKey = userDelegationKey;
+
+                // Step #4, Define the permissions for the SAS token
+                BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                {
+                    BlobContainerName = model.ContainerName,
+                    BlobName = model.BlobName,
+                    Resource = "b",
+                    StartsOn = DateTimeOffset.UtcNow,
+                    ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                };
+
+                // Step #5, Specify the necessary permissions
+                sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+                //// Alternatively, you can combine multiple permissions
+                //sasBuilder.SetPermissions(BlobContainerSasPermissions.Read |
+                //                          BlobContainerSasPermissions.Write |
+                //                          BlobContainerSasPermissions.List |
+                //                          BlobContainerSasPermissions.Delete);
+
+                // Step #6, Build the SAS token
+                model.SASToken = sasBuilder.ToSasQueryParameters(userDelegationKey, model.StorageAccountName).ToString();
+
+            }
+            catch (Exception exc)
+            {
+                string str = $"Exception:\r\n{exc.Message}";
+                model.ErrorMessage = str;
+            }
+
+            return View(model);
         }
 
         [HttpGet]
@@ -57,12 +134,14 @@ namespace CloudDebugger.Features.HomePage
                         break;
                 }
 
-                model.ContainerContent = TryGetContainerContent(model);
+
             }
             catch (Exception exc)
             {
                 string str = $"Exception:\r\n{exc.Message}";
                 model.ErrorMessage = str;
+
+                model.ContainerContent = TryGetContainerContent(model);
             }
 
             return View(model);
@@ -70,6 +149,7 @@ namespace CloudDebugger.Features.HomePage
 
         private List<(string name, string size)> TryGetContainerContent(BlobStorageModel model)
         {
+            return new List<(string name, string size)>();
             try
             {
                 var client = GetBlobServiceClient(model);
@@ -94,8 +174,6 @@ namespace CloudDebugger.Features.HomePage
                 //Do nothing...
                 return new List<(string name, string size)>();
             }
-
-
         }
 
         private string? LoadBlob(BlobStorageModel model)

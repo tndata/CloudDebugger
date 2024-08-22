@@ -1,0 +1,159 @@
+﻿@model CloudDebugger.Features.BlobStorage.UserDelegationModel
+@{
+    ViewData["Title"] = "Create a user delegate SAS token";
+}
+
+<h4>Get a user delegation SAS token</h4>
+This tool will genereate a user delegation access token, that then ca be used anyone out side azure to read a specific blob.<br />
+<br />
+
+To get this to work, the following requirements must be met:
+<ul>
+    <li>The CloudDebugger must be able to authenticate against Entra ID (DefaultAzureCredentials)</li>
+    <li>The CloudDebugger must have access to the storage account</li>
+    <li>
+        The CloudDebugger must have one of these roles set on the storage account level:
+        <ul>
+            <li>
+                Contributor
+            </li>
+            <li>
+                Storage Account Contributor
+            </li>
+            <li>
+                Storage Blob Data Contributor
+            </li>
+            <li>
+                Storage Blob Data Owner
+            </li>
+            <li>
+                Storage Blob Data Reader
+            </li>
+            <li>
+                Storage Blob Delegator
+            </li>
+        </ul>
+    </li>
+</ul>
+
+
+<br />
+<h4>Storage account and blob details</h4>
+<form asp-controller="BlobStorage" asp-action="GetUserDelegationSASToken" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Storage account name
+            </td>
+            <td class="col-md-10">
+                <input asp-for="StorageAccountName" style="min-width:30%">
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Container name</td>
+            <td class="col-md-6">
+                <input asp-for="ContainerName" style="min-width:30%">
+                <span asp-validation-for="ContainerName"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Blob name</td>
+            <td class="col-md-6">
+                <input asp-for="BlobName" style="min-width:30%">
+                <span asp-validation-for="BlobName"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+
+    </table>
+
+    <button type="submit" name="button">Generate token</button>
+
+</form>
+
+
+<br />
+<br />
+
+
+@if (string.IsNullOrEmpty(Model.SASToken) == false)
+{
+    <h4>User delegation SAS token</h4>
+    <table class="table">
+        <tr>
+            <td class="col-md-2">SAS token</td>
+            <td class="col-md-10">
+                <input asp-for="SASToken" style="min-width:100%"><br />
+            </td>
+        </tr>
+    </table>
+}
+
+
+
+@if (Model.DelegationKey != null)
+{
+    <h4>Internals of the user delegation key</h4>
+    <table class="table">
+        <tr>
+            <td class="col-md-2">SignedObjectId</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.SignedObjectId (The Azure Active Directory object ID in GUID format.)
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SignedTenantId</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.SignedTenantId (The Azure Active Directory tenant ID in GUID format.)
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SignedStartsOn</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.SignedStartsOn (The time at which the key becomes valid.)
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SignedExpiresOn</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.SignedExpiresOn (The time at which the key becomes invalid.)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2">SignedService</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.SignedService (The service that accepts the key, b for blob.)
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SignedVersion</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.SignedVersion (The service version that created the key.)
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Key</td>
+            <td class="col-md-10">
+                @Model.DelegationKey.Value (The key as a base64 string.)
+            </td>
+        </tr>
+    </table>
+}
+
+
+<br>
+
+@if (String.IsNullOrWhiteSpace(Model?.ErrorMessage) == false)
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (String.IsNullOrWhiteSpace(Model?.Message) == false)
+{
+    <b>@Model.Message</b>
+}

@@ -15,8 +15,7 @@ public class BlobStorageModel
 
 
     public List<(string name, string size)> ContainerContent = new();
-    public string? FileContent { get; set; } = "Current time is " + DateTime.Now;
-
+    public string? FileContent { get; set; } = "";
 
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
