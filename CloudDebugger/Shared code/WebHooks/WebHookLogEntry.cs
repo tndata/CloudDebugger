@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.WebHook;
+﻿namespace CloudDebugger.Shared_code.WebHooks;
 
 public class WebHookLogEntry
 {
@@ -9,5 +9,6 @@ public class WebHookLogEntry
     public string? Url { get; set; }
     public string? Body { get; set; }
     public string? Subject { get; set; }
+    public string? Color { get; set; }
     public Dictionary<string, string> Headers { get; set; } = new();
 }

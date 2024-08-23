@@ -35,11 +35,11 @@ $ACRName = 'tncontaineregistry'
 $imageName = 'clouddebugger'
 
 # Container App 
-$containerAppName = "ca-CloudDebugger"
+$containerAppName = "ca-clouddebugger"
 $environmentName = "cae-CloudDebuggerAppsEnvironment"
 
 # Container Instances
-$containerInstanceName = "CloudDebugger"
+$containerInstanceName = "clouddebugger"
 
 # Log Analytics workspace
 $workspaceName = "log-CloudDebugger"

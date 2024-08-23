@@ -1,0 +1,109 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+
+#Sample Event Grid Schema validation request (array)
+POST https://localhost:5001/WebhookAdvanced/hook2
+Content-Type: application/json; charset=utf-8
+Aeg-Event-Type: SubscriptionValidation
+
+[
+  {
+    "id": "01a07c63-4614-4839-ab71-d85778996402",
+    "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-dev/providers/microsoft.storage/storageaccounts/mytndatastorageaccount",
+    "subject": "",
+    "data": {
+      "validationCode": "2C59C8CA-B453-4FB0-9094-4C0DEAA4761A",
+      "validationUrl": "https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/blobsadded/validate?id=2C59C8CA-B453-4FB0-9094-4C0DEAA4761A&t=2024-07-03T12:03:43.1634232Z&apiVersion=2023-12-15-preview&token=gEYLdkoR1LChv9wp0DOXIefcvDS23IOkpkT5TBu0xgk%3d"
+    },
+    "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+    "eventTime": "2024-07-03T12:03:43.1634844Z",
+    "metadataVersion": "1",
+    "dataVersion": "2"
+  }
+]
+
+###
+
+#Sample Event Grid Schema validation request (array)
+POST https://localhost:5001/WebhookAdvanced/hook2
+Content-Type: application/json; charset=utf-8
+Aeg-Event-Type: SubscriptionValidation
+
+[
+  {
+    "id": "01a07c63-4614-4839-ab71-d85778996402",
+    "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-dev/providers/microsoft.storage/storageaccounts/mytndatastorageaccount",
+    "subject": "",
+    "data": {
+      "validationCode": "2C59C8CA-B453-4FB0-9094-4C0DEAA4761A",
+      "validationUrl": "https://www.tn-data.se"
+    },
+    "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+    "eventTime": "2024-07-03T12:03:43.1634844Z",
+    "metadataVersion": "1",
+    "dataVersion": "2"
+  }
+]
+
+###
+
+
+#Sample Event Grid Schema validation request (single object)
+POST https://localhost:5001/WebhookAdvanced/hook1
+Content-Type: application/json; charset=utf-8
+Aeg-Event-Type: SubscriptionValidation
+
+{
+  "id": "01a07c63-4614-4839-ab71-d85778996402",
+  "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-dev/providers/microsoft.storage/storageaccounts/mytndatastorageaccount",
+  "subject": "",
+  "data": {
+    "validationCode": "2C59C8CA-B453-4FB0-9094-4C0DEAA4761A",
+    "validationUrl": "https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/blobsadded/validate?id=2C59C8CA-B453-4FB0-9094-4C0DEAA4761A&t=2024-07-03T12:03:43.1634232Z&apiVersion=2023-12-15-preview&token=gEYLdkoR1LChv9wp0DOXIefcvDS23IOkpkT5TBu0xgk%3d"
+  },
+  "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+  "eventTime": "2024-07-03T12:03:43.1634844Z",
+  "metadataVersion": "1",
+  "dataVersion": "2"
+}
+
+
+###
+
+#Sample Event Grid Cloud event validation request 
+OPTIONS https://localhost:5001/WebhookAdvanced/hook2
+webhook-request-callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/storagechangessubscription/validate?id=4DBEDDCF-0D41-444A-B127-D5C23181F528&t=2024-07-05T12:07:14.7028427Z&apiVersion=2023-12-15-preview&token=HC1QbIN%2fWRwr5TYOINVxpBKTtYHxWvhTbo%2bnRpTG%2fFg%3d
+webhook-request-origin: eventgrid.azure.net
+x-arr-ssl: true
+x-envoy-expected-rq-timeout-ms: 1800000
+x-envoy-external-address: 51.12.47.155
+x-forwarded-for: 51.12.47.155
+x-forwarded-proto: https
+x-k8se-app-kind: web
+x-k8se-app-name: clouddebugger--69zn5vw
+x-k8se-app-namespace: k8se-apps
+x-k8se-protocol: http1
+x-ms-containerapp-name: clouddebugger
+x-ms-containerapp-revision-name: clouddebugger--69zn5vw
+x-request-id: 092cfd9a-3ab2-4765-8548-91f86c5ea1df
+
+
+
+###
+
+#Sample Event Grid Cloud event validation request 
+OPTIONS https://localhost:5001/WebhookAdvanced/hook1
+webhook-request-callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/cloudeventschemasubscription/validate?id=FB1907B9-330F-4436-A7FD-3A5708C4F688&t=2024-07-05T14:07:58.3740229Z&apiVersion=2023-12-15-preview&token=h0LkYAIuRW0gb6j1JhCQSANZDHShGEzydFdQ%2fjhEzrQ%3d
+webhook-request-origin: eventgrid.azure.net
+x-arr-ssl: true
+x-envoy-expected-rq-timeout-ms: 1800000
+x-envoy-external-address: 51.12.47.148
+x-forwarded-for: 51.12.47.148
+x-forwarded-proto: https
+x-k8se-app-kind: web
+x-k8se-app-name: clouddebugger--69zn5vw
+x-k8se-app-namespace: k8se-apps
+x-k8se-protocol: http1
+x-ms-containerapp-name: clouddebugger
+x-ms-containerapp-revision-name: clouddebugger--69zn5vw
+x-request-id: 502ceb8b-fa3d-4977-9909-214861558371

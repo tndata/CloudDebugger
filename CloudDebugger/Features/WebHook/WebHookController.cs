@@ -1,6 +1,5 @@
+using CloudDebugger.Shared_code.WebHooks;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-
 
 namespace CloudDebugger.Features.WebHook;
 
@@ -19,7 +18,14 @@ public class WebHookController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index(int hookId)
+
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+
+    public IActionResult Hook(int hookId)
     {
         if (hookId != 1 && hookId != 2)
             hookId = 1; // Default to hook #1   
@@ -30,9 +36,9 @@ public class WebHookController : Controller
         ViewData["HookId"] = hookId;
 
         if (hookId == 1)
-            return View("Index", webHook1);
+            return View("Hook", webHook1);
         else
-            return View("Index", webHook2);
+            return View("Hook", webHook2);
     }
 
 
@@ -47,9 +53,9 @@ public class WebHookController : Controller
             hookFailureEnabled = true;
 
         if (hookId == 1)
-            return Redirect("/WebHook/Index?hookId=1");
+            return Redirect("/WebHook/Hook?hookId=1");
         else
-            return Redirect("/WebHook/Index?hookId=2");
+            return Redirect("/WebHook/Hook?hookId=2");
     }
 
     public IActionResult SetHideHeadersMode(int hookId, int id)
@@ -63,9 +69,9 @@ public class WebHookController : Controller
             hideHeaders = true;
 
         if (hookId == 1)
-            return Redirect("/WebHook/Index?hookId=1");
+            return Redirect("/WebHook/Hook?hookId=1");
         else
-            return Redirect("/WebHook/Index?hookId=2");
+            return Redirect("/WebHook/Hook?hookId=2");
     }
 
     public IActionResult SetHideBodyMode(int hookId, int id)
@@ -79,9 +85,9 @@ public class WebHookController : Controller
             hideBody = true;
 
         if (hookId == 1)
-            return Redirect("/WebHook/Index?hookId=1");
+            return Redirect("/WebHook/Hook?hookId=1");
         else
-            return Redirect("/WebHook/Index?hookId=2");
+            return Redirect("/WebHook/Hook?hookId=2");
     }
 
     public IActionResult ClearWebHookLog(int hookId)
@@ -92,12 +98,12 @@ public class WebHookController : Controller
         if (hookId == 1)
         {
             webHook1.ClearLog();
-            return Redirect("/WebHook/Index?hookId=1");
+            return Redirect("/WebHook/Hook?hookId=1");
         }
         else
         {
             webHook2.ClearLog();
-            return Redirect("/WebHook/Index?hookId=2");
+            return Redirect("/WebHook/Hook?hookId=2");
         }
     }
 
@@ -128,7 +134,7 @@ public class WebHookController : Controller
     {
         lock (this)
         {
-            var logEntry = GetRequestDetails();
+            var logEntry = WebHookUtility.GetRequestDetails(Request, _logger);
 
             IActionResult result;
 
@@ -145,68 +151,25 @@ public class WebHookController : Controller
 
             webHook.AddToLog(logEntry);
 
-            WebHookValidation.CheckIfEventGridSchemaValdationRequest(webHook, logEntry);
-            WebHookValidation.CheckIfCloudEventValidationRequest(HttpContext, webHook, logEntry);
+            WebHookValidation.CheckIfEventGridSchemaValdationRequest(e =>
+            {
+                //Called when we want to add a notice to the log when the validation have sent a validation request back
+                webHook.AddToLog(e);
+
+            }, logEntry);
+            WebHookValidation.CheckIfCloudEventValidationRequest(HttpContext, e =>
+            {
+                //Called when we want to add a notice to the log when the validation have sent a validation request back
+                webHook.AddToLog(e);
+
+            }, logEntry);
+
+            //WebHookValidation.CheckIfEventGridSchemaValdationRequest(webHook, logEntry);
+            //WebHookValidation.CheckIfCloudEventValidationRequest(HttpContext, webHook, logEntry);
 
             return result;
         }
     }
 
-
-    private WebHookLogEntry GetRequestDetails()
-    {
-        var logEntry = new WebHookLogEntry();
-
-        logEntry.EntryTime = DateTime.Now;
-        logEntry.Comment = "";
-
-        if (Request.Headers.ContainsKey("Content-Type"))
-        {
-            logEntry.ContentType = Request.Headers["Content-Type"].FirstOrDefault() ?? "[Unknown]";
-        }
-
-        //Get request body 
-        logEntry.Body = "";
-        if (Request.ContentLength > 0)
-        {
-            using (var reader = new StreamReader(Request.Body))
-            {
-                logEntry.Body = reader.ReadToEndAsync().Result;
-
-                //Optionally, parse the JSON body to make it pretty.
-                if (logEntry.ContentType != null && logEntry.ContentType.Contains("json"))
-                {
-                    try
-                    {
-                        var obj = JToken.Parse(logEntry.Body);
-                        logEntry.Body = obj.ToString();
-
-                        // Get the subject if present
-                        dynamic dynObj = obj;
-                        if (dynObj != null)
-                        {
-                            logEntry.Subject = dynObj.subject ?? "[Subject missing]";
-
-                            _logger.LogInformation("Received cloud event with subject:" + logEntry.Subject);
-                        }
-                    }
-                    catch
-                    {
-                        // If parsing fails, keep the original result
-                    }
-                }
-            }
-        }
-
-        logEntry.Headers = new Dictionary<string, string>();
-        foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> header in Request.Headers.OrderBy(h => h.Key))
-        {
-            logEntry.Headers.Add(header.Key, header.Value.ToString() ?? "");
-        }
-
-        logEntry.HttpMethod = Request.Method;
-        logEntry.Url = Request.Path.Value ?? "";
-        return logEntry;
-    }
 }
 

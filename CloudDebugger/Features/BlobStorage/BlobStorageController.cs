@@ -149,7 +149,6 @@ namespace CloudDebugger.Features.HomePage
 
         private List<(string name, string size)> TryGetContainerContent(BlobStorageModel model)
         {
-            return new List<(string name, string size)>();
             try
             {
                 var client = GetBlobServiceClient(model);

@@ -2,7 +2,9 @@
 using Newtonsoft.Json.Linq;
 using System.Text;
 
-namespace CloudDebugger.Features.WebHook;
+namespace CloudDebugger.Shared_code.WebHooks;
+
+
 
 
 /// <summary>
@@ -19,7 +21,7 @@ public class WebHookValidation
     /// </summary>
     /// <param name="webHookLog"></param>
     /// <param name="logEntry"></param>
-    public static void CheckIfEventGridSchemaValdationRequest(WebHookLog webHookLog, WebHookLogEntry logEntry)
+    public static void CheckIfEventGridSchemaValdationRequest(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
     {
         if (logEntry.Headers.ContainsKey("aeg-event-type"))
         {
@@ -28,7 +30,7 @@ public class WebHookValidation
             switch (eventType)
             {
                 case "SubscriptionValidation":
-                    HandleEventGridSubscriptionValidation(webHookLog, logEntry);
+                    HandleEventGridSubscriptionValidation(LogEventHandler, logEntry);
                     break;
                 case "Notification":
                     //Do nothing
@@ -52,14 +54,14 @@ public class WebHookValidation
     /// <param name="webHookLog"></param>
     /// <param name="logEntry"></param>
     /// <exception cref="NotImplementedException"></exception>
-    internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, WebHookLog webHookLog, WebHookLogEntry logEntry)
+    internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
     {
 
-        if (logEntry.Headers.ContainsKey("webhook-request-callback") &&
-            logEntry.Headers.ContainsKey("webhook-request-origin"))
+        if (logEntry.Headers.ContainsKey("WebHook-Request-Callback") &&
+            logEntry.Headers.ContainsKey("WebHook-Request-Origin"))
         {
-            var callbackUrl = logEntry.Headers["webhook-request-callback"];
-            var callbackorigin = logEntry.Headers["webhook-request-origin"];
+            var callbackUrl = logEntry.Headers["WebHook-Request-Callback"];
+            var callbackorigin = logEntry.Headers["WebHook-Request-Origin"];
 
             if (string.IsNullOrEmpty(callbackUrl) == false)
             {
@@ -68,14 +70,14 @@ public class WebHookValidation
                 httpContext.Response.Headers.Append("WebHook-Allowed-Rate", "120");
 
 
-                SendCallBackRequest(webHookLog, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
+                SendCallBackRequest(LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
 
             }
         }
     }
 
 
-    private static void HandleEventGridSubscriptionValidation(WebHookLog webHookLog, WebHookLogEntry logEntry)
+    private static void HandleEventGridSubscriptionValidation(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
     {
         if (logEntry.Body != null && logEntry.Body.Length > 0)
         {
@@ -113,7 +115,7 @@ public class WebHookValidation
 
             if (validationUrl != null)
             {
-                SendCallBackRequest(webHookLog, validationUrl, "Event Grid schema webhook confirmation request.");
+                SendCallBackRequest(LogEventHandler, validationUrl, "Event Grid schema webhook confirmation request.");
             }
         }
     }
@@ -121,7 +123,7 @@ public class WebHookValidation
 
 
 
-    private static void SendCallBackRequest(WebHookLog webHookLog, string callbackUrl, string comment)
+    private static void SendCallBackRequest(Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
     {
         //Call the callBackUrl to confirm the webhoook
         ThreadPool.QueueUserWorkItem(delegate (object? state)
@@ -209,7 +211,7 @@ public class WebHookValidation
             }
 
             // Add an extra entry in the log about this validation request.
-            webHookLog.AddToLog(newLogEntry);
+            LogEventHandler(newLogEntry);
         });
     }
 }

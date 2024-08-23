@@ -51,12 +51,12 @@ $workspaceKey = $workspaceKeys.primarySharedKey
 # Step 6: Create Azure Container Instance
 Write-Host "`n`nCreating Azure Container Instance"
 $container = az container create --resource-group $rgname `
-                                --name "CloudDebugger" `
+                                --name $containerInstanceName `
                                 --image "${acrname}.azurecr.io/${imagename}:latest" `
                                 --cpu 0.5 `
                                 --memory 0.5 `
                                 --ports 8080 `
-                                --dns-name-label "CloudDebugger" `
+                                --dns-name-label $containerInstanceName `
                                 --assign-identity $identityId `
                                 --acr-identity $identityId `
                                 --log-analytics-workspace $workspaceId `

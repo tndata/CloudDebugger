@@ -11,7 +11,7 @@ public class UserDelegationModel
     public string? ContainerName { get; set; } = "clouddebugger";                   //Must be lowercase
     public string? BlobName { get; set; } = "MyBlob.txt";
 
-    public UserDelegationKey DelegationKey { get; set; }
+    public UserDelegationKey? DelegationKey { get; set; }
 
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }

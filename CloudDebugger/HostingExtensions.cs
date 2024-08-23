@@ -1,4 +1,5 @@
 ﻿using CloudDebugger.Features.Health;
+using CloudDebugger.Features.WebhookAdvanced;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
 using Serilog;
@@ -17,6 +18,9 @@ internal static class HostingExtensions
         });
 
         builder.Services.AddSerilog();
+
+        builder.Services.AddSignalR();  //Used by the advanced webhooks
+
 
         builder.Services.AddHealthChecks().AddCheck<AppHealthCheck>("CloudDebuggerHealthCheck");
 
@@ -60,8 +64,6 @@ internal static class HostingExtensions
 
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
-
-
         app.Use((context, next) =>
         {
             context.Request.EnableBuffering();
@@ -107,6 +109,8 @@ internal static class HostingExtensions
         app.UseCors();
 
         app.UseAuthorization();
+
+        app.MapHub<WebHookHub>("/WebHookHub");
 
         app.MapControllerRoute(
             name: "default",

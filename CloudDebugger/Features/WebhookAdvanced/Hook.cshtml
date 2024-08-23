@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "CloudDebugger - Homepage";
+
+    bool enableHookFailure = ViewData["HookFailureEnabled"] as bool? ?? false;
+    bool hideHeaders = ViewData["HideHeaders"] as bool? ?? false;
+    bool hideBody = ViewData["HideBody"] as bool? ?? false;
+}
+
+
+<h3>Advanced Webhooks</h3>
+
+
+@{
+    <br>
+    if (enableHookFailure)
+    {
+        @:WebHook endpoint returns 500 server error: <a href="/WebHookAdvanced/SetWebHookFailureMode/0">(disable)</a>
+    }
+    else
+    {
+        @:WebHook endpoint: Functional <a href="/WebHookAdvanced/SetWebHookFailureMode/1">(make hook endpoint fail)</a>
+    }
+    <br />
+    if (hideHeaders)
+    {
+        @:Headers: <a href="/WebHookAdvanced/SetHideHeadersMode/0">show</a>
+    }
+    else
+    {
+        @:Headers: <a href="/WebHookAdvanced/SetHideHeadersMode/1">hide</a>
+    }
+    if (hideBody)
+    {
+        @:Body: <a href="/WebHookAdvanced/SetHideBodyMode/0">show</a>
+
+    }
+    else
+    {
+        @:Body: <a href="/WebHookAdvanced/SetHideBodyMode/1">hide</a>
+    }
+    <br>
+    <br>
+}
+
+
+
+
+
+<table class="table table-bordered" style="border-width:4px">
+    <tr style="border-width:4px">
+        <td><b>Webhook 1</b></td>
+        <td><b>Webhook 2</b></td>
+    </tr>
+    <tr style="border-width:4px">
+        <td class="col-md-6" style="word-wrap: break-word;min-width: 160px;max-width: 160px;white-space:normal;">
+            <pre>
+            <ul id="Messagebox1"></ul>
+            </pre>
+        </td>
+        <td class="col-md-6" style="word-wrap: break-word;min-width: 160px;max-width: 160px;white-space:normal;">
+            <pre>
+            <ul id="Messagebox2"></ul>
+            </pre>
+        </td>
+    </tr>
+    <tr style="border-width:4px">
+        <td><b>Webhook 3</b></td>
+        <td><b>Webhook 4</b></td>
+    </tr>
+    <tr style="border-width:4px">
+        <td class="col-md-6" style="word-wrap: break-word;min-width: 160px;max-width: 160px;white-space:normal;">
+            <pre>
+            <ul id="Messagebox3"></ul>
+            </pre>
+        </td>
+        <td class="col-md-6" style="word-wrap: break-word;min-width: 160px;max-width: 160px;white-space:normal;">
+            <pre>
+            <ul id="Messagebox4"></ul>
+            </pre>
+        </td>
+    </tr>
+
+</table>
+
+
+@section Scripts {
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/Webhook.js"></script>
+}

@@ -1,0 +1,122 @@
+
+
+#Sample cloud event
+POST https://as-clouddebugger-linux.azurewebsites.net/WebHookAdvanced/Hook
+Content-Type: application/cloudevents+json; charset=utf-8
+aeg-delivery-count: 0
+aeg-event-type: Notification
+aeg-metadata-version: 1
+aeg-subscription-name: ALLBUSINESSEVENTS
+webhook-request-origin: eventgrid.azure.net
+x-arr-ssl: true
+x-envoy-expected-rq-timeout-ms: 1800000
+x-envoy-external-address: 51.12.47.168
+x-forwarded-for: 51.12.47.168
+x-forwarded-proto: https
+x-k8se-app-kind: web
+x-k8se-app-name: clouddebugger--9ry8jzw
+x-k8se-app-namespace: k8se-apps
+x-k8se-protocol: http1
+x-ms-containerapp-name: clouddebugger
+x-ms-containerapp-revision-name: clouddebugger--9ry8jzw
+x-request-id: 59ad7b35-9ba9-4769-b926-ad3c16b38993
+
+{
+  "id": "973ed28b-38eb-423e-9e6c-839bb86c648d",
+  "source": "CloudDebugger",
+  "type": "BusinessEvent.NewOrder",
+  "data": {
+    "ProductId": 1,
+    "ProductName": "Product 1",
+    "Color": "Red"
+  },
+  "time": "2024-07-06T09:31:58.6139464+00:00",
+  "specversion": "1.0",
+  "subject": "Product1",
+  "traceparent": "00-f4671311242f1d91aec83873553bc799-0674a399b6808262-00"
+}
+
+###
+
+#Sample cloud event
+POST https://as-clouddebugger-linux.azurewebsites.net/WebHookAdvanced/Hook1
+Content-Type: application/cloudevents+json; charset=utf-8
+aeg-delivery-count: 0
+aeg-event-type: Notification
+aeg-metadata-version: 1
+aeg-subscription-name: ALLBUSINESSEVENTS
+webhook-request-origin: eventgrid.azure.net
+x-arr-ssl: true
+x-envoy-expected-rq-timeout-ms: 1800000
+x-envoy-external-address: 51.12.47.168
+x-forwarded-for: 51.12.47.168
+x-forwarded-proto: https
+x-k8se-app-kind: web
+x-k8se-app-name: clouddebugger--9ry8jzw
+x-k8se-app-namespace: k8se-apps
+x-k8se-protocol: http1
+x-ms-containerapp-name: clouddebugger
+x-ms-containerapp-revision-name: clouddebugger--9ry8jzw
+x-request-id: 59ad7b35-9ba9-4769-b926-ad3c16b38993
+
+{
+  "id": "973ed28b-38eb-423e-9e6c-839bb86c648d",
+  "source": "CloudDebugger",
+  "type": "BusinessEvent.NewOrder",
+  "data": {
+    "ProductId": 1,
+    "ProductName": "Product 1",
+    "Color": "Red"
+  },
+  "time": "2024-07-06T09:31:58.6139464+00:00",
+  "specversion": "1.0",
+  "subject": "Product1",
+  "traceparent": "00-f4671311242f1d91aec83873553bc799-0674a399b6808262-00"
+}
+
+
+
+###
+
+# Eventgrid validation request
+OptIONS https://as-clouddebugger-linux.azurewebsites.net/WebHookAdvanced/Hook2
+CLIENT-IP: 51.12.47.155:30343
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+WebHook-Request-Callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/blobchanges2/validate?id=234AFE6A-A435-4D81-AC37-7E24F10BD31A&t=2024-08-22T14:06:42.7316312Z&apiVersion=2023-12-15-preview&token=iF2Tdqnmojm0l8DkE%2feAKoV8FUjNk1Kb1QyDn0trQnE%3d
+WebHook-Request-Origin: eventgrid.azure.net
+X-ARR-LOG-ID: 59d38479-e269-4314-a8c9-48469745e3b3
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 51.12.47.155
+X-Client-Port: 30343
+X-Forwarded-TlsVersion: 1.2
+X-Original-For: [::ffff:169.254.129.1]:50421
+X-Original-Proto: http
+X-Original-URL: /WebhookAdvanced/Hook1
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /WebhookAdvanced/Hook1
+
+
+###
+
+# Eventgrid validation request
+OptIONS https://localhost:5001/WebhookAdvanced/Hook1
+CLIENT-IP: 51.12.47.155:30343
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+WebHook-Request-Callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/blobchanges2/validate?id=234AFE6A-A435-4D81-AC37-7E24F10BD31A&t=2024-08-22T14:06:42.7316312Z&apiVersion=2023-12-15-preview&token=iF2Tdqnmojm0l8DkE%2feAKoV8FUjNk1Kb1QyDn0trQnE%3d
+WebHook-Request-Origin: eventgrid.azure.net
+X-ARR-LOG-ID: 59d38479-e269-4314-a8c9-48469745e3b3
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 51.12.47.155
+X-Client-Port: 30343
+X-Forwarded-TlsVersion: 1.2
+X-Original-For: [::ffff:169.254.129.1]:50421
+X-Original-Proto: http
+X-Original-URL: /WebhookAdvanced/Hook1
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /WebhookAdvanced/Hook1

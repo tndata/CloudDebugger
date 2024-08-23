@@ -1,4 +1,6 @@
-﻿namespace CloudDebugger.Features.WebHook;
+﻿using CloudDebugger.Shared_code.WebHooks;
+
+namespace CloudDebugger.Features.WebHook;
 
 
 /// <summary>
