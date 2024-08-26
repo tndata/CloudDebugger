@@ -1,68 +1,71 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace CloudDebugger.Shared_code.WebHooks
+namespace CloudDebugger.Shared_code.WebHooks;
+
+public class WebHookUtility
 {
-    public class WebHookUtility
+
+    /// <summary>
+    /// Get the request and package it up into a WebHookLogEntry
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="_logger"></param>
+    /// <returns></returns>
+    public async static Task<WebHookLogEntry> GetRequestDetails(HttpRequest request, ILogger _logger)
     {
+        var logEntry = new WebHookLogEntry();
 
+        logEntry.EntryTime = DateTime.Now;
+        logEntry.Comment = "";
 
-
-        public static WebHookLogEntry GetRequestDetails(HttpRequest request, ILogger _logger)
+        if (request.Headers.ContainsKey("Content-Type"))
         {
-            var logEntry = new WebHookLogEntry();
+            logEntry.ContentType = request.Headers["Content-Type"].FirstOrDefault() ?? "[Unknown]";
+        }
 
-            logEntry.EntryTime = DateTime.Now;
-            logEntry.Comment = "";
-
-            if (request.Headers.ContainsKey("Content-Type"))
+        //Get request body 
+        logEntry.Body = "";
+        if (request.ContentLength > 0)
+        {
+            using (var reader = new StreamReader(request.Body))
             {
-                logEntry.ContentType = request.Headers["Content-Type"].FirstOrDefault() ?? "[Unknown]";
-            }
+                logEntry.Body = await reader.ReadToEndAsync();
 
-            //Get request body 
-            logEntry.Body = "";
-            if (request.ContentLength > 0)
-            {
-                using (var reader = new StreamReader(request.Body))
+                //Optionally, parse the JSON body to make it pretty.
+                if (logEntry.ContentType != null && logEntry.ContentType.Contains("json"))
                 {
-                    logEntry.Body = reader.ReadToEndAsync().Result;
-
-                    //Optionally, parse the JSON body to make it pretty.
-                    if (logEntry.ContentType != null && logEntry.ContentType.Contains("json"))
+                    try
                     {
-                        try
-                        {
-                            var obj = JToken.Parse(logEntry.Body);
-                            logEntry.Body = obj.ToString();
+                        var obj = JToken.Parse(logEntry.Body);
+                        logEntry.Body = obj.ToString();
 
-                            // Get the subject if present
-                            dynamic dynObj = obj;
-                            if (dynObj != null)
-                            {
-                                logEntry.Subject = dynObj.subject ?? "[Subject missing]";
-
-                                _logger.LogInformation("Received cloud event with subject:" + logEntry.Subject);
-                            }
-                        }
-                        catch
+                        // Get the subject if present
+                        dynamic dynObj = obj;
+                        if (dynObj != null)
                         {
-                            // If parsing fails, keep the original result
+                            logEntry.Subject = dynObj.subject ?? "[Subject missing]";
+
+                            _logger.LogInformation("Received cloud event with subject:" + logEntry.Subject);
                         }
+                    }
+                    catch
+                    {
+                        // If parsing fails, keep the original result
                     }
                 }
             }
-
-            logEntry.Headers = new Dictionary<string, string>();
-            foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> header in request.Headers.OrderBy(h => h.Key))
-            {
-                logEntry.Headers.Add(header.Key, header.Value.ToString() ?? "");
-            }
-
-            logEntry.HttpMethod = request.Method;
-            logEntry.Url = request.Path.Value ?? "";
-            return logEntry;
         }
 
+        logEntry.RequestHeaders = new Dictionary<string, string>();
+        foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> header in request.Headers.OrderBy(h => h.Key))
+        {
+            logEntry.RequestHeaders.Add(header.Key, header.Value.ToString() ?? "");
+        }
 
+        logEntry.HttpMethod = request.Method;
+        logEntry.Url = request.Path.Value ?? "";
+        return logEntry;
     }
+
+
 }

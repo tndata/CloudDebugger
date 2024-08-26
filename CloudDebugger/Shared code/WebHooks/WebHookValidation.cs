@@ -23,9 +23,9 @@ public class WebHookValidation
     /// <param name="logEntry"></param>
     public static void CheckIfEventGridSchemaValdationRequest(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
     {
-        if (logEntry.Headers.ContainsKey("aeg-event-type"))
+        if (logEntry.RequestHeaders.ContainsKey("aeg-event-type"))
         {
-            var eventType = logEntry.Headers["aeg-event-type"];
+            var eventType = logEntry.RequestHeaders["aeg-event-type"];
 
             switch (eventType)
             {
@@ -57,11 +57,11 @@ public class WebHookValidation
     internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
     {
 
-        if (logEntry.Headers.ContainsKey("WebHook-Request-Callback") &&
-            logEntry.Headers.ContainsKey("WebHook-Request-Origin"))
+        if (logEntry.RequestHeaders.ContainsKey("WebHook-Request-Callback") &&
+            logEntry.RequestHeaders.ContainsKey("WebHook-Request-Origin"))
         {
-            var callbackUrl = logEntry.Headers["WebHook-Request-Callback"];
-            var callbackorigin = logEntry.Headers["WebHook-Request-Origin"];
+            var callbackUrl = logEntry.RequestHeaders["WebHook-Request-Callback"];
+            var callbackorigin = logEntry.RequestHeaders["WebHook-Request-Origin"];
 
             if (string.IsNullOrEmpty(callbackUrl) == false)
             {

@@ -1,4 +1,4 @@
-using CloudDebugger.Shared_code.WebHooks;
+/*CloudDebugger.Shared_code.WebHooks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Text;
@@ -175,7 +175,7 @@ public class WebHookAdvancedController : Controller
 
         if (hideHeaders == false)
         {
-            foreach (var header in entry.Headers)
+            foreach (var header in entry.RequestHeaders)
             {
                 SB.AppendLine($"{header.Key}: {header.Value}");
                 ////Too long line, do wrap it over multiple lines
@@ -214,3 +214,4 @@ public class WebHookAdvancedController : Controller
 
 
 
+*/

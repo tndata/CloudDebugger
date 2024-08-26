@@ -1,5 +1,6 @@
 ﻿using CloudDebugger.Features.Health;
 using CloudDebugger.Features.WebhookAdvanced;
+using CloudDebugger.Features.WebHooks;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
 using Serilog;
@@ -16,6 +17,8 @@ internal static class HostingExtensions
             //Options https://github.com/microsoft/ApplicationInsights-dotnet/blob/main/NETCORE/src/Shared/Extensions/ApplicationInsightsServiceOptions.cs
             o.EnableDebugLogger = true;
         });
+
+        builder.Services.AddSingleton<IWebHookLog, WebHookLog>();
 
         builder.Services.AddSerilog();
 
