@@ -1,6 +1,7 @@
 @hostname=https://localhost:5001
-@hookId=4
+@hookId=1
 
+# Sample requests to test the webhook overview page
 
 
 #Sample cloud event
@@ -29,7 +30,7 @@ x-request-id: 59ad7b35-9ba9-4769-b926-ad3c16b38993
   "source": "CloudDebugger",
   "type": "BusinessEvent.NewOrder",
   "data": {
-    "ProductId": 6,
+    "ProductId": 1,
     "ProductName": "Product 1",
     "Color": "Red"
   },

@@ -19,6 +19,11 @@ public class WebHooksController : Controller
         return View();
     }
 
+    public IActionResult Overview()
+    {
+        return View();
+    }
+
     public IActionResult WebHooksLog(int hookId)
     {
         if (hookId < 1 || hookId > 4)

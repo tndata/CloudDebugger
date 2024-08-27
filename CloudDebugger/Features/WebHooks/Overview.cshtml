@@ -1,49 +1,9 @@
 ﻿@{
     ViewData["Title"] = "CloudDebugger - Homepage";
-
-    bool enableHookFailure = ViewData["HookFailureEnabled"] as bool? ?? false;
-    bool hideHeaders = ViewData["HideHeaders"] as bool? ?? false;
-    bool hideBody = ViewData["HideBody"] as bool? ?? false;
 }
 
 
-<h3>Advanced Webhooks</h3>
-
-
-@{
-    <br>
-    if (enableHookFailure)
-    {
-        @:WebHook endpoint returns 500 server error: <a href="/WebHookAdvanced/SetWebHookFailureMode/0">(disable)</a>
-    }
-    else
-    {
-        @:WebHook endpoint: Functional <a href="/WebHookAdvanced/SetWebHookFailureMode/1">(make hook endpoint fail)</a>
-    }
-    <br />
-    if (hideHeaders)
-    {
-        @:Headers: <a href="/WebHookAdvanced/SetHideHeadersMode/0">show</a>
-    }
-    else
-    {
-        @:Headers: <a href="/WebHookAdvanced/SetHideHeadersMode/1">hide</a>
-    }
-    if (hideBody)
-    {
-        @:Body: <a href="/WebHookAdvanced/SetHideBodyMode/0">show</a>
-
-    }
-    else
-    {
-        @:Body: <a href="/WebHookAdvanced/SetHideBodyMode/1">hide</a>
-    }
-    <br>
-    <br>
-}
-
-
-
+<h4>Webhook overview</h4>
 
 
 <table class="table table-bordered" style="border-width:4px">

@@ -1,5 +1,6 @@
 ﻿using CloudDebugger.Shared_code.WebHooks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CloudDebugger.Features.WebHooks;
 
@@ -18,11 +19,15 @@ public class WebHookAPIController : ControllerBase
 {
     private readonly ILogger<WebHookAPIController> logger;
     private readonly IWebHookLog webHookLog;
+    private readonly IHubContext<WebHookHub> hubContext;
 
-    public WebHookAPIController(ILogger<WebHookAPIController> logger, IWebHookLog webHookLog)
+    public WebHookAPIController(ILogger<WebHookAPIController> logger,
+                                IWebHookLog webHookLog,
+                                IHubContext<WebHookHub> hubContext)
     {
         this.logger = logger;
         this.webHookLog = webHookLog;
+        this.hubContext = hubContext;
     }
 
     [Route("/hook1")]
@@ -66,6 +71,7 @@ public class WebHookAPIController : ControllerBase
             else
             {
                 AddWebHookEntryToLog(hookId, hookRequest);
+                await SendToSignalR(hookId, hookRequest);
                 result = Ok("OK");          //OK response
             }
 
@@ -92,15 +98,42 @@ public class WebHookAPIController : ControllerBase
         return result;
     }
 
+    private async Task SendToSignalR(int hookId, WebHookLogEntry entry)
+    {
+        string signalRMessage = $"ReceiveMessage{hookId}";
+        string color = "";
+
+        switch (entry?.Body?.GetHashCode() % 4)
+        {
+            case 0:
+                color = "red";
+                break;
+            case 1:
+                color = "blue";
+                break;
+            case 2:
+                color = "green";
+                break;
+            case 3:
+                color = "black";
+                break;
+        }
+
+        var content = "[M]";
+
+        await hubContext.Clients.All.SendAsync(signalRMessage, color, content);
+    }
 
     /// <summary>
-    /// Add a standard webhook entry to the log
+    /// Add a standard webhook entry to the log and to the SignalR hubContext
     /// </summary>
     /// <param name="hookId"></param>
     /// <param name="entry"></param>
     private void AddWebHookEntryToLog(int hookId, WebHookLogEntry entry)
     {
         webHookLog.AddToLog(hookId, entry);
+
+
     }
 
     /// <summary>

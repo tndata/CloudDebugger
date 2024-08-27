@@ -1,5 +1,4 @@
 ﻿using CloudDebugger.Features.Health;
-using CloudDebugger.Features.WebhookAdvanced;
 using CloudDebugger.Features.WebHooks;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
