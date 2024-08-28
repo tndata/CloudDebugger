@@ -31,11 +31,11 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine("AuthorizationCodeCredential");
-            sb.AppendLine($"_authCode = {_authCode}");
-            sb.AppendLine($"_clientId = {_clientId}");
-            sb.AppendLine($"_record = {_record.ToString()}");
-            sb.AppendLine($"_redirectUri = {_redirectUri}");
-            sb.AppendLine($"_tenantId = {_tenantId}");
+            sb.AppendLine($" - authCode = {_authCode}");
+            sb.AppendLine($" - clientId = {_clientId}");
+            sb.AppendLine($" - record = {_record.ToString()}");
+            sb.AppendLine($" - redirectUri = {_redirectUri}");
+            sb.AppendLine($" - tenantId = {_tenantId}");
             sb.AppendLine("");
             return sb.ToString();
         }

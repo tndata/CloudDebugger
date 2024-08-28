@@ -36,12 +36,12 @@ namespace Azure.MyIdentity
                 password = _password.Length <= 5 ? _password : _password.Substring(0, 5) + "******";
 
             var sb = new StringBuilder();
-            sb.AppendLine("ClientSecretCredential");
-            sb.AppendLine($"TenantId = {_tenantId}");
-            sb.AppendLine($"ClientId = {_clientId}");
-            sb.AppendLine($"Password = {password}");
-            sb.AppendLine($"DefaultScope = {DefaultScope}");
-            sb.AppendLine(_record?.ToString());
+            sb.AppendLine($"ClientSecretCredential");
+            sb.AppendLine($" - TenantId = {_tenantId}");
+            sb.AppendLine($" - ClientId = {_clientId}");
+            sb.AppendLine($" - Password = {password}");
+            sb.AppendLine($" - DefaultScope = {DefaultScope}");
+            sb.AppendLine(" - " + _record?.ToString());
             return sb.ToString();
         }
 

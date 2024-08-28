@@ -41,14 +41,13 @@ namespace Azure.MyIdentity
 
             if (_sources != null)
             {
-                sb.AppendLine(" ChainedTokenCredential sources");
+                sb.AppendLine(" - ChainedTokenCredential sources");
 
                 foreach (var source in _sources)
                 {
-                    sb.AppendLine(source.ToString());
+                    sb.AppendLine(" - " + source.ToString());
                 }
             }
-            sb.AppendLine("LogText");
             sb.AppendLine(LogText.ToString());
             return sb.ToString();
         }
@@ -139,9 +138,10 @@ namespace Azure.MyIdentity
 
                         var lifetime = token.ExpiresOn - DateTimeOffset.UtcNow;
 
-                        LogText.AppendLine($" - Success:  Token.Hash={token.Token.GetHashCode()}");
-                        LogText.AppendLine($" - Success:  Token={token.Token}");
-                        LogText.AppendLine($" - Success:  Expires={token.ExpiresOn} (lifetime={(int)(lifetime.TotalMinutes)} minutes");
+                        LogText.AppendLine($"We successfully got a token");
+                        LogText.AppendLine($" - Token.Hash={token.Token.GetHashCode()}");
+                        LogText.AppendLine($" - Token={token.Token}");
+                        LogText.AppendLine($" - Expires={token.ExpiresOn} (lifetime={(int)(lifetime.TotalMinutes)} minutes");
 
                         MyAzureIdentityLog.AddToLog("ChainedTokenCredential", LogText.ToString());
 

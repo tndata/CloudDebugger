@@ -18,7 +18,7 @@ namespace Azure.MyIdentity
         {
             var sb = new StringBuilder();
             sb.AppendLine("TokenExchangeManagedIdentitySource");
-            sb.AppendLine(_clientAssertionCredential?.ToString());
+            sb.AppendLine(" - " + _clientAssertionCredential?.ToString());
             sb.AppendLine(base.ToString());
             return sb.ToString();
         }
@@ -43,9 +43,9 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine($"TokenExchangeManagedIdentitySource");
-            sb.AppendLine($"tokenFilePath={tokenFilePath}");
-            sb.AppendLine($"tenantId={tenantId}");
-            sb.AppendLine($"clientId={clientId}");
+            sb.AppendLine($" - tokenFilePath={tokenFilePath}");
+            sb.AppendLine($" - tenantId={tenantId}");
+            sb.AppendLine($" - clientId={clientId}");
             TryCreateLog = sb.ToString();
 
 

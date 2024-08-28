@@ -30,8 +30,8 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine($"AppServiceV2017ManagedIdentitySource");
-            sb.AppendLine($"msiSecret={msiSecret}");
-            sb.AppendLine($"MsiEndpoint={EnvironmentVariables.MsiEndpoint}");
+            sb.AppendLine($" - msiSecret={msiSecret}");
+            sb.AppendLine($" - MsiEndpoint={EnvironmentVariables.MsiEndpoint}");
             TryCreateLog = sb.ToString();
 
 

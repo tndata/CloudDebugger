@@ -48,22 +48,17 @@ namespace Azure.MyIdentity
         internal bool _isChainedCredential;
         internal TenantIdResolverBase TenantIdResolver { get; }
 
-
         public override string ToString()
         {
-
             var sb = new StringBuilder();
-            sb.AppendLine("AzureCliCredential");
-            sb.AppendLine($"_logPII = {_logPII}");
-            sb.AppendLine($"_logAccountDetails = {_logAccountDetails}");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"_isChainedCredential = {_isChainedCredential}");
+            sb.AppendLine($"AzureCliCredential");
+            sb.AppendLine($" - logPII = {_logPII}");
+            sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - isChainedCredential = {_isChainedCredential}");
             sb.AppendLine("");
             return sb.ToString();
         }
-
-
-
 
         /// <summary>
         /// Create an instance of <see cref="AzureCliCredential"/> class.

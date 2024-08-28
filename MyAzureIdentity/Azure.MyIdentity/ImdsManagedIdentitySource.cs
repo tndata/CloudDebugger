@@ -32,10 +32,10 @@ namespace Azure.MyIdentity
         {
             var sb = new StringBuilder();
             sb.AppendLine("ImdsManagedIdentitySource (Azure Instance Metadata Service)");
-            sb.AppendLine($"_clientId = {_clientId}");
-            sb.AppendLine($"_resourceId = {_resourceId}");
-            sb.AppendLine($"_imdsEndpoint = {_imdsEndpoint}");
-            sb.AppendLine($"imddsTokenPath = {imddsTokenPath}");
+            sb.AppendLine($" - clientId = {_clientId}");
+            sb.AppendLine($" - resourceId = {_resourceId}");
+            sb.AppendLine($" - imdsEndpoint = {_imdsEndpoint}");
+            sb.AppendLine($" - imddsTokenPath = {imddsTokenPath}");
             sb.AppendLine(base.ToString());
             return sb.ToString();
         }

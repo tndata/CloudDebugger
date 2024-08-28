@@ -26,7 +26,7 @@ namespace Azure.MyIdentity
 
             if (_clientAssertionCredential != null)
             {
-                sb.AppendLine(_clientAssertionCredential.ToString());
+                sb.AppendLine(" - " + _clientAssertionCredential.ToString());
             }
             return sb.ToString();
         }

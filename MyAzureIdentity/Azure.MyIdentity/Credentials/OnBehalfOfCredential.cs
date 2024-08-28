@@ -32,8 +32,8 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine("OnBehalfOfCredential");
-            sb.AppendLine($"_tenantId = {_tenantId}");
-            sb.AppendLine($"_clientSecret = {secret}");
+            sb.AppendLine($" - tenantId = {_tenantId}");
+            sb.AppendLine($" - clientSecret = {secret}");
             sb.AppendLine("");
             return sb.ToString();
         }

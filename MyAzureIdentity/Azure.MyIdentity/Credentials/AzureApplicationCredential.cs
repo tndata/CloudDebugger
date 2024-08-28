@@ -22,7 +22,7 @@ namespace Azure.MyIdentity
         {
             var sb = new StringBuilder();
             sb.AppendLine("AzureApplicationCredential");
-            sb.AppendLine(_credential.ToString());
+            sb.AppendLine(" - " + _credential.ToString());
             sb.AppendLine("");
             return sb.ToString();
         }

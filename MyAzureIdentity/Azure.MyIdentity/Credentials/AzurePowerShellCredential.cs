@@ -39,19 +39,17 @@ namespace Azure.MyIdentity
         internal const string PowerShellNotInstalledError = "PowerShell is not installed.";
         internal const string AzurePowerShellTimeoutError = "Azure PowerShell authentication timed out.";
 
-
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("AzurePowerShellCredential");
-            sb.AppendLine($"_logPII = {_logPII}");
-            sb.AppendLine($"_logAccountDetails = {_logAccountDetails}");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"_isChainedCredential = {_isChainedCredential}");
+            sb.AppendLine($" - logPII = {_logPII}");
+            sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - isChainedCredential = {_isChainedCredential}");
             sb.AppendLine("");
             return sb.ToString();
         }
-
 
         /// <summary>
         /// Creates a new instance of the <see cref="AzurePowerShellCredential"/>.

@@ -33,13 +33,13 @@ namespace Azure.MyIdentity
         {
 
             var sb = new StringBuilder();
-            sb.AppendLine("AuthenticationRecord");
-            sb.AppendLine($"s_usernamePropertyNameBytes = {Username}");
-            sb.AppendLine($"s_authorityPropertyNameBytes = {Authority}");
-            sb.AppendLine($"s_homeAccountIdPropertyNameBytes = {HomeAccountId}");
-            sb.AppendLine($"s_tenantIdPropertyNameBytes = {TenantId}");
-            sb.AppendLine($"s_clientIdPropertyNameBytes = {ClientId}");
-            sb.AppendLine($"s_versionPropertyNameBytes = {Version}");
+            sb.AppendLine($"AuthenticationRecord");
+            sb.AppendLine($" - s_usernamePropertyNameBytes = {Username}");
+            sb.AppendLine($" - s_authorityPropertyNameBytes = {Authority}");
+            sb.AppendLine($" - s_homeAccountIdPropertyNameBytes = {HomeAccountId}");
+            sb.AppendLine($" - s_tenantIdPropertyNameBytes = {TenantId}");
+            sb.AppendLine($" - s_clientIdPropertyNameBytes = {ClientId}");
+            sb.AppendLine($" - s_versionPropertyNameBytes = {Version}");
             sb.AppendLine("");
             return sb.ToString();
         }

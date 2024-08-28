@@ -14,8 +14,8 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("CloudShellManagedIdentitySource");
-            sb.AppendLine($"_endpoint = {_endpoint}");
+            sb.AppendLine($"CloudShellManagedIdentitySource");
+            sb.AppendLine($" - endpoint = {_endpoint}");
             sb.AppendLine(base.ToString());
             return sb.ToString();
         }
@@ -29,7 +29,7 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine($"CloudShellManagedIdentitySource");
-            sb.AppendLine($"msiEndpoint={msiEndpoint}");
+            sb.AppendLine($" - msiEndpoint={msiEndpoint}");
             TryCreateLog = sb.ToString();
 
             // if ONLY the env var MSI_ENDPOINT is set the MsiType is CloudShell

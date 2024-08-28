@@ -36,9 +36,9 @@ namespace Azure.MyIdentity
         {
             var sb = new StringBuilder();
             sb.AppendLine("SharedTokenCacheCredential");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"Username = {Username}");
-            sb.AppendLine(_record.ToString());
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - Username = {Username}");
+            sb.AppendLine(" - " + _record.ToString());
             sb.AppendLine("");
             return sb.ToString();
         }

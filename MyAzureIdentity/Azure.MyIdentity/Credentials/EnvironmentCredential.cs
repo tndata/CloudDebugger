@@ -83,6 +83,8 @@ namespace Azure.MyIdentity
         {
             StringBuilder sb = new();
 
+            sb.Append(log.ToString());
+
             if (Credential != null)
             {
                 sb.AppendLine(Credential.ToString());
@@ -91,7 +93,6 @@ namespace Azure.MyIdentity
             {
                 sb.AppendLine("Credential is NULL");
             }
-            sb.Append(log.ToString());
 
             return sb.ToString();
         }
@@ -117,30 +118,35 @@ namespace Azure.MyIdentity
             string password = envCredOptions.Password;
 
 
-            var certpwd = "NULL";
+            var safeCertPassword = "NULL";
             if (string.IsNullOrEmpty(clientCertificatePassword) == false)
-                certpwd = clientCertificatePassword.Length <= 5 ? clientCertificatePassword : clientCertificatePassword.Substring(0, 5) + "******";
+                safeCertPassword = clientCertificatePassword.Length <= 5 ? clientCertificatePassword : clientCertificatePassword.Substring(0, 5) + "******";
 
-            var pwd = "NULL";
+            var safeUserPassword = "NULL";
             if (string.IsNullOrEmpty(password) == false)
-                pwd = password.Length <= 5 ? password : password.Substring(0, 5) + "******";
+                safeUserPassword = password.Length <= 5 ? password : password.Substring(0, 5) + "******";
 
+            var safeClientSecret = "NULL";
+            if (string.IsNullOrEmpty(clientSecret) == false)
+                safeClientSecret = clientSecret.Length <= 5 ? clientSecret : clientSecret.Substring(0, 5) + "******";
 
             log.Append("EnvironmentCredential");
-            log.AppendLine($"tenantId = {tenantId}");
-            log.AppendLine($"clientId = {clientId}");
-            log.AppendLine($"clientSecret = {clientSecret}");
-            log.AppendLine($"clientCertificatePath = {clientCertificatePath}");
-            log.AppendLine($"clientCertificatePassword = {certpwd}");
-            log.AppendLine($"sendCertificateChain = {sendCertificateChain}");
-            log.AppendLine($"username = {username}");
-            log.AppendLine($"password = {pwd}");
+            log.AppendLine($" - tenantId = {tenantId}");
+            log.AppendLine($" - clientId = {clientId}");
+            log.AppendLine($" - clientSecret = {safeClientSecret}");
+            log.AppendLine($" - clientCertificatePath = {clientCertificatePath}");
+            log.AppendLine($" - clientCertificatePassword = {safeCertPassword}");
+            log.AppendLine($" - sendCertificateChain = {sendCertificateChain}");
+            log.AppendLine($" - username = {username}");
+            log.AppendLine($" - password = {safeUserPassword}");
+            log.AppendLine();
 
 
             if (!string.IsNullOrEmpty(tenantId) && !string.IsNullOrEmpty(clientId))
             {
                 if (!string.IsNullOrEmpty(clientSecret))
                 {
+                    log.AppendLine($"Selected ClientSecretCredential based on the provided environment variables");
                     Credential = new ClientSecretCredential(tenantId, clientId, clientSecret, envCredOptions, _pipeline, envCredOptions.MsalConfidentialClient);
                 }
                 else if (!string.IsNullOrEmpty(clientCertificatePath))
@@ -149,10 +155,12 @@ namespace Azure.MyIdentity
 
                     clientCertificateCredentialOptions.SendCertificateChain = sendCertificateChain;
 
+                    log.AppendLine($"Selected ClientCertificateCredential based on the provided environment variables");
                     Credential = new ClientCertificateCredential(tenantId, clientId, clientCertificatePath, clientCertificatePassword, clientCertificateCredentialOptions, _pipeline, envCredOptions.MsalConfidentialClient);
                 }
                 else if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
                 {
+                    log.AppendLine($"Selected UsernamePasswordCredential based on the provided environment variables");
                     Credential = new UsernamePasswordCredential(username, password, tenantId, clientId, envCredOptions, _pipeline, envCredOptions.MsalPublicClient);
                 }
             }

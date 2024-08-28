@@ -1,15 +1,19 @@
 ﻿namespace Azure.MyIdentity
 {
-    public class MyAzureIdentityLog
+    /// <summary>
+    /// This is a custom hack that incorporates a simple log into this library.
+    /// </summary>
+    public static class MyAzureIdentityLog
     {
-        public static List<LogEntry> Log = new();
+        public readonly static List<AzureIdentityLogEntry> Log = new();
+        private readonly static object lockObj = new();
 
         public static void AddToLog(string context, string message)
         {
-            lock (Log)
+            lock (lockObj)
             {
 
-                Log.Add(new LogEntry()
+                Log.Add(new AzureIdentityLogEntry()
                 {
                     EntryTime = DateTime.Now,
                     Context = context,
@@ -23,14 +27,14 @@
 
         public static void ClearLog()
         {
-            lock (Log)
+            lock (lockObj)
             {
                 Log.Clear();
             }
         }
     }
 
-    public class LogEntry
+    public class AzureIdentityLogEntry
     {
         public DateTime EntryTime { get; set; }
         public string Context { get; set; }

@@ -20,9 +20,9 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("AzureArcManagedIdentitySource");
-            sb.AppendLine($"_clientId = {_clientId}");
-            sb.AppendLine($"_endpoint = {_endpoint}");
+            sb.AppendLine($"AzureArcManagedIdentitySource");
+            sb.AppendLine($" - clientId = {_clientId}");
+            sb.AppendLine($" - endpoint = {_endpoint}");
             sb.AppendLine(base.ToString());
             return sb.ToString();
         }
@@ -36,8 +36,8 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine($"AzureArcManagedIdentitySource");
-            sb.AppendLine($"identityEndpoint={identityEndpoint}");
-            sb.AppendLine($"imdsEndpoint={imdsEndpoint}");
+            sb.AppendLine($" - identityEndpoint={identityEndpoint}");
+            sb.AppendLine($" - imdsEndpoint={imdsEndpoint}");
             TryCreateLog = sb.ToString();
 
             // if BOTH the env vars IDENTITY_ENDPOINT and IMDS_ENDPOINT are set the MsiType is Azure Arc

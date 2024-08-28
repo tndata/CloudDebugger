@@ -36,7 +36,7 @@ namespace Azure.MyIdentity
         {
             var sb = new StringBuilder();
             sb.AppendLine("VisualStudioCodeCredential");
-            sb.AppendLine($"TenantId = {TenantId}");
+            sb.AppendLine($" - TenantId = {TenantId}");
             return sb.ToString();
         }
 

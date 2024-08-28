@@ -37,7 +37,6 @@ namespace Azure.MyIdentity
         internal TenantIdResolverBase TenantIdResolver { get; }
 
 
-
         public override string ToString()
         {
             var secret = "NULL";
@@ -45,10 +44,10 @@ namespace Azure.MyIdentity
                 secret = ClientSecret.Length <= 5 ? ClientSecret : ClientSecret.Substring(0, 5) + "******";
 
             var sb = new StringBuilder();
-            sb.AppendLine("ClientSecretCredential");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"ClientId = {ClientId}");
-            sb.AppendLine($"ClientSecret = {secret}");
+            sb.AppendLine($"ClientSecretCredential");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - ClientId = {ClientId}");
+            sb.AppendLine($" - ClientSecret = {secret}");
             return sb.ToString();
         }
 

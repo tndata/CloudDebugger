@@ -36,12 +36,12 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("InteractiveBrowserCredential");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"LoginHint = {LoginHint}");
-            sb.AppendLine($"DisableAutomaticAuthentication = {DisableAutomaticAuthentication}");
-            sb.AppendLine($"DefaultScope = {DefaultScope}");
-            sb.AppendLine($"UseOperatingSystemAccount = {UseOperatingSystemAccount}");
+            sb.AppendLine($"InteractiveBrowserCredential");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - LoginHint = {LoginHint}");
+            sb.AppendLine($" - DisableAutomaticAuthentication = {DisableAutomaticAuthentication}");
+            sb.AppendLine($" - DefaultScope = {DefaultScope}");
+            sb.AppendLine($" - UseOperatingSystemAccount = {UseOperatingSystemAccount}");
             sb.AppendLine(Record.ToString());
 
             return sb.ToString();

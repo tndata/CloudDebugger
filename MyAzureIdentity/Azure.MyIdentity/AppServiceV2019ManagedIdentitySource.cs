@@ -29,8 +29,8 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine($"AppServiceV2019ManagedIdentitySource");
-            sb.AppendLine($"msiSecret={msiSecret}");
-            sb.AppendLine($"IdentityEndpoint={EnvironmentVariables.IdentityEndpoint}");
+            sb.AppendLine($" - msiSecret={msiSecret}");
+            sb.AppendLine($" - IdentityEndpoint={EnvironmentVariables.IdentityEndpoint}");
             TryCreateLog = sb.ToString();
 
 

@@ -20,11 +20,11 @@ namespace Azure.MyIdentity
                 secret = _secret.Length <= 5 ? _secret : _secret.Substring(0, 5) + "******";
 
             var sb = new StringBuilder();
-            sb.AppendLine("AppServiceManagedIdentitySource");
-            sb.AppendLine($"_endpoint = {_endpoint}");
-            sb.AppendLine($"_clientId = {_clientId}");
-            sb.AppendLine($"_resourceId = {_resourceId}");
-            sb.AppendLine($"_secret = {secret}");
+            sb.AppendLine($"AppServiceManagedIdentitySource");
+            sb.AppendLine($" - endpoint = {_endpoint}");
+            sb.AppendLine($" - clientId = {_clientId}");
+            sb.AppendLine($" - resourceId = {_resourceId}");
+            sb.AppendLine($" - secret = {secret}");
             return sb.ToString();
         }
 

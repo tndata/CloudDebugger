@@ -30,11 +30,11 @@ namespace Azure.MyIdentity
 
             if (Client != null)
             {
-                sb.AppendLine("Client=" + Client.ToString());
+                sb.AppendLine(" - Client=" + Client.ToString());
             }
             else
             {
-                return "Client=NULL";
+                return " - Client=NULL";
             }
 
             return sb.ToString();

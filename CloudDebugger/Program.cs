@@ -1,8 +1,11 @@
+using Azure.Core.Diagnostics;
+using Azure.MyIdentity;
 using CloudDebugger;
 using CloudDebugger.Infrastructure;
 using Serilog;
 using Serilog.Events;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Reflection;
 
 Console.Title = "CloudDebugger";
@@ -30,6 +33,24 @@ Log.Information("");
 //Get the build date, it is set in the project file, see https://stackoverflow.com/a/50607951/68490
 var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location ?? "");
 Log.Information("Project Build time: {StartTime}", versionInfo?.LegalCopyright);
+
+
+var listener = new AzureEventSourceListener((e, message) =>
+{
+    // Only log messages from "Azure-Core" event source
+    //Azure-Messaging-ServiceBus
+    //Azure-Messaging-EventHubs
+    //Azure-Messaging-ServiceBus
+
+    // Console.WriteLine(e.EventSource.Name);
+
+    if (e.EventSource.Name == "Azure-Core" || e.EventSource.Name == "Azure-Identity")
+    {
+        MyAzureIdentityLog.AddToLog(e.EventSource.Name.ToString(), message);
+    }
+},
+    level: EventLevel.Verbose);
+
 
 try
 {

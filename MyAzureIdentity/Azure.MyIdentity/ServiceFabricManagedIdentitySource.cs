@@ -24,12 +24,12 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine("ServiceFabricManagedIdentitySource");
-            sb.AppendLine($"_identityHeaderValue = {_identityHeaderValue}");
-            sb.AppendLine($"_clientId = {_clientId}");
-            sb.AppendLine($"_resourceId = {_resourceId}");
-            sb.AppendLine($"identityEndpoint = {EnvironmentVariables.IdentityEndpoint}");
-            sb.AppendLine($"identityHeader = {EnvironmentVariables.IdentityHeader}");
-            sb.AppendLine($"identityServerThumbprint = {EnvironmentVariables.IdentityServerThumbprint}");
+            sb.AppendLine($" - identityHeaderValue = {_identityHeaderValue}");
+            sb.AppendLine($" - clientId = {_clientId}");
+            sb.AppendLine($" - resourceId = {_resourceId}");
+            sb.AppendLine($" - identityEndpoint = {EnvironmentVariables.IdentityEndpoint}");
+            sb.AppendLine($" - identityHeader = {EnvironmentVariables.IdentityHeader}");
+            sb.AppendLine($" - identityServerThumbprint = {EnvironmentVariables.IdentityServerThumbprint}");
             return sb.ToString();
         }
 
@@ -44,9 +44,9 @@ namespace Azure.MyIdentity
 
             var sb = new StringBuilder();
             sb.AppendLine($"ServiceFabricManagedIdentitySource");
-            sb.AppendLine($"identityEndpoint={identityEndpoint}");
-            sb.AppendLine($"identityHeader={identityHeader}");
-            sb.AppendLine($"identityServerThumbprint={identityServerThumbprint}");
+            sb.AppendLine($" - identityEndpoint={identityEndpoint}");
+            sb.AppendLine($" - identityHeader={identityHeader}");
+            sb.AppendLine($" - identityServerThumbprint={identityServerThumbprint}");
             TryCreateLog = sb.ToString();
 
 

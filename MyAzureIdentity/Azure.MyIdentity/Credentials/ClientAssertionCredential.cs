@@ -24,10 +24,10 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("ClientAssertionCredential");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"ClientId = {ClientId}");
-            sb.AppendLine($"AllowMultiTenantAuthentication = {AllowMultiTenantAuthentication}");
+            sb.AppendLine($"ClientAssertionCredential");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - ClientId = {ClientId}");
+            sb.AppendLine($" - AllowMultiTenantAuthentication = {AllowMultiTenantAuthentication}");
             return sb.ToString();
         }
 

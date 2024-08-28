@@ -205,7 +205,7 @@ namespace Azure.MyIdentity
             LogText.AppendLine("");
 
 
-
+            LogText.AppendLine("Processing sources");
             bool foundSource = false;
             for (var i = 0; i < sources.Length && sources[i] != null; i++)
             {
@@ -215,8 +215,8 @@ namespace Azure.MyIdentity
                 foundSource = true;
                 try
                 {
-                    LogText.AppendLine("");
                     LogText.AppendLine($" - Trying: {sources[i].GetType().FullName}");
+                    LogText.AppendLine("");
                     LogText.AppendLine($" - {sources[i].ToString()}");
 
 
@@ -227,12 +227,13 @@ namespace Azure.MyIdentity
                     var lifetime = token.ExpiresOn - DateTimeOffset.UtcNow;
 
                     sw.Stop();
-                    LogText.AppendLine($" - Success:  Took {sw.ElapsedMilliseconds} ms");
-                    LogText.AppendLine($" - Success:  Token.Hash={token.Token.GetHashCode()}");
-                    LogText.AppendLine($" - Success:  Token={token.Token}");
-                    LogText.AppendLine($" - Success:  Expires={token.ExpiresOn} (lifetime={(int)(lifetime.TotalMinutes)} minutes)");
+                    LogText.AppendLine($"We successfully got a token");
+                    LogText.AppendLine($" - Took {sw.ElapsedMilliseconds} ms");
+                    LogText.AppendLine($" - Token.Hash={token.Token.GetHashCode()}");
+                    LogText.AppendLine($" - Token={token.Token}");
+                    LogText.AppendLine($" - Expires={token.ExpiresOn} (lifetime={(int)(lifetime.TotalMinutes)} minutes)");
 
-                    LogText.AppendLine($"Total time taken for checking all credentials: {totalTimeSw.ElapsedMilliseconds} ms");
+                    LogText.AppendLine($"\r\nTotal time taken for checking all credentials: {totalTimeSw.ElapsedMilliseconds} ms");
 
 
                     MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", LogText.ToString());
@@ -257,16 +258,16 @@ namespace Azure.MyIdentity
 
                     throw;
                 }
+
+                LogText.AppendLine("");
             }
 
             if (foundSource == false)
                 MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", "No source found");
 
-
-
             LogText.AppendLine(" - All sources failed to get token");
+            LogText.AppendLine();
             LogText.AppendLine($"Total time taken for checking all credentials: {totalTimeSw.ElapsedMilliseconds} ms");
-
 
             MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", LogText.ToString());
 

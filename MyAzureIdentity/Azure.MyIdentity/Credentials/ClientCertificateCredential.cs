@@ -38,16 +38,14 @@ namespace Azure.MyIdentity
         internal TenantIdResolverBase TenantIdResolver { get; }
 
 
-
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("ClientCertificateCredential");
-            sb.AppendLine($"TenantId = {TenantId}");
-            sb.AppendLine($"ClientId = {ClientId}");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - ClientId = {ClientId}");
             return sb.ToString();
         }
-
 
         /// <summary>
         /// Protected constructor for mocking.
