@@ -5,6 +5,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<!-- Exclude the project from analysis https://stackoverflow.com/questions/47939122 -->
+		<SonarQubeExclude>true</SonarQubeExclude>
 	</PropertyGroup>
 
 

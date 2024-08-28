@@ -4,14 +4,17 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+
+		<!-- Exclude the project from analysis https://stackoverflow.com/questions/47939122 -->
+		<SonarQubeExclude>true</SonarQubeExclude>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <WarningLevel>0</WarningLevel>
+		<WarningLevel>0</WarningLevel>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <WarningLevel>0</WarningLevel>
+		<WarningLevel>0</WarningLevel>
 	</PropertyGroup>
 
 	<ItemGroup>
