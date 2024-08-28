@@ -33,10 +33,7 @@ public class EventHubController : Controller
     [HttpGet("/EventHub/SendEvents")]
     public IActionResult GetSendEvents(SendEventHubModel model)
     {
-        if (model == null)
-        {
-            model = new SendEventHubModel();
-        }
+        model ??= new SendEventHubModel();
         model.ConnectionString = _connectionString;
 
         return View("SendEvents", model);
@@ -44,7 +41,7 @@ public class EventHubController : Controller
 
 
     [HttpPost("/EventHub/SendEvents")]
-    public IActionResult PostSendEvents(SendEventHubModel model)
+    public async Task<IActionResult> PostSendEvents(SendEventHubModel model)
     {
         if (model != null && ModelState.IsValid)
         {
@@ -72,7 +69,7 @@ public class EventHubController : Controller
                             CustomerName = "Customer " + eventId
                         };
                         eventData = new EventData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event)));
-                        SendEvent(producerClient, eventData, partitionKey: "order");
+                        await SendEvent(producerClient, eventData, partitionKey: "order");
                     }
                     else
                     {
@@ -82,7 +79,7 @@ public class EventHubController : Controller
                             ProductName = "Product " + eventId
                         };
                         eventData = new EventData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event)));
-                        SendEvent(producerClient, eventData, partitionKey: "product");
+                        await SendEvent(producerClient, eventData, partitionKey: "product");
                     }
 
                     eventId++;
@@ -104,14 +101,14 @@ public class EventHubController : Controller
     /// <summary>
     /// We send one event per batch, so we can provide different partition keys for each event.
     /// </summary>
-    private void SendEvent(EventHubProducerClient producerClient, EventData eventData, string partitionKey)
+    private async static Task SendEvent(EventHubProducerClient producerClient, EventData eventData, string partitionKey)
     {
         var batchOptions = new CreateBatchOptions()
         {
             PartitionKey = partitionKey
         };
 
-        using (EventDataBatch eventBatch = producerClient.CreateBatchAsync(batchOptions).Result)
+        using (EventDataBatch eventBatch = await producerClient.CreateBatchAsync(batchOptions))
         {
             eventBatch.TryAdd(eventData);
 
@@ -123,10 +120,7 @@ public class EventHubController : Controller
     [HttpGet("/EventHub/ConsumeEvents")]
     public IActionResult GetConsumeEvents(ConsumeEventHubModel model)
     {
-        if (model == null)
-        {
-            model = new ConsumeEventHubModel();
-        }
+        model ??= new ConsumeEventHubModel();
         model.ConnectionString = _connectionString;
 
         return View("ConsumeEvents", model);
@@ -168,10 +162,10 @@ public class EventHubController : Controller
                         if (@event.Data == null)
                             break;
 
-                        var entry = new EventHubLogEntry();
-
-
-                        entry.EventDetails = new List<string>();
+                        var entry = new EventHubLogEntry()
+                        {
+                            EventDetails = new()
+                        };
 
                         var contentType = @event.Data.ContentType;
                         if (!String.IsNullOrWhiteSpace(contentType))
@@ -200,13 +194,13 @@ public class EventHubController : Controller
                         var properties = @event.Data.Properties;
                         foreach (var property in properties)
                         {
-                            entry.EventDetails.Add($"{property.Key}: {property.Value.ToString()}");
+                            entry.EventDetails.Add($"{property.Key}: {property.Value}");
                         }
 
                         var systemProperties = @event.Data.SystemProperties;
                         foreach (var property in systemProperties)
                         {
-                            entry.EventDetails.Add($"{property.Key}: {property.Value.ToString()}");
+                            entry.EventDetails.Add($"{property.Key}: {property.Value}");
                         }
 
                         entry.PartitionId = @event.Partition.PartitionId;
@@ -226,30 +220,8 @@ public class EventHubController : Controller
         return View("ConsumeEvents", model);
     }
 }
-
-
-public class EventHubOrderEvent
-{
-    public int OrderId { get; set; }
-    public string? CustomerName { get; set; }
-}
 public class EventHubProductEvent
 {
     public int ProductId { get; set; }
     public string? ProductName { get; set; }
-}
-
-
-
-public class EventHubLogEntry
-{
-    public List<string>? EventDetails { get; set; }
-
-    public long Offset { get; set; }
-
-    public string? PartitionId { get; set; }
-
-    public DateTime EntryTime { get; set; }
-
-    public string? Body { get; set; }
 }

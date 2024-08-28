@@ -25,11 +25,11 @@ Log.Information(@"  /    \  \/|  |  /  _ \|  |  \/ __ |  |    |  \_/ __ \| __ \|
 Log.Information(@"  \     \___|  |_(  <_> )  |  / /_/ |  |    `   \  ___/| \_\ \  |  / /_/  > /_/  >  ___/|  | \/ ");
 Log.Information(@"   \______  /____/\____/|____/\____ | /_______  /\___  >___  /____/\___  /\___  / \___  >__|    ");
 Log.Information(@"          \/                       \/         \/     \/    \/     /_____//_____/      \/        ");
-Log.Information("");                                                                                             
+Log.Information("");
 
 //Get the build date, it is set in the project file, see https://stackoverflow.com/a/50607951/68490
 var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location ?? "");
-Log.Information("Project Build time: " + versionInfo?.LegalCopyright);
+Log.Information("Project Build time: {StartTime}", versionInfo?.LegalCopyright);
 
 try
 {
@@ -51,7 +51,7 @@ try
       .ConfigureServices()
       .ConfigurePipeline();
 
-    app.Run();
+    await app.RunAsync();
 
 }
 catch (Exception ex)
@@ -61,5 +61,5 @@ catch (Exception ex)
 finally
 {
     Log.Information("Shut down complete");
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }

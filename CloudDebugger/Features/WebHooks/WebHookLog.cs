@@ -8,7 +8,8 @@ namespace CloudDebugger.Features.WebHooks;
 public class WebHookLog : IWebHookLog
 {
     private const int MaxLogEntries = 100;
-    private List<WebHookLogEntry> Log = new();
+    private readonly List<WebHookLogEntry> Log = new();
+    private readonly object lockObj = new();
 
     public WebHookLog()
     {
@@ -16,7 +17,7 @@ public class WebHookLog : IWebHookLog
 
     public void ClearLog()
     {
-        lock (Log)
+        lock (lockObj)
         {
             Log.Clear();
         }
@@ -24,7 +25,7 @@ public class WebHookLog : IWebHookLog
 
     public void AddToLog(int hookId, WebHookLogEntry logEntry)
     {
-        lock (Log)
+        lock (lockObj)
         {
             logEntry.HookId = hookId;
             Log.Add(logEntry);
@@ -38,7 +39,7 @@ public class WebHookLog : IWebHookLog
     public List<WebHookLogEntry> GetAllLogEntries()
     {
         //Return a new list to avoid any enumeration errors
-        lock (Log)
+        lock (lockObj)
         {
             var log = new List<WebHookLogEntry>(Log);
         }
@@ -50,11 +51,10 @@ public class WebHookLog : IWebHookLog
     public List<WebHookLogEntry> GetLogEntriesForWebHook(int hookId)
     {
         //Return a new list to avoid any enumeration errors
-        lock (Log)
+        lock (lockObj)
         {
             var filtered = Log.Where(e => e.HookId == hookId).ToList();
             return filtered;
-            var log = new List<WebHookLogEntry>(filtered.ToList());
         }
     }
 

@@ -80,13 +80,13 @@ public class WebHookAPIController : ControllerBase
                     //This lambda is called when a webhook validation request is sent back to the caller
                     AddCallbackEntryToLog(hookId, e);
 
-                }, hookRequest);
+                }, hookRequest, logger);
             WebHookValidation.CheckIfCloudEventValidationRequest(HttpContext, e =>
                 {
                     //This lambda is called when a webhook validation request is sent back to the caller
                     AddCallbackEntryToLog(hookId, e);
 
-                }, hookRequest);
+                }, hookRequest, logger);
 
         }
         catch (Exception exc)

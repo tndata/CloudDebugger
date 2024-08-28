@@ -2,7 +2,7 @@
 
 namespace CloudDebugger.Shared_code.WebHooks;
 
-public class WebHookUtility
+public static class WebHookUtility
 {
 
     /// <summary>
@@ -13,14 +13,15 @@ public class WebHookUtility
     /// <returns></returns>
     public async static Task<WebHookLogEntry> GetRequestDetails(HttpRequest request, ILogger _logger)
     {
-        var logEntry = new WebHookLogEntry();
-
-        logEntry.EntryTime = DateTime.Now;
-        logEntry.Comment = "";
+        var logEntry = new WebHookLogEntry()
+        {
+            EntryTime = DateTime.Now,
+            Comment = ""
+        };
 
         if (request.Headers.ContainsKey("Content-Type"))
         {
-            logEntry.ContentType = request.Headers["Content-Type"].FirstOrDefault() ?? "[Unknown]";
+            logEntry.ContentType = request.Headers.ContentType.FirstOrDefault() ?? "[Unknown]";
         }
 
         //Get request body 
@@ -45,7 +46,7 @@ public class WebHookUtility
                         {
                             logEntry.Subject = dynObj.subject ?? "[Subject missing]";
 
-                            _logger.LogInformation("Received cloud event with subject:" + logEntry.Subject);
+                            _logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
                         }
                     }
                     catch
@@ -56,7 +57,7 @@ public class WebHookUtility
             }
         }
 
-        logEntry.RequestHeaders = new Dictionary<string, string>();
+        logEntry.RequestHeaders = new();
         foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> header in request.Headers.OrderBy(h => h.Key))
         {
             logEntry.RequestHeaders.Add(header.Key, header.Value.ToString() ?? "");

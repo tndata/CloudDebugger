@@ -4,15 +4,12 @@ using System.Text;
 
 namespace CloudDebugger.Shared_code.WebHooks;
 
-
-
-
 /// <summary>
 /// WebHook Validation logic
 /// 
 /// Some services require the webhook endpoint to respond to a validation request before they begin sending events to it.
 /// </summary>
-public class WebHookValidation
+public static class WebHookValidation
 {
     /// <summary>
     /// Test if this is a EventGrid Event Subscription validation request
@@ -21,7 +18,7 @@ public class WebHookValidation
     /// </summary>
     /// <param name="webHookLog"></param>
     /// <param name="logEntry"></param>
-    public static void CheckIfEventGridSchemaValdationRequest(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
+    public static void CheckIfEventGridSchemaValdationRequest(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)
     {
         if (logEntry.RequestHeaders.ContainsKey("aeg-event-type"))
         {
@@ -30,7 +27,7 @@ public class WebHookValidation
             switch (eventType)
             {
                 case "SubscriptionValidation":
-                    HandleEventGridSubscriptionValidation(LogEventHandler, logEntry);
+                    HandleEventGridSubscriptionValidation(LogEventHandler, logEntry, logger);
                     break;
                 case "Notification":
                     //Do nothing
@@ -54,7 +51,7 @@ public class WebHookValidation
     /// <param name="webHookLog"></param>
     /// <param name="logEntry"></param>
     /// <exception cref="NotImplementedException"></exception>
-    internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
+    internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)
     {
 
         if (logEntry.RequestHeaders.ContainsKey("WebHook-Request-Callback") &&
@@ -69,15 +66,15 @@ public class WebHookValidation
                 httpContext.Response.Headers.Append("WebHook-Request-Origin", "eventgrid.azure.net");
                 httpContext.Response.Headers.Append("WebHook-Allowed-Rate", "120");
 
+                logger.LogInformation("Received CLoudEvent  validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
 
                 SendCallBackRequest(LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
-
             }
         }
     }
 
 
-    private static void HandleEventGridSubscriptionValidation(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry)
+    private static void HandleEventGridSubscriptionValidation(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)
     {
         if (logEntry.Body != null && logEntry.Body.Length > 0)
         {
@@ -92,13 +89,15 @@ public class WebHookValidation
                 return;
             }
 
-            string? validationCode = null;
-            string? validationUrl = null;
+            string? validationCode;
+            string? validationUrl;
             switch (receivedEvents.Type)
             {
                 case JTokenType.Array:
-                    validationCode = receivedEvents?[0]?["data"]?["validationCode"]?.ToString();
-                    validationUrl = receivedEvents?[0]?["data"]?["validationUrl"]?.ToString();
+                    validationCode = receivedEvents[0]?["data"]?["validationCode"]?.ToString();
+                    validationUrl = receivedEvents[0]?["data"]?["validationUrl"]?.ToString();
+
+                    logger.LogInformation("Received EventGrid subscription validation request with validation code '{ValidationCode}' and validation URL '{ValidationUrl}'", validationCode, validationUrl);
                     break;
                 case JTokenType.Object:
                     {
@@ -106,12 +105,15 @@ public class WebHookValidation
                         var data = JToken.Parse(receivedEvents["data"]?.ToString() ?? "");
                         validationCode = data["validationCode"]?.ToString();
                         validationUrl = data["validationUrl"]?.ToString();
+
+                        logger.LogInformation("Received EventGrid subscription validation request with validation code '{ValidationCode}' and validation URL '{ValidationUrl}'", validationCode, validationUrl);
                         break;
                     }
                 default:
                     throw new ArgumentOutOfRangeException(
                         $"The request content should be parseable into a JSON object or array, but was {receivedEvents.Type}.");
             }
+
 
             if (validationUrl != null)
             {
@@ -128,11 +130,13 @@ public class WebHookValidation
         //Call the callBackUrl to confirm the webhoook
         ThreadPool.QueueUserWorkItem(delegate (object? state)
         {
-            var newLogEntry = new WebHookLogEntry();
-            newLogEntry.EntryTime = DateTime.Now;
-            newLogEntry.Url = callbackUrl;
-            newLogEntry.HttpMethod = "GET";
-            newLogEntry.Comment = comment;
+            var newLogEntry = new WebHookLogEntry()
+            {
+                EntryTime = DateTime.Now,
+                Url = callbackUrl,
+                HttpMethod = "GET",
+                Comment = comment
+            };
 
             try
             {

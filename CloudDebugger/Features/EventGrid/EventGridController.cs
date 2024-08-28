@@ -30,10 +30,7 @@ namespace CloudDebugger.Features.EventGrid
         [HttpGet("/EventGrid/SendEvents")]
         public IActionResult GetSendEvents(SendEventGridModel model)
         {
-            if (model == null)
-            {
-                model = new SendEventGridModel();
-            }
+            model ??= new SendEventGridModel();
             model.AccessKey = _accessKey;
 
             return View("SendEvents", model);
@@ -88,8 +85,10 @@ namespace CloudDebugger.Features.EventGrid
                                 CustomerName = "Customer " + eventId
                             };
 
-                            @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: order);
-                            @event.Subject = "Order" + order.OrderId;
+                            @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: order)
+                            {
+                                Subject = "Order" + order.OrderId
+                            };
 
                             Console.WriteLine(@event.Subject);
 
@@ -102,10 +101,12 @@ namespace CloudDebugger.Features.EventGrid
                                 ProductName = "Product " + eventId
                             };
 
-                            @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: product);
-                            @event.Subject = "Product" + product.ProductId;
+                            @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: product)
+                            {
+                                Subject = "Product" + product.ProductId
+                            };
 
-                            _logger.LogInformation("Sendt event to Event Grid:" + @event.Subject);
+                            _logger.LogInformation("Sendt event to Event Grid {Subject}:", @event.Subject);
                         }
 
 

@@ -20,9 +20,10 @@ public class AppServicesController : Controller
 
     public IActionResult ShowFileSystem()
     {
-        var model = new ShowFilesModel();
-
-        model.HomeDirectory = Environment.GetEnvironmentVariable("HOME");
+        var model = new ShowFilesModel()
+        {
+            HomeDirectory = Environment.GetEnvironmentVariable("HOME")
+        };
 
         model.TempDirectory = "/tmp"; //Linux Path
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -75,7 +76,7 @@ public class AppServicesController : Controller
         return View(model);
     }
 
-    private List<string> GetFiles(string path)
+    private static List<string> GetFiles(string path)
     {
         var result = new List<string>();
         int count = 0;
@@ -93,7 +94,7 @@ public class AppServicesController : Controller
         return result;
     }
 
-    private List<string> GetFolders(string path)
+    private static List<string> GetFolders(string path)
     {
         var result = new List<string>();
         int count = 0;
