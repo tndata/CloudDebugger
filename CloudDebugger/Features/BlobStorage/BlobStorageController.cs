@@ -9,6 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.HomePage
 {
+
+    /// <summary>
+    /// To get the User delegation key demo to work
+    /// 1. Create a storage account named clouddebuggerstorage
+    /// 2. In it, create a blog container named clouddebugger
+    /// 3. In it, upload a blob named MyBlob.txt
+    /// 4. On the storage account. Assign the role "Storage Blob Data Reader" to the identity of this tool.
+    /// </summary>
     public class BlobStorageController : Controller
     {
         private readonly ILogger<BlobStorageController> _logger;
