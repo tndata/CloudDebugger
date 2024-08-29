@@ -7,8 +7,7 @@ namespace CloudDebugger.Features.HomePage
     public class RedisController : Controller
     {
         private readonly ILogger<RedisController> _logger;
-        private static string connectionString = "myrediscache2024.redis.cache.windows.net:6380,password=BpIMci8eWKYegtsm5naeLVaC6ESq2GbVeAzCaJ5DH4w=,ssl=True,abortConnect=False";
-
+        private static string connectionString = "";
 
         public RedisController(ILogger<RedisController> logger)
         {
@@ -23,10 +22,7 @@ namespace CloudDebugger.Features.HomePage
         [HttpGet("/Redis/ReadWriteKeys")]
         public IActionResult GetKeys(RedisModel model)
         {
-            if (model == null)
-            {
-                model = new RedisModel();
-            }
+            model ??= new RedisModel();
             model.ConnectionString = connectionString;
 
             try

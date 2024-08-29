@@ -11,9 +11,8 @@ public class CredentialsController : Controller
     private readonly ILogger<CredentialsController> _logger;
 
     // The double slash is intentional for public cloud.
-    private static readonly string[] scopes = ["https://management.azure.com//.default"];
     //private static readonly string[] scopes = ["https://graph.microsoft.com/.default"];
-
+    private static readonly string[] scopes = ["https://management.azure.com//.default"];
 
     public CredentialsController(ILogger<CredentialsController> logger)
     {
@@ -50,7 +49,7 @@ public class CredentialsController : Controller
         {
             string str = $"Exception:\r\n{exc.Message}";
             model.ErrorMessage = str;
-            _logger.LogInformation("Failed to retrieve access token. Exception: {ExceptionMessage}", exc.Message);
+            _logger.LogInformation(exc, "Failed to retrieve access token");
         }
         totalTimeSw.Stop();
         model.ExecutionTime = $"{totalTimeSw.Elapsed.TotalMilliseconds} ms";
@@ -71,7 +70,7 @@ public class CredentialsController : Controller
         catch (Exception exc)
         {
             model.ErrorMessage = $"Exception:\r\n{exc.Message}";
-            _logger.LogError("Failed to retrieve multiple access token. Exception: {ExceptionMessage}", exc.Message);
+            _logger.LogError(exc, "Failed to retrieve multiple access token");
         }
 
         return View(model);
@@ -82,7 +81,7 @@ public class CredentialsController : Controller
     /// Call new MyDefaultAzureCredential() 10 times in a row a new instance each time, 
     /// is the token the same? Same execution time?
     /// </summary>
-    private List<string>? GetTokensUsingMultipleInstances()
+    private static List<string>? GetTokensUsingMultipleInstances()
     {
         var result = new List<string>();
 
@@ -120,7 +119,7 @@ public class CredentialsController : Controller
     /// is the token the same? Same execution time?
     /// </summary>
     /// <returns></returns>
-    private List<string>? GetTokensUsingSingleInstance()
+    private static List<string>? GetTokensUsingSingleInstance()
     {
         var result = new List<string>();
 
@@ -180,9 +179,6 @@ public class CredentialsController : Controller
 
     private static AccessToken GetAccessToken(MyDefaultAzureCredential credential)
     {
-
-
-        // Create a TokenRequestContext
         var tokenRequestContext = new TokenRequestContext(scopes);
 
         var token = credential.GetToken(tokenRequestContext);

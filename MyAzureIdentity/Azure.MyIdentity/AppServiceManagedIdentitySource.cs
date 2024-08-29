@@ -25,6 +25,8 @@ namespace Azure.MyIdentity
             sb.AppendLine($" - clientId = {_clientId}");
             sb.AppendLine($" - resourceId = {_resourceId}");
             sb.AppendLine($" - secret = {secret}");
+            sb.AppendLine($"[If this step fails, ensure the ClientId is set, for example by setting the AZURE_CLIENT_ID env variable");
+
             return sb.ToString();
         }
 

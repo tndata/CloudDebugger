@@ -13,13 +13,13 @@
         public string? LocalCacheOption { get; set; }
         public string? LocalCacheSize { get; set; }
 
-        public List<string> HomeDirFolders = [];
-        public List<string> HomeDirFiles = [];
+        public List<string> HomeDirFolders { get; set; } = [];
+        public List<string> HomeDirFiles { get; set; } = [];
 
-        public List<string> TempDirFolders = [];
-        public List<string> TempDirFiles = [];
+        public List<string> TempDirFolders { get; set; } = [];
+        public List<string> TempDirFiles { get; set; } = [];
 
-        public List<string> AppDirFolders = [];
-        public List<string> AppDirFiles = [];
+        public List<string> AppDirFolders { get; set; } = [];
+        public List<string> AppDirFiles { get; set; } = [];
     }
 }

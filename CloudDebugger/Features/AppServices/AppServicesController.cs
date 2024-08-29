@@ -25,10 +25,13 @@ public class AppServicesController : Controller
             HomeDirectory = Environment.GetEnvironmentVariable("HOME")
         };
 
-        model.TempDirectory = "/tmp"; //Linux Path
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             model.TempDirectory = Environment.GetEnvironmentVariable("TEMP"); //Windows path
+        }
+        else
+        {
+            model.TempDirectory = "/tmp";  //Linux Path
         }
 
         // https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings

@@ -8,7 +8,7 @@ namespace CloudDebugger.Features.WebHooks;
 public class WebHookLog : IWebHookLog
 {
     private const int MaxLogEntries = 100;
-    private readonly List<WebHookLogEntry> Log = new();
+    private readonly List<WebHookLogEntry> Log = [];
     private readonly object lockObj = new();
 
     public WebHookLog()
@@ -41,10 +41,8 @@ public class WebHookLog : IWebHookLog
         //Return a new list to avoid any enumeration errors
         lock (lockObj)
         {
-            var log = new List<WebHookLogEntry>(Log);
+            return new List<WebHookLogEntry>(Log);
         }
-
-        return Log;
     }
 
 

@@ -1,42 +1,37 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.HomePage
+namespace CloudDebugger.Features.Caching;
+
+public class CachingController : Controller
 {
-    public class CachingController : Controller
+    public CachingController()
     {
-        private readonly ILogger<CachingController> _logger;
+    }
 
+    public IActionResult Index()
+    {
+        return View();
+    }
 
-        public CachingController(ILogger<CachingController> logger)
-        {
-            _logger = logger;
-        }
+    public IActionResult GetTimeNoCacheControl()
+    {
+        return Ok(DateTime.Now.ToString());
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+    public IActionResult GetTimeWithCacheControl()
+    {
+        Response.Headers.CacheControl = "public, max-age=5";
+        return Ok("Cache max for 5 seconds: " + DateTime.Now.ToString());
+    }
 
-        public IActionResult GetTimeNoCacheControl()
-        {
-            return Ok(DateTime.Now.ToString());
-        }
+    public IActionResult GetTimePrivateCacheControl()
+    {
+        Response.Headers.CacheControl = "no-store, no-cache, max-age=0, must-revalidate, proxy-revalidate, private  ";
 
-        public IActionResult GetTimeWithCacheControl()
-        {
-            Response.Headers["Cache-Control"] = "public, max-age=5";
-            return Ok("Cache max for 5 seconds: " + DateTime.Now.ToString());
-        }
+        // Optionally, set other related headers
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.Expires = "0";
 
-        public IActionResult GetTimePrivateCacheControl()
-        {
-            Response.Headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate, proxy-revalidate, private  ";
-
-            // Optionally, set other related headers
-            Response.Headers["Pragma"] = "no-cache";
-            Response.Headers["Expires"] = "0";
-
-            return Ok("Should not be cached: " + DateTime.Now.ToString());
-        }
+        return Ok("Should not be cached: " + DateTime.Now.ToString());
     }
 }
