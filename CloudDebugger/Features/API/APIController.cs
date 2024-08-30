@@ -1,17 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.API
+namespace CloudDebugger.Features.Api
 {
     /// <summary>
     /// Controller for the API HTML summary page
     /// </summary>
-    public class APIController : Controller
+    public class ApiController : Controller
     {
-        private readonly ILogger<APIController> _logger;
-
-        public APIController(ILogger<APIController> logger)
+        public ApiController()
         {
-            _logger = logger;
         }
 
         public IActionResult Index()

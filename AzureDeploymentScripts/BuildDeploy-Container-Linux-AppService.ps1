@@ -79,7 +79,14 @@ $hostName = $AppService.defaultHostName
 $appServiceID = $AppService.id
 Write-Host "App Service created, id: ${appServiceID}"
 
-# Step 6: Set the AcrUserManagedIdentityID using  
+# Step 6: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
+Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."
+$tmp = az webapp config appsettings set --name $AppServiceName_container_linux `
+	--resource-group $rgname `
+	--settings AZURE_CLIENT_ID=$clientId `
+	--output json | ConvertFrom-Json
+
+# Step 7: Set the AcrUserManagedIdentityID using  
 Write-Host "`nSet the identity in the App Service for accessing the ACR."
 $data="{\""acrUserManagedIdentityID\"": \""${clientId}\""}"
 $tmp = az webapp config set `
@@ -89,7 +96,7 @@ $tmp = az webapp config set `
     --output json | ConvertFrom-Json
 
 
-# Step 7: Verify the ACR access settings  
+# Step 8: Verify the ACR access settings  
 $settings = az webapp config show `
     --resource-group $rgname `
     --name $AppServiceName_container_linux `
@@ -99,7 +106,7 @@ Write-Host "acrUseManagedIdentityCreds='$($settings.acrUseManagedIdentityCreds)'
 Write-Host "acrUserManagedIdentityID='$($settings.acrUserManagedIdentityId)'"
 
 
-# Step 8: Enable Application Logging (Filesystem)
+# Step 9: Enable Application Logging (Filesystem)
 Write-Host "`nEnabling application logging for the Container App Service."
 $tmp = az webapp log config `
     --name $AppServiceName_container_linux `
@@ -110,7 +117,7 @@ $tmp = az webapp log config `
     --output json | ConvertFrom-Json
                              
 
-#  Step 9: Now, when everything is setup correctly, we can switch to use the container image instead.
+#  Step 10: Now, when everything is setup correctly, we can switch to use the container image instead.
 $imagePath = "${acrname}.azurecr.io/${imagename}:latest"
 Write-Host "`n`nChange the service to use the container ${imagePath}."
 az webapp config container set `

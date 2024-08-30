@@ -11,7 +11,7 @@ public class LogWorkspaceModel
     /// The name of the table to write to in Log Analytics workspace
     /// We keep it hardcoded for now. The table will be automatically crated 
     /// </summary>
-    public string? logType { get; set; }
+    public string? LogType { get; set; }
 
     [Required]
     /// <summary>

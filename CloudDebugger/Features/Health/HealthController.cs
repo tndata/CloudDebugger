@@ -7,7 +7,7 @@ public class HealthController : Controller
 {
     private readonly ILogger<HealthController> _logger;
 
-    private static CustomHealthStatusEnum customHealthEndpointStatus { get; set; } = CustomHealthStatusEnum.Healthy;
+    private static CustomHealthStatusEnum CustomHealthEndpointStatus { get; set; } = CustomHealthStatusEnum.Healthy;
 
     public HealthController(ILogger<HealthController> logger)
     {
@@ -19,7 +19,7 @@ public class HealthController : Controller
         var model = new HealthModel
         {
             CurrentServiceHealth = Settings.ServiceHealth,
-            CurrentCustomHealth = customHealthEndpointStatus
+            CurrentCustomHealth = CustomHealthEndpointStatus
         };
 
         return View(model);
@@ -28,27 +28,29 @@ public class HealthController : Controller
     [HttpPost]
     public IActionResult SetServiceHealthMode(HealthModel model, string mode)
     {
-        switch (mode)
+        if (ModelState.IsValid)
         {
-            case "Healthy":
-                Settings.ServiceHealth = HealthStatusEnum.Healthy;
-                break;
-            case "Degraded":
-                Settings.ServiceHealth = HealthStatusEnum.Degraded;
-                break;
-            case "Unhealthy":
-                Settings.ServiceHealth = HealthStatusEnum.Unhealthy;
-                break;
-            default:
-                //No change
-                break;
+            switch (mode)
+            {
+                case "Healthy":
+                    Settings.ServiceHealth = HealthStatusEnum.Healthy;
+                    break;
+                case "Degraded":
+                    Settings.ServiceHealth = HealthStatusEnum.Degraded;
+                    break;
+                case "Unhealthy":
+                    Settings.ServiceHealth = HealthStatusEnum.Unhealthy;
+                    break;
+                default:
+                    //No change
+                    break;
+            }
+
+            model ??= new HealthModel();
+
+            model.CurrentServiceHealth = Settings.ServiceHealth;
+            model.CurrentCustomHealth = CustomHealthEndpointStatus;
         }
-
-        if (model == null)
-            model = new HealthModel();
-
-        model.CurrentServiceHealth = Settings.ServiceHealth;
-        model.CurrentCustomHealth = customHealthEndpointStatus;
 
         return View("index", model);
     }
@@ -57,30 +59,32 @@ public class HealthController : Controller
     [HttpPost]
     public IActionResult SetCustomHealthMode(HealthModel model, string mode)
     {
-        switch (mode)
+        if (ModelState.IsValid)
         {
-            case "healthy":
-                customHealthEndpointStatus = CustomHealthStatusEnum.Healthy;
-                break;
-            case "delayed10s":
-                customHealthEndpointStatus = CustomHealthStatusEnum.Delayed10s;
-                break;
-            case "delayed60s":
-                customHealthEndpointStatus = CustomHealthStatusEnum.Delayed60s;
-                break;
-            case "error":
-                customHealthEndpointStatus = CustomHealthStatusEnum.Error;
-                break;
-            default:
-                //No change
-                break;
+            switch (mode)
+            {
+                case "healthy":
+                    CustomHealthEndpointStatus = CustomHealthStatusEnum.Healthy;
+                    break;
+                case "delayed10s":
+                    CustomHealthEndpointStatus = CustomHealthStatusEnum.Delayed10s;
+                    break;
+                case "delayed60s":
+                    CustomHealthEndpointStatus = CustomHealthStatusEnum.Delayed60s;
+                    break;
+                case "error":
+                    CustomHealthEndpointStatus = CustomHealthStatusEnum.Error;
+                    break;
+                default:
+                    //No change
+                    break;
+            }
+
+            model ??= new HealthModel();
+
+            model.CurrentServiceHealth = Settings.ServiceHealth;
+            model.CurrentCustomHealth = CustomHealthEndpointStatus;
         }
-
-        if (model == null)
-            model = new HealthModel();
-
-        model.CurrentServiceHealth = Settings.ServiceHealth;
-        model.CurrentCustomHealth = customHealthEndpointStatus;
 
         return View("index", model);
     }
@@ -89,7 +93,7 @@ public class HealthController : Controller
     public IActionResult CustomEndpoint()
     {
         string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        switch (customHealthEndpointStatus)
+        switch (CustomHealthEndpointStatus)
         {
             case CustomHealthStatusEnum.Healthy:
                 return Ok("I am healthy, current time=" + time);

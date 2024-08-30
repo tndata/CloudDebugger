@@ -9,9 +9,11 @@ $identity = az identity create --name $identityName `
                    --output json | ConvertFrom-Json
 $identityId = $identity.id
 $principalId = $identity.principalId
+$clientId = $identity.clientId
 Write-Host "User-assigned managed identity created"
 Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
+Write-Host "ClientId: ${clientId}"
 
 # Step 2: Get the Azure Container Registry ID
 Write-Host "`n`nRetrieving the Azure Container Registry ID"
@@ -53,7 +55,9 @@ $containerEnv = az containerapp env create `
 Write-Host "Container Apps Environment created"
 
 # Step 7: Create Azure Container App for CloudDebugger
+# Set DEPLOY_TRIGGER to a random value to force a redeployment
 Write-Host "`nCreating Azure Container App for CloudDebugger"
+$randomValue = [guid]::NewGuid().ToString()
 $container = az containerapp create `
     --name $containerAppName `
     --environment $environmentName `
@@ -68,6 +72,7 @@ $container = az containerapp create `
     --memory 0.5 `
     --min-replicas 1 `
     --max-replicas 1 `
+    --env-vars AZURE_CLIENT_ID=$clientId DEPLOY_TRIGGER=$randomValue `
     --output json | ConvertFrom-Json
 $containerId = $container.id
 

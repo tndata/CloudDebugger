@@ -1,30 +1,30 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.API
+namespace CloudDebugger.Features.Api
 {
     /// <summary>
     /// The various REST API Endpoints
     /// </summary>
     [EnableCors("MyCorsPolicy_wildcard")]
     [ApiController]
-    public class APIEndpointsController : ControllerBase
+    public class ApiEndpointsController : ControllerBase
     {
-        private readonly ILogger<APIEndpointsController> _logger;
-        private static CustomerDatabase m_db = new();
+        private readonly ILogger<ApiEndpointsController> _logger;
+        private static readonly CustomerDatabase m_db = new();
 
-        public APIEndpointsController(ILogger<APIEndpointsController> logger)
+        public ApiEndpointsController(ILogger<ApiEndpointsController> logger)
         {
             _logger = logger;
         }
 
-        [Route("/api/customers")]
+        [HttpGet("/api/customers")]
         public IEnumerable<Customer> GetAllCustomers()
         {
             return m_db.GetAllCustomers();
         }
 
-        [Route("/api/customers/{id}")]
+        [HttpGet("/api/customers/{id}")]
         public ActionResult<Customer> GetSingleCustomer(int id)
         {
             var cust = m_db.GetCustomer(id);
@@ -34,8 +34,7 @@ namespace CloudDebugger.Features.API
                 : NotFound();
         }
 
-
-        [Route("/api/echo")]
+        [HttpGet("/api/echo")]
         public ActionResult<RequestHeaders> Echo()
         {
             // Add the code to return all the request headers in the response
@@ -49,7 +48,7 @@ namespace CloudDebugger.Features.API
             return Ok(response);
         }
 
-        [Route("/api/time")]
+        [HttpGet("/api/time")]
         public ActionResult<RequestHeaders> CurrentTime()
         {
             return Ok(DateTime.Now.ToString("HH:mm:ss"));

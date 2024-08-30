@@ -56,7 +56,7 @@ namespace CloudDebugger.Features.EventGrid
                         // See https://github.com/microsoft/azure-container-apps/issues/442
                         // because one or more UserAssignedIdentity can be assigned to an Azure Resource, we have to be explicit about which one to use.
                         userAssignedClientID = Environment.GetEnvironmentVariable("USERASSIGNEDCLIENTID") ?? "";
-                        if (string.IsNullOrWhiteSpace(userAssignedClientID) == false)
+                        if (!string.IsNullOrWhiteSpace(userAssignedClientID))
                         {
                             defaultCredentialOptions.ManagedIdentityClientId = userAssignedClientID;
                         }
@@ -70,7 +70,6 @@ namespace CloudDebugger.Features.EventGrid
                                                               new AzureKeyCredential(_accessKey));
                     }
 
-                    int id = model.StartNumber;
                     int eventId = model.StartNumber;
 
                     CloudEvent? @event = null;
@@ -119,7 +118,7 @@ namespace CloudDebugger.Features.EventGrid
                     model.StartNumber = eventId;
                     model.Message = "Events sent!";
 
-                    if (string.IsNullOrWhiteSpace(userAssignedClientID) == false)
+                    if (!string.IsNullOrWhiteSpace(userAssignedClientID))
                     {
                         model.Message = model.Message + " Using Entra ID identity " + userAssignedClientID;
                     }
@@ -127,7 +126,7 @@ namespace CloudDebugger.Features.EventGrid
                 catch (Exception exc)
                 {
                     string msg = "";
-                    if (string.IsNullOrWhiteSpace(userAssignedClientID) == false)
+                    if (!string.IsNullOrWhiteSpace(userAssignedClientID))
                     {
                         msg = "Using Entra ID identity " + userAssignedClientID + "\r\n";
                     }

@@ -6,6 +6,6 @@
         public string? NonCachablePath { get; set; }
         public string? TempPath { get; set; }
 
-        public List<string>? ResultLog { get; set; } = new();
+        public List<string>? ResultLog { get; set; } = [];
     }
 }

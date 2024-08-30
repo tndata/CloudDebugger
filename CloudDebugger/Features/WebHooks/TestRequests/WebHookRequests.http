@@ -1,4 +1,4 @@
-@hostname=https://localhost:5001
+@hostname=https://as-clouddebugger-linux.azurewebsites.net/ 
 @hookId=1
 
 

@@ -11,7 +11,7 @@ public class CredentialsController : Controller
     private readonly ILogger<CredentialsController> _logger;
 
     // The double slash is intentional for public cloud.
-    //private static readonly string[] scopes = ["https://graph.microsoft.com/.default"];
+    // private static readonly string[] scopes = ["https://graph.microsoft.com/.default"];
     private static readonly string[] scopes = ["https://management.azure.com//.default"];
 
     public CredentialsController(ILogger<CredentialsController> logger)

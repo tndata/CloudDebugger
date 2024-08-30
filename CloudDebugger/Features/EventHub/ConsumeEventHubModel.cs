@@ -14,5 +14,5 @@ public class ConsumeEventHubModel
 
     public string? Message { get; set; }
 
-    public List<EventHubLogEntry> Events = new();
+    public List<EventHubLogEntry> Events { get; set; } = [];
 }

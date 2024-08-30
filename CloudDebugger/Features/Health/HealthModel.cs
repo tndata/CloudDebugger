@@ -2,6 +2,6 @@
 
 public class HealthModel
 {
-    public HealthStatusEnum CurrentServiceHealth { get; set; }
-    public CustomHealthStatusEnum CurrentCustomHealth { get; set; }
+    public HealthStatusEnum CurrentServiceHealth { get; set; } = HealthStatusEnum.Unhealthy;
+    public CustomHealthStatusEnum CurrentCustomHealth { get; set; } = CustomHealthStatusEnum.Error;
 }

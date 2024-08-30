@@ -9,7 +9,7 @@ using System.Diagnostics.Tracing;
 using System.Reflection;
 
 Console.Title = "CloudDebugger";
-Settings.StartupTime = DateTime.Now;
+Settings.StartupTime = DateTime.UtcNow;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -35,14 +35,12 @@ var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Lo
 Log.Information("Project Build time: {StartTime}", versionInfo?.LegalCopyright);
 
 
-var listener = new AzureEventSourceListener((e, message) =>
+_ = new AzureEventSourceListener((e, message) =>
 {
     // Only log messages from "Azure-Core" event source
     //Azure-Messaging-ServiceBus
     //Azure-Messaging-EventHubs
     //Azure-Messaging-ServiceBus
-
-    // Console.WriteLine(e.EventSource.Name);
 
     if (e.EventSource.Name == "Azure-Core" || e.EventSource.Name == "Azure-Identity")
     {

@@ -15,9 +15,11 @@ $identity = az identity create --name $identityName `
                    --output json | ConvertFrom-Json
 $identityId = $identity.id
 $principalId = $identity.principalId
+$clientId = $identity.clientId
 Write-Host "User-assigned managed identity created"
 Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
+Write-Host "ClientId: ${clientId}"
 
 # Step 2: Get the Azure Container Registry ID
 Write-Host "`n`nRetrieving the Azure Container Registry ID"
@@ -61,6 +63,7 @@ $container = az container create --resource-group $rgname `
                                 --acr-identity $identityId `
                                 --log-analytics-workspace $workspaceId `
                                 --log-analytics-workspace-key $workspaceKey `
+                                --environment-variables AZURE_CLIENT_ID=$clientId `
                                 --output json | ConvertFrom-Json
 $containerId = $container.id
 $hostName = $container.ipAddress.fqdn

@@ -1,7 +1,6 @@
-using CloudDebugger.Features.WebHooks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.WebHook;
+namespace CloudDebugger.Features.WebHooks;
 
 public class WebHooksController : Controller
 {

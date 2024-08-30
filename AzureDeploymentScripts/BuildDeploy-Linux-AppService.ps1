@@ -29,9 +29,11 @@ $identity = az identity create --name $identityName `
                    --output json | ConvertFrom-Json
 $identityId = $identity.id
 $principalId = $identity.principalId
+$clientId = $identity.clientId
 Write-Host "User-assigned managed identity created"
 Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
+Write-Host "ClientId: ${clientId}"
 
 # Step 5: Create the Linux App Service Plan
 Write-Host "`nCreating the Linux App Service Plan '${AppServicePlan_linux}'."
@@ -51,6 +53,14 @@ $AppService = az webapp create --name $AppServiceName_linux `
                                           --runtime 'DOTNETCORE:8.0' `
                                           --assign-identity $identityId `
                                           --output json | ConvertFrom-Json
+
+# Step 7: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
+Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."
+$tmp = az webapp config appsettings set --name $AppServiceName_linux `
+	--resource-group $rgname `
+	--settings AZURE_CLIENT_ID=$clientId `
+	--output json | ConvertFrom-Json
+
 # $appServiceID = $AppService.id
 # $hostName = $AppService.defaultHostName
 # Write-Host "App Service created, id: ${appServiceID}"
