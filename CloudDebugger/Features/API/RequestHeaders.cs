@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.API;
+﻿namespace CloudDebugger.Features.Api;
 
 public class RequestHeaders
 {

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace CloudDebugger.Features.FileSystem;
 
@@ -18,12 +20,36 @@ public class FileSystemController : Controller
 
     public IActionResult ReadWriteFiles()
     {
-        var model = new ReadWriteFilesModel();
+        var model = new ReadWriteFilesModel()
+        {
+            Message = "",
+            ErrorMessage = "",
+            DirectoryContent = []
+        };
 
-        model.DirectoryContent = GetDirectoryContent(model.Path);
-        model.AppPath = AppContext.BaseDirectory;
-        model.HomePath = Environment.GetEnvironmentVariable("HOME") ?? "[Unknown]";
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                //Linux
+                model.Path = "/tmp";
+            }
+            else
+            {
+                //Windows
+                model.Path = Environment.GetEnvironmentVariable("HOME") ?? @"c:\temp";
+            }
 
+            model.DirectoryContent = GetDirectoryContent(model.Path);
+            model.AppPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? "[Unknown]");
+            model.HomePath = Environment.GetEnvironmentVariable("HOME") ?? "[Unknown]";
+        }
+        catch (Exception exc)
+        {
+            _logger.LogInformation(exc, "Failure when calling ReadWriteFiles");
+            string str = $"Exception:\r\n{exc.Message}";
+            model.ErrorMessage = str;
+        }
 
         return View(model);
     }
@@ -31,7 +57,7 @@ public class FileSystemController : Controller
     [HttpPost]
     public IActionResult ReadWriteFiles(ReadWriteFilesModel model, string button)
     {
-        if (model == null)
+        if (ModelState.IsValid == false || model == null)
             return View(new ReadWriteFilesModel());
 
         model.Message = "";
@@ -62,6 +88,7 @@ public class FileSystemController : Controller
         }
         catch (Exception exc)
         {
+            _logger.LogInformation(exc, "Failure when doing a ReadWriteFiles operation");
             string str = $"Exception:\r\n{exc.Message}";
             model.ErrorMessage = str;
         }
@@ -95,7 +122,7 @@ public class FileSystemController : Controller
             {
                 var content = System.IO.File.ReadAllText(filePath);
                 if (content.Length > 10000)
-                    content = content.Substring(0, 10000) + "\r\n\r\nDisplaying the first 10,000 characters....";
+                    content = $"{content.Substring(0, 10000)}\r\n\r\nDisplaying the first 10,000 characters....";
                 return content;
             }
             else
@@ -112,7 +139,7 @@ public class FileSystemController : Controller
 
     private static void CreateDirectory(ReadWriteFilesModel model)
     {
-        if (string.IsNullOrWhiteSpace(model.Path) == false)
+        if (!string.IsNullOrWhiteSpace(model.Path))
         {
             Directory.CreateDirectory(model.Path);
             model.Message = "Folder created";

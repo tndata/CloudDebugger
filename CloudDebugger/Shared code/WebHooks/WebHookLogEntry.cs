@@ -42,5 +42,5 @@ public class WebHookLogEntry
     /// <summary>
     /// All the request headers
     /// </summary>
-    public Dictionary<string, string> RequestHeaders { get; set; } = new();
+    public Dictionary<string, string> RequestHeaders { get; set; } = [];
 }

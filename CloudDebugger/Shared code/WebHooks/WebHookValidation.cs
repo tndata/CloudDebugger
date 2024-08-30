@@ -20,9 +20,9 @@ public static class WebHookValidation
     /// <param name="logEntry"></param>
     public static void CheckIfEventGridSchemaValdationRequest(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)
     {
-        if (logEntry.RequestHeaders.ContainsKey("aeg-event-type"))
+        if (logEntry.RequestHeaders.TryGetValue("aeg-event-type", out string? value))
         {
-            var eventType = logEntry.RequestHeaders["aeg-event-type"];
+            var eventType = value;
 
             switch (eventType)
             {
@@ -60,7 +60,7 @@ public static class WebHookValidation
             var callbackUrl = logEntry.RequestHeaders["WebHook-Request-Callback"];
             var callbackorigin = logEntry.RequestHeaders["WebHook-Request-Origin"];
 
-            if (string.IsNullOrEmpty(callbackUrl) == false)
+            if (!string.IsNullOrEmpty(callbackUrl))
             {
                 //Respond with the correct headers and body
                 httpContext.Response.Headers.Append("WebHook-Request-Origin", "eventgrid.azure.net");

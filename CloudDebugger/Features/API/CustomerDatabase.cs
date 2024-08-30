@@ -1,16 +1,13 @@
-﻿using System.Data;
-
-
-namespace CloudDebugger.Features.API;
+﻿namespace CloudDebugger.Features.Api;
 
 public class CustomerDatabase
 {
-    private static readonly List<Customer> m_customers;
+    private readonly List<Customer> m_customers;
 
-    static CustomerDatabase()
+    public CustomerDatabase()
     {
-        m_customers = new List<Customer>
-        {
+        m_customers =
+        [
             new Customer { Id=1, FirstName = "Muriel", LastName = "Cook", StreetAddress = "22523 Willison Street", City = "Minneapolis", ZipCode = "55415"},
             new Customer { Id=2, FirstName = "Kenny", LastName = "Taylor", StreetAddress = "493 Sarah Drive", City = "Lake Charles", ZipCode = "70601" },
             new Customer { Id=3, FirstName = "Patrick", LastName = "Masi", StreetAddress = "932 White Lane", City = "Macon", ZipCode = "31201" },
@@ -22,7 +19,7 @@ public class CustomerDatabase
             new Customer { Id=9, FirstName = "Stephen", LastName = "McCormick", StreetAddress = "1177 Spadafore Drive", City = "Sigel", ZipCode = "15860"},
             new Customer { Id=10, FirstName = "James", LastName = "Hill", StreetAddress = "3759 Jefferson Street", City = "Atlanta", ZipCode = "30318"},
             new Customer { Id=11, FirstName = "Antonia", LastName = "Trevino", StreetAddress = "3031 Carson Street", City = "California", ZipCode = "02110"},
-        };
+        ];
 
         //Add some more ustomers
         for (int i = m_customers.Count; i < 100; i++)
@@ -40,7 +37,7 @@ public class CustomerDatabase
 
     public Customer? GetCustomer(int id)
     {
-        return m_customers.Where(x => x.Id == id).FirstOrDefault();
+        return m_customers.Find(x => x.Id == id);
     }
 
     public int AddCustomer(Customer customer)

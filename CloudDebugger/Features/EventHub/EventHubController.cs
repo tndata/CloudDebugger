@@ -53,10 +53,7 @@ public class EventHubController : Controller
 
             try
             {
-                int id = model.StartNumber;
                 int eventId = model.StartNumber;
-
-
                 EventData? eventData = null;
 
                 for (int i = 0; i < model.NumberOfEvents; i++)
@@ -164,7 +161,7 @@ public class EventHubController : Controller
 
                         var entry = new EventHubLogEntry()
                         {
-                            EventDetails = new()
+                            EventDetails = []
                         };
 
                         var contentType = @event.Data.ContentType;

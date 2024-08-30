@@ -1,8 +1,7 @@
-using CloudDebugger.Features.Redis;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 
-namespace CloudDebugger.Features.HomePage
+namespace CloudDebugger.Features.Redis
 {
     public class RedisController : Controller
     {
@@ -68,9 +67,8 @@ namespace CloudDebugger.Features.HomePage
         private static List<string> ScanKeys(string pattern)
         {
             var connection = ConnectionMultiplexer.Connect(connectionString);
-            IDatabase db = connection.GetDatabase();
-
             var server = connection.GetServer(connection.GetEndPoints()[0]);
+
             var keys = new List<RedisKey>();
             long cursor;
             do

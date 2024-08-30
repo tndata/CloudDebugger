@@ -37,6 +37,7 @@ namespace CloudDebugger.Features.RequestLogger
             return RedirectToAction("RequestList");
         }
 
+        [HttpGet()]
         public IActionResult RequestDetails(int id)
         {
             var logEntry = RequestLog.LookupLogEntry(id);

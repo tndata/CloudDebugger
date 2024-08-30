@@ -57,7 +57,7 @@ public static class WebHookUtility
             }
         }
 
-        logEntry.RequestHeaders = new();
+        logEntry.RequestHeaders = [];
         foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> header in request.Headers.OrderBy(h => h.Key))
         {
             logEntry.RequestHeaders.Add(header.Key, header.Value.ToString() ?? "");

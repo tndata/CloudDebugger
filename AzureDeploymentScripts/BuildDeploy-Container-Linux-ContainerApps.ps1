@@ -9,9 +9,11 @@ $identity = az identity create --name $identityName `
                    --output json | ConvertFrom-Json
 $identityId = $identity.id
 $principalId = $identity.principalId
+$clientId = $identity.clientId
 Write-Host "User-assigned managed identity created"
 Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
+Write-Host "ClientId: ${clientId}"
 
 # Step 2: Get the Azure Container Registry ID
 Write-Host "`n`nRetrieving the Azure Container Registry ID"
@@ -68,6 +70,7 @@ $container = az containerapp create `
     --memory 0.5 `
     --min-replicas 1 `
     --max-replicas 1 `
+    --env-vars AZURE_CLIENT_ID=$clientId `
     --output json | ConvertFrom-Json
 $containerId = $container.id
 

@@ -19,10 +19,8 @@ namespace CloudDebugger.Features.Logging
         [HttpGet("/Logging/WriteToLog")]
         public IActionResult GetWriteToLogPage(LoggingModel model)
         {
-            if (model == null)
-            {
-                model = new LoggingModel();
-            }
+            //TODO: Refactor!!
+            model ??= new LoggingModel();
 
             return View("WriteToLog", model);
         }
@@ -30,26 +28,27 @@ namespace CloudDebugger.Features.Logging
         [HttpPost("/Logging/WriteToLog")]
         public IActionResult WriteToLogAction(LoggingModel model)
         {
-            model.LogMessage = "";
+            if (ModelState.IsValid)
+            {
+                model.LogMessage = "";
+                string message = model.LogMessage ?? "This is my log message!";
 
-            string message = model.LogMessage ?? "This is my log message!";
+                WriteToLog(message, LogLevel.Trace);
+                WriteToLog(message, LogLevel.Debug);
+                WriteToLog(message, LogLevel.Information);
+                WriteToLog(message, LogLevel.Warning);
+                WriteToLog(message, LogLevel.Error);
+                WriteToLog(message, LogLevel.Critical);
 
-            WriteToLog(message, LogLevel.Trace);
-            WriteToLog(message, LogLevel.Debug);
-            WriteToLog(message, LogLevel.Information);
-            WriteToLog(message, LogLevel.Warning);
-            WriteToLog(message, LogLevel.Error);
-            WriteToLog(message, LogLevel.Critical);
-
-            model.Message = "Log messages written successfully!";
+                model.Message = "Log messages written successfully!";
+            }
 
             return View("WriteToLog", model);
         }
 
         private void WriteToLog(string message, LogLevel logLevel)
         {
-            message = "This message was written with the " + logLevel + " log level.\r\n" + message + "\r\n";
-            _logger.Log(logLevel, message);
+            _logger.Log(logLevel, "This message was written with the {LogLevel} log level. {Message}", logLevel, message);
         }
     }
 }

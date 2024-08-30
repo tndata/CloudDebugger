@@ -2,7 +2,7 @@
 {
     public class ReadWriteFilesModel
     {
-        public string? Path { get; set; } = "c:\\temp";
+        public string? Path { get; set; }
         public string? FileName { get; set; } = "test.txt";
         public string? FileContent { get; set; } = "Current time is " + DateTime.Now;
 
@@ -12,7 +12,6 @@
         public string? ErrorMessage { get; set; }
         public string? Message { get; set; }
 
-
-        public List<(string name, string size)> DirectoryContent = new();
+        public List<(string name, string size)>? DirectoryContent { get; set; }
     }
 }

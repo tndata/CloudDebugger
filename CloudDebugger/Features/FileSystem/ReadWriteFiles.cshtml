@@ -17,6 +17,20 @@
     </tr>
 </table>
 
+@if (String.IsNullOrWhiteSpace(Model.ErrorMessage) == false)
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (String.IsNullOrWhiteSpace(Model.Message) == false)
+{
+    <b>@Model.Message</b>
+}
+
+
+
 <form asp-action="ReadWriteFiles" method="post">
 
     <table class="table table-bordered">
@@ -43,7 +57,7 @@
                 <h5>Folders and files in this directory</h5>
                 <table class="table">
 
-                    @if (Model.DirectoryContent.Count > 0)
+                    @if (Model != null && Model.DirectoryContent?.Count > 0)
                     {
                         <tr>
                             <td class="col-md-3">
@@ -102,7 +116,7 @@
 
                     <tr>
                         <td>
-                            @if (string.IsNullOrEmpty(Model.FileContent) == false)
+                            @if (Model != null && string.IsNullOrEmpty(Model.FileContent) == false)
                             {
                                 <h5>File content</h5>
                                 <textarea asp-for="FileContent" rows="50" cols="50"></textarea>
@@ -130,14 +144,3 @@
 
 
 
-@if (String.IsNullOrWhiteSpace(Model.ErrorMessage) == false)
-{
-    <div class="alert alert-danger" role="alert">
-        <pre>@Model.ErrorMessage</pre>
-    </div>
-}
-
-@if (String.IsNullOrWhiteSpace(Model.Message) == false)
-{
-    <b>@Model.Message</b>
-}

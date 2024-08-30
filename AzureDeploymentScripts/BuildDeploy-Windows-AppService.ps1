@@ -29,9 +29,11 @@ $identity = az identity create --name $identityName `
                    --output json | ConvertFrom-Json
 $identityId = $identity.id
 $principalId = $identity.principalId
+$clientId = $identity.clientId
 Write-Host "User-assigned managed identity created"
 Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
+Write-Host "ClientId: ${clientId}"
 
 # Step 5: Create the App Service Plan
 Write-Host "`nCreating the Windows App Service Plan '${AppServicePlan_win}'."
@@ -55,7 +57,14 @@ $appServiceID = $AppService.id
 $hostName = $AppService.defaultHostName
 Write-Host "App Service created, id: ${appServiceID}"
 
-# Step 7: Enable Application Logging (Filesystem)
+# Step 7: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
+Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."
+$tmp = az webapp config appsettings set --name $AppServiceName_win `
+	--resource-group $rgname `
+	--settings AZURE_CLIENT_ID=$clientId `
+	--output json | ConvertFrom-Json
+
+# Step 8: Enable Application Logging (Filesystem)
 Write-Host "`nEnabling application logging for the App Service."
 $res2 = az webapp log config --name $AppServiceName_win `
                              --resource-group $rgname `
@@ -64,11 +73,11 @@ $res2 = az webapp log config --name $AppServiceName_win `
                              | ConvertFrom-Json
 
 write-host "Set platform settings to 64 bits for Windows App Service (The App Service is by default 32 bit!)"
-$tmp1 = az webapp config set --resource-group $rgname `
+$tmp = az webapp config set --resource-group $rgname `
                      --name $AppServiceName_win `
                      --use-32bit-worker-process false
 
-# Step 8: Deploy the ZIP file to the App Service
+# Step 9: Deploy the ZIP file to the App Service
 Write-Host "`nUploading the CloudDebugger ZIP file to the App Service"
 $deployResult = az webapp deploy --resource-group $rgname `
                             --name $AppServiceName_win `
@@ -83,7 +92,7 @@ $deploymentId = $deployResult.id
 $deploymentProvisioningState = $deployResult.provisioningState
 Write-Host "App Service deployment completed with id: ${deploymentId}, provisioningState: ${deploymentProvisioningState}"
 
-# Step 9: Assign the User-Assigned Identity to the Web App
+# Step 10: Assign the User-Assigned Identity to the Web App
 Write-Host "`nAssigning the User-Assigned Identity to the Web App."
 $tmp = az webapp identity assign --name $AppServiceName_win --resource-group $rgname --identities $identityId
 

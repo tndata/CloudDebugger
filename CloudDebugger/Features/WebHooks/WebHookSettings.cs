@@ -1,6 +1,6 @@
 ﻿namespace CloudDebugger.Features.WebHooks
 {
-    public class WebHookSettings
+    public static class WebHookSettings
     {
         /// <summary>
         /// If true, the webhook endpoins will return a 500 error.
