@@ -32,6 +32,9 @@
 
 
 <form asp-action="ReadWriteFiles" method="post">
+    
+    <input type="hidden" asp-for="HomePath" />
+    <input type="hidden" asp-for="AppPath" />
 
     <table class="table table-bordered">
         <tr>

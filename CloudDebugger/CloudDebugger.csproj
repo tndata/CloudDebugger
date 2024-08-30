@@ -52,7 +52,7 @@
 
 	<!--Set the build date https://stackoverflow.com/a/50607951/68490-->
 	<PropertyGroup>
-		<Copyright>$([System.DateTime]::Now.ToString("HH:mm:ss"))</Copyright>
+		<Copyright>$([System.DateTime]::UtcNow.ToString("HH:mm:ss"))</Copyright>
 	</PropertyGroup>
 
 </Project>

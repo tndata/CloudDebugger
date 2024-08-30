@@ -20,29 +20,11 @@ public class FileSystemController : Controller
 
     public IActionResult ReadWriteFiles()
     {
-        var model = new ReadWriteFilesModel()
-        {
-            Message = "",
-            ErrorMessage = "",
-            DirectoryContent = []
-        };
-
+        var model = GetDefaultModel();
         try
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                //Linux
-                model.Path = "/tmp";
-            }
-            else
-            {
-                //Windows
-                model.Path = Environment.GetEnvironmentVariable("HOME") ?? @"c:\temp";
-            }
-
             model.DirectoryContent = GetDirectoryContent(model.Path);
-            model.AppPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? "[Unknown]");
-            model.HomePath = Environment.GetEnvironmentVariable("HOME") ?? "[Unknown]";
+
         }
         catch (Exception exc)
         {
@@ -57,15 +39,17 @@ public class FileSystemController : Controller
     [HttpPost]
     public IActionResult ReadWriteFiles(ReadWriteFilesModel model, string button)
     {
-        if (ModelState.IsValid == false || model == null)
-            return View(new ReadWriteFilesModel());
+        model ??= GetDefaultModel();
 
-        model.Message = "";
-        model.ErrorMessage = "";
-        ModelState.Clear();
+        if (!ModelState.IsValid)
+            return View(model);
 
         try
         {
+            model.Message = "";
+            model.ErrorMessage = "";
+            ModelState.Clear();
+
             switch (button)
             {
                 case "changepath":
@@ -207,5 +191,30 @@ public class FileSystemController : Controller
             }
         }
         return result;
+    }
+
+    private static ReadWriteFilesModel GetDefaultModel()
+    {
+        var model = new ReadWriteFilesModel()
+        {
+            Message = "",
+            ErrorMessage = "",
+            DirectoryContent = []
+        };
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            //Linux
+            model.Path = "/tmp";
+        }
+        else
+        {
+            //Windows
+            model.Path = Environment.GetEnvironmentVariable("HOME") ?? @"c:\temp";
+        }
+        model.AppPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? "[Unknown]");
+        model.HomePath = Environment.GetEnvironmentVariable("HOME") ?? "[Unknown]";
+
+        return model;
     }
 }

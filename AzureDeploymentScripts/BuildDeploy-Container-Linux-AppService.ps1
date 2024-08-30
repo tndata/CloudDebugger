@@ -86,7 +86,6 @@ $tmp = az webapp config appsettings set --name $AppServiceName_container_linux `
 	--settings AZURE_CLIENT_ID=$clientId `
 	--output json | ConvertFrom-Json
 
-
 # Step 7: Set the AcrUserManagedIdentityID using  
 Write-Host "`nSet the identity in the App Service for accessing the ACR."
 $data="{\""acrUserManagedIdentityID\"": \""${clientId}\""}"
