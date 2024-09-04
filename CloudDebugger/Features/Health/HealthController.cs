@@ -28,6 +28,8 @@ public class HealthController : Controller
     [HttpPost]
     public IActionResult SetServiceHealthMode(HealthModel model, string mode)
     {
+        _logger.LogInformation("SetServiceHealthMode action called, mode={Mode}", mode);
+
         if (ModelState.IsValid)
         {
             switch (mode)
@@ -59,6 +61,8 @@ public class HealthController : Controller
     [HttpPost]
     public IActionResult SetCustomHealthMode(HealthModel model, string mode)
     {
+        _logger.LogInformation("SetCustomHealthMode action called, mode={Mode}", mode);
+
         if (ModelState.IsValid)
         {
             switch (mode)
@@ -92,6 +96,8 @@ public class HealthController : Controller
 
     public IActionResult CustomEndpoint()
     {
+        _logger.LogInformation("CustomEndpoint action called");
+
         string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         switch (CustomHealthEndpointStatus)
         {

@@ -4,150 +4,152 @@ using Azure.Messaging.EventGrid;
 using Azure.MyIdentity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.EventGrid
+namespace CloudDebugger.Features.EventGrid;
+
+/// <summary>
+/// Azure Event Grid client library for .NET
+/// https://learn.microsoft.com/en-us/dotnet/api/overview/azure/messaging.eventgrid-readme?view=azure-dotnet
+/// 
+/// </summary>
+public class EventGridController : Controller
 {
-    /// <summary>
-    /// Azure Event Grid client library for .NET
-    /// https://learn.microsoft.com/en-us/dotnet/api/overview/azure/messaging.eventgrid-readme?view=azure-dotnet
-    /// 
-    /// </summary>
-    public class EventGridController : Controller
+    private readonly ILogger<EventGridController> _logger;
+
+    private static string _accessKey = "";
+
+    public EventGridController(ILogger<EventGridController> logger)
     {
-        private readonly ILogger<EventGridController> _logger;
+        _logger = logger;
+    }
 
-        private static string _accessKey = "";
+    public IActionResult Index()
+    {
+        return View();
+    }
 
-        public EventGridController(ILogger<EventGridController> logger)
+    [HttpGet("/EventGrid/SendEvents")]
+    public IActionResult GetSendEvents(SendEventGridModel model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        model ??= new SendEventGridModel();
+        model.AccessKey = _accessKey;
+
+        return View("SendEvents", model);
+    }
+
+    [HttpPost("/EventGrid/SendEvents")]
+    public IActionResult PostSendEvents(SendEventGridModel model)
+    {
+        if (model != null && ModelState.IsValid)
         {
-            _logger = logger;
-        }
+            _accessKey = model.AccessKey ?? "";   //Remember access key
+            model.Exception = "";
+            model.Message = "";
+            string userAssignedClientID = "";
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        [HttpGet("/EventGrid/SendEvents")]
-        public IActionResult GetSendEvents(SendEventGridModel model)
-        {
-            model ??= new SendEventGridModel();
-            model.AccessKey = _accessKey;
-
-            return View("SendEvents", model);
-        }
-
-        [HttpPost("/EventGrid/SendEvents")]
-        public IActionResult PostSendEvents(SendEventGridModel model)
-        {
-            if (model != null && ModelState.IsValid)
+            try
             {
-                _accessKey = model.AccessKey ?? "";   //Remember access key
-                model.Exception = "";
-                model.Message = "";
-                string userAssignedClientID = "";
-
-                try
+                EventGridPublisherClient? client = null;
+                if (string.IsNullOrWhiteSpace(_accessKey))
                 {
-                    EventGridPublisherClient? client = null;
-                    if (string.IsNullOrWhiteSpace(_accessKey))
+                    var defaultCredentialOptions = new DefaultAzureCredentialOptions();
+
+                    // See https://github.com/microsoft/azure-container-apps/issues/442
+                    // because one or more UserAssignedIdentity can be assigned to an Azure Resource, we have to be explicit about which one to use.
+                    userAssignedClientID = Environment.GetEnvironmentVariable("USERASSIGNEDCLIENTID") ?? "";
+                    if (!string.IsNullOrWhiteSpace(userAssignedClientID))
                     {
-                        var defaultCredentialOptions = new DefaultAzureCredentialOptions();
+                        defaultCredentialOptions.ManagedIdentityClientId = userAssignedClientID;
+                    }
 
-                        // See https://github.com/microsoft/azure-container-apps/issues/442
-                        // because one or more UserAssignedIdentity can be assigned to an Azure Resource, we have to be explicit about which one to use.
-                        userAssignedClientID = Environment.GetEnvironmentVariable("USERASSIGNEDCLIENTID") ?? "";
-                        if (!string.IsNullOrWhiteSpace(userAssignedClientID))
+                    client = new EventGridPublisherClient(new Uri(model.TopicEndpoint ?? ""),
+                                                          new MyDefaultAzureCredential(defaultCredentialOptions));
+                }
+                else
+                {
+                    client = new EventGridPublisherClient(new Uri(model.TopicEndpoint ?? ""),
+                                                          new AzureKeyCredential(_accessKey));
+                }
+
+                int eventId = model.StartNumber;
+
+                CloudEvent? @event = null;
+
+                for (int i = 0; i < model.NumberOfEvents; i++)
+                {
+                    if (eventId % 2 == 0)
+                    {
+                        var order = new OrderEvent()
                         {
-                            defaultCredentialOptions.ManagedIdentityClientId = userAssignedClientID;
-                        }
+                            OrderId = eventId,
+                            CustomerName = "Customer " + eventId
+                        };
 
-                        client = new EventGridPublisherClient(new Uri(model.TopicEndpoint ?? ""),
-                                                              new MyDefaultAzureCredential(defaultCredentialOptions));
+                        @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: order)
+                        {
+                            Subject = "Order" + order.OrderId
+                        };
+
+                        Console.WriteLine(@event.Subject);
+
                     }
                     else
                     {
-                        client = new EventGridPublisherClient(new Uri(model.TopicEndpoint ?? ""),
-                                                              new AzureKeyCredential(_accessKey));
-                    }
-
-                    int eventId = model.StartNumber;
-
-                    CloudEvent? @event = null;
-
-                    for (int i = 0; i < model.NumberOfEvents; i++)
-                    {
-                        if (eventId % 2 == 0)
+                        var product = new ProductEvent()
                         {
-                            var order = new OrderEvent()
-                            {
-                                OrderId = eventId,
-                                CustomerName = "Customer " + eventId
-                            };
+                            ProductId = eventId,
+                            ProductName = "Product " + eventId
+                        };
 
-                            @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: order)
-                            {
-                                Subject = "Order" + order.OrderId
-                            };
-
-                            Console.WriteLine(@event.Subject);
-
-                        }
-                        else
+                        @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: product)
                         {
-                            var product = new ProductEvent()
-                            {
-                                ProductId = eventId,
-                                ProductName = "Product " + eventId
-                            };
+                            Subject = "Product" + product.ProductId
+                        };
 
-                            @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: product)
-                            {
-                                Subject = "Product" + product.ProductId
-                            };
-
-                            _logger.LogInformation("Sendt event to Event Grid {Subject}:", @event.Subject);
-                        }
-
-
-                        // Send the event
-                        client.SendEventAsync(@event).Wait();
-
-                        eventId++;
+                        _logger.LogInformation("Sendt event to Event Grid {Subject}:", @event.Subject);
                     }
 
-                    model.StartNumber = eventId;
-                    model.Message = "Events sent!";
 
-                    if (!string.IsNullOrWhiteSpace(userAssignedClientID))
-                    {
-                        model.Message = model.Message + " Using Entra ID identity " + userAssignedClientID;
-                    }
+                    // Send the event
+                    client.SendEventAsync(@event).Wait();
+
+                    eventId++;
                 }
-                catch (Exception exc)
-                {
-                    string msg = "";
-                    if (!string.IsNullOrWhiteSpace(userAssignedClientID))
-                    {
-                        msg = "Using Entra ID identity " + userAssignedClientID + "\r\n";
-                    }
 
-                    model.Exception = msg + exc.ToString();
+                model.StartNumber = eventId;
+                model.Message = "Events sent!";
+
+                if (!string.IsNullOrWhiteSpace(userAssignedClientID))
+                {
+                    model.Message = model.Message + " Using Entra ID identity " + userAssignedClientID;
                 }
             }
+            catch (Exception exc)
+            {
+                string msg = "";
+                if (!string.IsNullOrWhiteSpace(userAssignedClientID))
+                {
+                    msg = "Using Entra ID identity " + userAssignedClientID + "\r\n";
+                }
 
-            return View("SendEvents", model);
+                model.Exception = msg + exc.ToString();
+            }
         }
+
+        return View("SendEvents", model);
     }
+}
 
 
-    public class OrderEvent
-    {
-        public int OrderId { get; set; }
-        public string? CustomerName { get; set; }
-    }
-    public class ProductEvent
-    {
-        public int ProductId { get; set; }
-        public string? ProductName { get; set; }
-    }
+public class OrderEvent
+{
+    public int OrderId { get; set; }
+    public string? CustomerName { get; set; }
+}
+public class ProductEvent
+{
+    public int ProductId { get; set; }
+    public string? ProductName { get; set; }
 }

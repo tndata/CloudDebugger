@@ -33,6 +33,11 @@ public class EventHubController : Controller
     [HttpGet("/EventHub/SendEvents")]
     public IActionResult GetSendEvents(SendEventHubModel model)
     {
+        _logger.LogInformation("EventHub.GetSendEvents was called");
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         model ??= new SendEventHubModel();
         model.ConnectionString = _connectionString;
 
@@ -43,6 +48,8 @@ public class EventHubController : Controller
     [HttpPost("/EventHub/SendEvents")]
     public async Task<IActionResult> PostSendEvents(SendEventHubModel model)
     {
+        _logger.LogInformation("EventHub.PostSendEvents was called");
+
         if (model != null && ModelState.IsValid)
         {
             _connectionString = model.ConnectionString ?? "";   //Remember ConnectionString
@@ -117,6 +124,9 @@ public class EventHubController : Controller
     [HttpGet("/EventHub/ConsumeEvents")]
     public IActionResult GetConsumeEvents(ConsumeEventHubModel model)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         model ??= new ConsumeEventHubModel();
         model.ConnectionString = _connectionString;
 

@@ -4,12 +4,9 @@
 # Training and consulting services at https://www.tn-data.se
 ##########################################################################################
 # Deploy CloudDebugger to Azure App Services as a Linux Container
-# see https://learn.microsoft.com/en-us/azure/app-service/tutorial-custom-container
-# https://github.com/Azure/app-service-windows-containers/blob/master/HowTo/use_user-assigned_managed_identities.md 
-# https://raw.githubusercontent.com/mkmibrahim/AZ204/adc4e007a93784dc5ecda7b827bfaf0e18b9716d/Demo/backend/scripts/Azure_DeployContainerCityImages.ps1
-# https://learn.microsoft.com/en-us/azure/app-service/configure-custom-container
 #
-# See my App Service deployment blog posts on https://www.nestenius.se 
+# Deploy a container to Azure App Services using Azure CLI and user-assigned managed identity
+# https://nestenius.se/2024/08/27/deploy-a-container-to-azure-app-services-using-azure-cli-and-user-assigned-managed-identity/ 
 
 . .\_Settings.ps1
 
@@ -28,7 +25,7 @@ Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
 Write-Host "ClientId: ${clientId}"
 
-# Step 3: Create the Linux App Service Plan
+# Step 2: Create the Linux App Service Plan
 Write-Host "`nCreating a Linux App Service Plan named '${AppServicePlan_linux}'."
 $servicePlan = az appservice plan create `
     --name $AppServicePlan_linux `

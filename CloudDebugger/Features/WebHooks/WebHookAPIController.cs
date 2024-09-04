@@ -13,7 +13,7 @@ namespace CloudDebugger.Features.WebHooks;
 /// /Hook4
 /// 
 /// </summary>
-[Route("api/[controller]")]
+[Route("/")]
 [ApiController]
 public class WebHookAPIController : ControllerBase
 {
@@ -30,30 +30,29 @@ public class WebHookAPIController : ControllerBase
         this.hubContext = hubContext;
     }
 
-    [Route("/hook1")]
+    [HttpPost("hook1")]
     public Task<IActionResult> Hook1()
     {
         return ProcessHook(1);
     }
 
-    [Route("/hook2")]
+    [HttpPost("hook2")]
     public Task<IActionResult> Hook2()
     {
         return ProcessHook(2);
     }
 
-    [Route("/hook3")]
+    [HttpPost("hook3")]
     public Task<IActionResult> Hook3()
     {
         return ProcessHook(3);
     }
 
-    [Route("/hook4")]
+    [HttpPost("hook4")]
     public Task<IActionResult> Hook4()
     {
         return ProcessHook(4);
     }
-
 
     private async Task<IActionResult> ProcessHook(int hookId)
     {

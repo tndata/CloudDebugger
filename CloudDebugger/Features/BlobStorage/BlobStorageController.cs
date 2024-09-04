@@ -48,6 +48,11 @@ public class BlobStorageController : Controller
     [HttpPost]
     public IActionResult GetUserDelegationSASToken(UserDelegationModel model)
     {
+        _logger.LogInformation("GetUserDelegationSASToken was called");
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         if (model == null)
             return View(new UserDelegationModel());
 
@@ -87,12 +92,6 @@ public class BlobStorageController : Controller
             // Step #5, Specify the necessary permissions
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            //// Alternatively, you can combine multiple permissions
-            //sasBuilder.SetPermissions(BlobContainerSasPermissions.Read |
-            //                          BlobContainerSasPermissions.Write |
-            //                          BlobContainerSasPermissions.List |
-            //                          BlobContainerSasPermissions.Delete);
-
             // Step #6, Build the SAS token
             model.SASToken = sasBuilder.ToSasQueryParameters(userDelegationKey, model.StorageAccountName).ToString();
 
@@ -109,6 +108,8 @@ public class BlobStorageController : Controller
     [HttpGet]
     public IActionResult AccessBlobs()
     {
+        _logger.LogInformation("AccessBlobs was called");
+
         var model = new BlobStorageModel();
 
         model.ContainerContent = TryGetContainerContent(model);
@@ -118,6 +119,11 @@ public class BlobStorageController : Controller
     [HttpPost]
     public IActionResult AccessBlobs(BlobStorageModel model, string button)
     {
+        _logger.LogInformation("AccessBlobs was called, button={Button}", button);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         if (model == null)
             return View(new ReadWriteFilesModel());
 

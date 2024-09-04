@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.LogWorkspace;
 
-
 /// <summary>
 /// Send log data to Log Analytics with the HTTP Data Collector API
 /// https://learn.microsoft.com/en-us/rest/api/loganalytics/create-request
@@ -32,6 +31,11 @@ public class LogWorkspaceController : Controller
     [HttpGet("/LogWorkspace/SendEvents")]
     public IActionResult GetSendEvents(LogWorkspaceModel model)
     {
+        _logger.LogInformation("LogWorkspace.GetSendEvents was called");
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+
         //TODO: Refactor!!
         model ??= new LogWorkspaceModel();
 
@@ -46,6 +50,7 @@ public class LogWorkspaceController : Controller
     [HttpPost("/LogWorkspace/SendEvents")]
     public async Task<IActionResult> PostSendEvents(LogWorkspaceModel model)
     {
+        _logger.LogInformation("LogWorkspace.PostSendEvents was called");
         model.Exception = "";
         model.Message = "";
 

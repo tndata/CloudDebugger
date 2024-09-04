@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.WebHooks;
 
+/// <summary>
+/// 
+/// </summary>
 public class WebHooksController : Controller
 {
     private readonly ILogger<WebHooksController> _logger;
@@ -25,19 +28,20 @@ public class WebHooksController : Controller
 
     public IActionResult WebHooksLog(int hookId)
     {
-        if (hookId < 1 || hookId > 4)
-            hookId = 1;
+        if (!ModelState.IsValid || hookId < 1 || hookId > 4)
+            return BadRequest(ModelState);
 
         ViewData["HookId"] = hookId;
 
         return View();
     }
 
-
     public IActionResult SetWebHookFailureMode(int hookId, int id)
     {
-        if (hookId < 1 || hookId > 4)
-            hookId = 1;
+        _logger.LogInformation("SetWebHookFailureMode hookId={HookId} id={Id}", hookId, id);
+
+        if (!ModelState.IsValid || hookId < 1 || hookId > 4)
+            return BadRequest(ModelState);
 
         if (id == 0)
             WebHookSettings.WebHookFailureEnabled = false;
@@ -49,8 +53,11 @@ public class WebHooksController : Controller
 
     public IActionResult SetHideHeadersMode(int hookId, int id)
     {
-        if (hookId < 1 || hookId > 4)
-            hookId = 1;
+        _logger.LogInformation("SetHideHeadersMode hookId={HookId} id={Id}", hookId, id);
+
+        if (!ModelState.IsValid || hookId < 1 || hookId > 4)
+            return BadRequest(ModelState);
+
 
         if (id == 0)
             WebHookSettings.HideHeaders = false;
@@ -62,8 +69,10 @@ public class WebHooksController : Controller
 
     public IActionResult SetHideBodyMode(int hookId, int id)
     {
-        if (hookId < 1 || hookId > 4)
-            hookId = 1;
+        _logger.LogInformation("SetHideBodyMode hookId={HookId} id={Id}", hookId, id);
+
+        if (!ModelState.IsValid || hookId < 1 || hookId > 4)
+            return BadRequest(ModelState);
 
         if (id == 0)
             WebHookSettings.HideBody = false;
@@ -75,8 +84,10 @@ public class WebHooksController : Controller
 
     public IActionResult ClearWebHookLog(int hookId)
     {
-        if (hookId < 1 || hookId > 4)
-            hookId = 1;
+        _logger.LogInformation("ClearWebHookLog hookId={HookId}", hookId);
+
+        if (!ModelState.IsValid || hookId < 1 || hookId > 4)
+            return BadRequest(ModelState);
 
         webHookLog.ClearLog();
 

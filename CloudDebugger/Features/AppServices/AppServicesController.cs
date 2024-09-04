@@ -20,6 +20,8 @@ public class AppServicesController : Controller
 
     public IActionResult ShowFileSystem()
     {
+        _logger.LogInformation("ShowFileSystem action called");
+
         var model = new ShowFilesModel()
         {
             HomeDirectory = Environment.GetEnvironmentVariable("HOME")
