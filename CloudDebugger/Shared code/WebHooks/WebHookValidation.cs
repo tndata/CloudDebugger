@@ -54,24 +54,21 @@ public static class WebHookValidation
     internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)
     {
 
-        if (logEntry.RequestHeaders.ContainsKey("WebHook-Request-Callback") &&
-            logEntry.RequestHeaders.ContainsKey("WebHook-Request-Origin"))
+        logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackUrl);
+        logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackorigin);
+
+        if (!string.IsNullOrEmpty(callbackUrl))
         {
-            var callbackUrl = logEntry.RequestHeaders["WebHook-Request-Callback"];
-            var callbackorigin = logEntry.RequestHeaders["WebHook-Request-Origin"];
+            //Respond with the correct headers and body
+            httpContext.Response.Headers.Append("WebHook-Request-Origin", "eventgrid.azure.net");
+            httpContext.Response.Headers.Append("WebHook-Allowed-Rate", "120");
 
-            if (!string.IsNullOrEmpty(callbackUrl))
-            {
-                //Respond with the correct headers and body
-                httpContext.Response.Headers.Append("WebHook-Request-Origin", "eventgrid.azure.net");
-                httpContext.Response.Headers.Append("WebHook-Allowed-Rate", "120");
+            logger.LogInformation("Received CLoudEvent  validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
 
-                logger.LogInformation("Received CLoudEvent  validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
-
-                SendCallBackRequest(LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
-            }
+            SendCallBackRequest(LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
         }
     }
+
 
 
     private static void HandleEventGridSubscriptionValidation(Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)

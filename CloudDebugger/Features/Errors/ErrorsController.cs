@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.HomePage;
+namespace CloudDebugger.Features.Errors;
 
 public class ErrorsController : Controller
 {

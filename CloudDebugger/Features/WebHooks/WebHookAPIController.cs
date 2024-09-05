@@ -15,13 +15,13 @@ namespace CloudDebugger.Features.WebHooks;
 /// </summary>
 [Route("/")]
 [ApiController]
-public class WebHookAPIController : ControllerBase
+public class WebHookApiController : ControllerBase
 {
-    private readonly ILogger<WebHookAPIController> logger;
+    private readonly ILogger<WebHookApiController> logger;
     private readonly IWebHookLog webHookLog;
     private readonly IHubContext<WebHookHub> hubContext;
 
-    public WebHookAPIController(ILogger<WebHookAPIController> logger,
+    public WebHookApiController(ILogger<WebHookApiController> logger,
                                 IWebHookLog webHookLog,
                                 IHubContext<WebHookHub> hubContext)
     {
@@ -142,7 +142,7 @@ public class WebHookAPIController : ControllerBase
     /// <param name="entry"></param>
     private void AddFailedWebHookEntryToLog(int hookId, WebHookLogEntry entry)
     {
-        entry.Comment = entry.Comment + $" (Returned a HTPP 500 Server Error response to the caller for #{hookId})";
+        entry.Comment = $"{entry.Comment} (Returned a HTPP 500 Server Error response to the caller for #{hookId})";
         webHookLog.AddToLog(hookId, entry);
     }
 

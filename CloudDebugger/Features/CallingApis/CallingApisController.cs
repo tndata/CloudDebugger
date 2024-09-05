@@ -10,7 +10,7 @@ namespace CloudDebugger.Features.CallingApis;
 public class CallingApisController : Controller
 {
     private const string slowApiUrl = "https://httpbin.org/delay/5";
-    private const string error500ApiUrl = "\"https://httpbin.org/status/500";
+    private const string error500ApiUrl = "https://httpbin.org/status/500";
 
     private readonly ILogger<CallingApisController> _logger;
 
@@ -39,9 +39,7 @@ public class CallingApisController : Controller
         //TODO: REVIEW!
         _logger.LogInformation("ErrorApi endpoint was called");
 
-        var url = "https://httpbin.org/status/500";
-
-        var result = MakeCallToExternalApi(url);
+        var result = MakeCallToExternalApi(error500ApiUrl);
 
         ViewData["Message"] = "Request sent, result = " + result;
 
@@ -53,7 +51,9 @@ public class CallingApisController : Controller
         try
         {
             var client = new HttpClient();
-            var result = client.GetStringAsync(error500ApiUrl).Result;
+
+            // We ignore the result from this call.
+            _ = client.GetStringAsync(url).Result;
 
             //TODO: Handle result?
             return "OK";
