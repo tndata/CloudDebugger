@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace CloudDebugger.Features.Logging;
 
@@ -51,6 +52,11 @@ public class LoggingController : Controller
 
     private void WriteToLog(string message, LogLevel logLevel)
     {
-        _logger.Log(logLevel, "This message was written with the {LogLevel} log level. {Message}", logLevel, message);
+        // Define the regex pattern to allow only spaces, numerical, and alphabetical characters
+        string pattern = @"[^a-zA-Z0-9\s]";
+        // Replace all unwanted characters with an empty string
+        string filteredMessage = Regex.Replace(message, pattern, "", RegexOptions.None, TimeSpan.FromMilliseconds(250));
+
+        _logger.Log(logLevel, "This message was written with the {LogLevel} log level. {Message}", logLevel, filteredMessage);
     }
 }

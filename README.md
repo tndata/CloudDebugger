@@ -5,6 +5,9 @@
 
 
 
+## Features and tools
+* Redis cache explorer
+
 
 
 

@@ -7,6 +7,7 @@ public class HealthController : Controller
 {
     private readonly ILogger<HealthController> _logger;
 
+    //TODO: Remove static, use session
     private static CustomHealthStatusEnum CustomHealthEndpointStatus { get; set; } = CustomHealthStatusEnum.Healthy;
 
     public HealthController(ILogger<HealthController> logger)
@@ -25,17 +26,23 @@ public class HealthController : Controller
         return View(model);
     }
 
+
+    /// <summary>
+    /// The ServiceHealth controls the health of this application service.This is the overall health as exposed by the /healthz and /health endpoints.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult SetServiceHealthMode(HealthModel model, string mode)
     {
-        _logger.LogInformation("SetServiceHealthMode action called, mode={Mode}", mode);
-
         if (ModelState.IsValid)
         {
             switch (mode)
             {
                 case "Healthy":
                     Settings.ServiceHealth = HealthStatusEnum.Healthy;
+
                     break;
                 case "Degraded":
                     Settings.ServiceHealth = HealthStatusEnum.Degraded;
@@ -48,6 +55,8 @@ public class HealthController : Controller
                     break;
             }
 
+            _logger.LogInformation("Set ServiceHealthMode action called, mode={Mode}", Settings.ServiceHealth);
+
             model ??= new HealthModel();
 
             model.CurrentServiceHealth = Settings.ServiceHealth;
@@ -58,11 +67,16 @@ public class HealthController : Controller
     }
 
 
+
+    /// <summary>
+    /// The custom health controls the health of the custom local endpoint /health/CustomEndpoint endpoint.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult SetCustomHealthMode(HealthModel model, string mode)
     {
-        _logger.LogInformation("SetCustomHealthMode action called, mode={Mode}", mode);
-
         if (ModelState.IsValid)
         {
             switch (mode)
@@ -83,6 +97,8 @@ public class HealthController : Controller
                     //No change
                     break;
             }
+
+            _logger.LogInformation("Set CustomHealthMode action called, mode={Mode}", CustomHealthEndpointStatus);
 
             model ??= new HealthModel();
 

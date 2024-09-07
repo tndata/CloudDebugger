@@ -119,7 +119,7 @@ public class BlobStorageController : Controller
     [HttpPost]
     public IActionResult AccessBlobs(BlobStorageModel model, string button)
     {
-        _logger.LogInformation("AccessBlobs was called, button={Button}", button);
+
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -136,10 +136,12 @@ public class BlobStorageController : Controller
             switch (button)
             {
                 case "loadblob":
+                    _logger.LogInformation("BlobStorage.LoadBlob");
                     model.FileContent = "";
                     model.FileContent = LoadBlob(model);
                     break;
                 case "writeblob":
+                    _logger.LogInformation("BlobStorage.WriteBlob");
                     WriteBlob(model);
                     break;
                 default:
