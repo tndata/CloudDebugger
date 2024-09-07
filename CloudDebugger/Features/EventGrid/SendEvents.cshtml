@@ -47,14 +47,14 @@
     <br>
     <input type="submit" name="submit" value="Send Events" /><br />
 
-    @if(String.IsNullOrWhiteSpace(Model?.Exception) == false)
+    @if(!String.IsNullOrWhiteSpace(Model?.Exception))
     {
         <div class="alert alert-danger" role="alert">
             <pre>@Model.Exception</pre>
         </div>
     }
 
-    @if (String.IsNullOrWhiteSpace(Model?.Message) == false)
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
     {
         <b>@Model.Message</b>
     }

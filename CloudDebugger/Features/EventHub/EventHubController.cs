@@ -144,17 +144,13 @@ public class EventHubController : Controller
 
             try
             {
-
                 await using (var consumerClient = new EventHubConsumerClient(consumerGroup: model.ConsumerGroup,
                                                                 connectionString: _connectionString))
                 {
-
                     var options = new ReadEventOptions()
                     {
                         MaximumWaitTime = TimeSpan.FromSeconds(1)  //If specified, should there be no events available before this waiting period expires, an empty event will be returned, allowing control to return to the reader that was waiting.
                     };
-
-
 
                     // It is important to note that this method does not guarantee fairness amongst the partitions during iteration;
                     // each of the partitions compete to publish events to be read by the enumerator. Depending on service communication,
@@ -164,56 +160,11 @@ public class EventHubController : Controller
                     await foreach (PartitionEvent @event in consumerClient.ReadEventsAsync(startReadingAtEarliestEvent: true,
                                                                                 readOptions: options))
                     {
-
                         // Exit when we receive an emtpty event
                         if (@event.Data == null)
                             break;
 
-                        var entry = new EventHubLogEntry()
-                        {
-                            EventDetails = []
-                        };
-
-                        var contentType = @event.Data.ContentType;
-                        if (!String.IsNullOrWhiteSpace(contentType))
-                            entry.EventDetails.Add($"ContentType: {contentType}");
-
-                        string correlationId = @event.Data.CorrelationId;
-                        if (!String.IsNullOrWhiteSpace(correlationId))
-                            entry.EventDetails.Add($"CorrelationId: {correlationId}");
-
-                        DateTimeOffset enqueuedTime = @event.Data.EnqueuedTime;
-                        entry.EventDetails.Add($"EnqueuedTime: {enqueuedTime}");
-
-                        string messageId = @event.Data.MessageId;
-                        if (!String.IsNullOrWhiteSpace(messageId))
-                            entry.EventDetails.Add($"MessageId: {messageId}");
-
-                        string partitionKey = @event.Data.PartitionKey;
-                        if (!String.IsNullOrWhiteSpace(partitionKey))
-                            entry.EventDetails.Add($"PartitionKey: {partitionKey}");
-
-                        long sequenceNumber = @event.Data.SequenceNumber;
-                        entry.EventDetails.Add($"SequenceNumber: {sequenceNumber}");
-
-                        entry.Offset = @event.Data.Offset;
-
-                        var properties = @event.Data.Properties;
-                        foreach (var property in properties)
-                        {
-                            entry.EventDetails.Add($"{property.Key}: {property.Value}");
-                        }
-
-                        var systemProperties = @event.Data.SystemProperties;
-                        foreach (var property in systemProperties)
-                        {
-                            entry.EventDetails.Add($"{property.Key}: {property.Value}");
-                        }
-
-                        entry.PartitionId = @event.Partition.PartitionId;
-
-                        entry.Body = @event.Data.EventBody.ToString();
-
+                        var entry = BuildEvent(@event);
                         model.Events.Add(entry);
                     }
                 }
@@ -225,6 +176,56 @@ public class EventHubController : Controller
         }
 
         return View("ConsumeEvents", model);
+    }
+
+    private static EventHubLogEntry BuildEvent(PartitionEvent @event)
+    {
+        var entry = new EventHubLogEntry()
+        {
+            EventDetails = []
+        };
+
+        var contentType = @event.Data.ContentType;
+        if (!String.IsNullOrWhiteSpace(contentType))
+            entry.EventDetails.Add($"ContentType: {contentType}");
+
+        string correlationId = @event.Data.CorrelationId;
+        if (!String.IsNullOrWhiteSpace(correlationId))
+            entry.EventDetails.Add($"CorrelationId: {correlationId}");
+
+        DateTimeOffset enqueuedTime = @event.Data.EnqueuedTime;
+        entry.EventDetails.Add($"EnqueuedTime: {enqueuedTime}");
+
+        string messageId = @event.Data.MessageId;
+        if (!String.IsNullOrWhiteSpace(messageId))
+            entry.EventDetails.Add($"MessageId: {messageId}");
+
+        string partitionKey = @event.Data.PartitionKey;
+        if (!String.IsNullOrWhiteSpace(partitionKey))
+            entry.EventDetails.Add($"PartitionKey: {partitionKey}");
+
+        long sequenceNumber = @event.Data.SequenceNumber;
+        entry.EventDetails.Add($"SequenceNumber: {sequenceNumber}");
+
+        entry.Offset = @event.Data.Offset;
+
+        var properties = @event.Data.Properties;
+        foreach (var property in properties)
+        {
+            entry.EventDetails.Add($"{property.Key}: {property.Value}");
+        }
+
+        var systemProperties = @event.Data.SystemProperties;
+        foreach (var property in systemProperties)
+        {
+            entry.EventDetails.Add($"{property.Key}: {property.Value}");
+        }
+
+        entry.PartitionId = @event.Partition.PartitionId;
+
+        entry.Body = @event.Data.EventBody.ToString();
+
+        return entry;
     }
 }
 public class EventHubProductEvent

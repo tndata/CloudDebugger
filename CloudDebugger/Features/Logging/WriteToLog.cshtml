@@ -27,7 +27,7 @@ Trace, Debug, Information, Warning, Error, Critical.
     <br>
     <input type="submit" name="submit" value="Write the messge to the log" /><br />
 
-    @if (String.IsNullOrWhiteSpace(Model.Message) == false)
+    @if (!String.IsNullOrWhiteSpace(Model.Message))
     {
         <b>@Model.Message</b>
     }
@@ -35,10 +35,6 @@ Trace, Debug, Information, Warning, Error, Critical.
 </form>
 
 
-<br>
-<br>
-<br>
-<br>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

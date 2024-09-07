@@ -78,7 +78,7 @@ To get this to work, the following requirements must be met:
 <br />
 
 
-@if (string.IsNullOrEmpty(Model.SASToken) == false)
+@if (!string.IsNullOrEmpty(Model.SASToken))
 {
     <h4>User delegation SAS token</h4>
     <table class="table">
@@ -146,14 +146,14 @@ To get this to work, the following requirements must be met:
 
 <br>
 
-@if (String.IsNullOrWhiteSpace(Model?.ErrorMessage) == false)
+@if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
 {
     <div class="alert alert-danger" role="alert">
         <pre>@Model.ErrorMessage</pre>
     </div>
 }
 
-@if (String.IsNullOrWhiteSpace(Model?.Message) == false)
+@if (!String.IsNullOrWhiteSpace(Model?.Message))
 {
     <b>@Model.Message</b>
 }

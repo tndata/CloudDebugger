@@ -92,7 +92,7 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
                         <td colspan="11">
                             <b>@entry.HttpMethod @entry.Url</b> &nbsp;@entry.Subject
                             <br />
-                            @if (String.IsNullOrWhiteSpace(entry.Comment) == false)
+                            @if (!String.IsNullOrWhiteSpace(entry.Comment))
                             {
                                 <b>@entry.Comment</b>
                                 <br />

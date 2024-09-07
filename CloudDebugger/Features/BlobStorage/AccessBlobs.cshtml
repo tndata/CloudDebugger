@@ -119,7 +119,7 @@
 
                     <tr>
                         <td>
-                            @if (string.IsNullOrEmpty(Model.FileContent) == false)
+                            @if (!string.IsNullOrEmpty(Model.FileContent))
                             {
                                 <h5>File content</h5>
                                 <textarea asp-for="FileContent" rows="20" cols="50"></textarea>
@@ -136,14 +136,14 @@
 
     <br>
 
-    @if (String.IsNullOrWhiteSpace(Model?.ErrorMessage) == false)
+    @if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
     {
         <div class="alert alert-danger" role="alert">
             <pre>@Model.ErrorMessage</pre>
         </div>
     }
 
-    @if (String.IsNullOrWhiteSpace(Model?.Message) == false)
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
     {
         <b>@Model.Message</b>
     }

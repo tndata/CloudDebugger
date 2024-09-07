@@ -16,7 +16,7 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var secret = "NULL";
-            if (string.IsNullOrEmpty(_secret) == false)
+            if (!string.IsNullOrEmpty(_secret))
                 secret = _secret.Length <= 5 ? _secret : _secret.Substring(0, 5) + "******";
 
             var sb = new StringBuilder();
