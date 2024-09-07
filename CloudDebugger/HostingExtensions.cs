@@ -1,106 +1,52 @@
-﻿using CloudDebugger.Features.Health;
-using CloudDebugger.Features.WebHooks;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.MyHttpLogging;
+﻿using CloudDebugger.Features.WebHooks;
+using CloudDebugger.Infrastructure;
 using Serilog;
-using System.Text;
 
 namespace CloudDebugger;
 
+/// <summary>
+/// Configure the services and the request pipeline
+/// </summary>
 internal static class HostingExtensions
 {
+    /// <summary>
+    /// Add and Configure the ASP.NET Core services
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddApplicationInsightsTelemetry(o =>
-        {
-            //Options https://github.com/microsoft/ApplicationInsights-dotnet/blob/main/NETCORE/src/Shared/Extensions/ApplicationInsightsServiceOptions.cs
-            o.EnableDebugLogger = true;
-        });
-
         builder.Services.AddSingleton<IWebHookLog, WebHookLog>();
 
         builder.Services.AddSerilog();
 
         builder.Services.AddSignalR();  //Used by the advanced webhooks
 
+        builder.AddAndApplicationInsights();
 
-        builder.Services.AddHealthChecks().AddCheck<AppHealthCheck>("CloudDebuggerHealthCheck");
+        builder.AddAndConfigureHealth();
 
-        builder.Services.AddMyHttpLogging(o =>
-        {
-            o.LoggingFields = HttpLoggingFields.All;
-            o.MediaTypeOptions.AddText("application/json");
-            o.RequestBodyLogLimit = 2048;
-            o.ResponseBodyLogLimit = 2048;
-            o.CombineLogs = true;
-        });
+        builder.AddAndConfigureHttpLogging();
 
-        //Support features folder structure
-        builder.Services.Configure<RazorViewEngineOptions>(rvo =>
-        {
-            rvo.ViewLocationFormats.Add("~/Features/{1}/{0}.cshtml");
-            rvo.ViewLocationFormats.Add("~/Views/Shared/{0}.cshtml");
-        });
+        builder.AddAndConfigureControllersAndViews();
 
-        // Add services to the container.
-        builder.Services.AddControllersWithViews().AddJsonOptions(o =>
-        {
-            o.JsonSerializerOptions.WriteIndented = true; //Return pretty JSON in the APIs
-        });
+        builder.AddAndConfigureSession();
 
-        builder.Services.AddSession(options =>
-        {
-            // We do want to support session over HTTP as well
-            // Remember, the session is lost across restarts, the data is stored in memory.
-            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
-            options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
-        });
-
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy(name: "MyCorsPolicy_wildcard",
-                                builder =>
-                                {
-                                    builder.AllowAnyOrigin()
-                                   .AllowAnyMethod()
-                                   .AllowAnyHeader();
-                                });
-        });
-
+        builder.AddAndConfigureCORS();
 
         return builder.Build();
     }
 
+
+    /// <summary>
+    /// Add and configure the request pipeline
+    /// </summary>
+    /// <param name="app"></param>
+    /// <returns></returns>
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
-        app.Use((context, next) =>
-        {
-            context.Request.EnableBuffering();
-
-            try
-            {
-                //Try to read the request body (for the Request Logger). The data is then consumed inside the MyHttpLogging middleware
-                string bodyStr = "";
-                // Arguments: Stream, Encoding, detect encoding, buffer size 
-                // AND, the most important: keep stream opened
-                using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, true, 1024, true))
-                {
-                    bodyStr = reader.ReadToEndAsync().Result;
-
-                    context.Items.Add("RequestBody", bodyStr);
-                }
-            }
-            catch (Exception)
-            {
-                //Ignore any errors here
-            }
-
-            context.Request.Body.Position = 0;
-
-            return next();
-        });
+        // Custom middleware to capture the request body, used by the request logger tool
+        app.UseRequsetBodyCapture();
 
         app.UseStaticFiles();
 
