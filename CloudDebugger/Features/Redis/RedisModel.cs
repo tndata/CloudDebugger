@@ -14,7 +14,7 @@ public class RedisModel
     public int ExpireSeconds { get; set; } = 30;
 
     /// <summary>
-    /// Redis Connection string or host name
+    /// Redis Connection string or Redis host name
     /// </summary>
     [Required]
     public string? ConnectionString { get; set; }
@@ -22,5 +22,8 @@ public class RedisModel
     public string? Exception { get; set; }
     public string? Message { get; set; }
 
+    /// <summary>
+    /// List of keys found in Redis
+    /// </summary>
     public List<RedisKeyInfo>? RedisKeys { get; set; }
 }
