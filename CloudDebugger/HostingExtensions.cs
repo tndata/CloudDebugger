@@ -1,4 +1,5 @@
 ﻿using CloudDebugger.Features.WebHooks;
+using CloudDebugger.Infrastructure;
 using Serilog;
 
 namespace CloudDebugger;

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
 
-namespace CloudDebugger;
+namespace CloudDebugger.Infrastructure;
 
 /// <summary>
 /// Extension methods to configure the various services used in this application
@@ -43,7 +43,7 @@ public static class InfraExtensionMethods
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+            options.Cookie.SameSite = SameSiteMode.Strict;
         });
     }
 

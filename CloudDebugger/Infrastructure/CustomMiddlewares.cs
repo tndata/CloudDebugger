@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CloudDebugger;
+namespace CloudDebugger.Infrastructure;
 
 public static class CustomMiddlewares
 {
