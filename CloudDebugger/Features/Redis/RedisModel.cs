@@ -6,16 +6,21 @@ public class RedisModel
 {
     [Required]
     public string? Key { get; set; }
+
+    [Required]
     public string? Value { get; set; }
-    public int Expire { get; set; } = 30;
+
+    [Required]
+    public int ExpireSeconds { get; set; } = 30;
 
     /// <summary>
-    /// Redis Connection string
+    /// Redis Connection string or host name
     /// </summary>
+    [Required]
     public string? ConnectionString { get; set; }
 
     public string? Exception { get; set; }
     public string? Message { get; set; }
 
-    public List<string>? RedisKeys { get; set; }
+    public List<RedisKeyInfo>? RedisKeys { get; set; }
 }

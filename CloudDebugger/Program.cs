@@ -14,6 +14,7 @@ Settings.StartupTime = DateTime.UtcNow;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .MinimumLevel.Override("Microsoft.AspNetCore.Session", LogEventLevel.Verbose)
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .CreateBootstrapLogger();

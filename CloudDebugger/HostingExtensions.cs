@@ -48,6 +48,15 @@ internal static class HostingExtensions
             o.JsonSerializerOptions.WriteIndented = true; //Return pretty JSON in the APIs
         });
 
+        builder.Services.AddSession(options =>
+        {
+            // We do want to support session over HTTP as well
+            // Remember, the session is lost across restarts, the data is stored in memory.
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+            options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+        });
 
         builder.Services.AddCors(options =>
         {
@@ -111,6 +120,8 @@ internal static class HostingExtensions
         app.UseCors();
 
         app.UseAuthorization();
+
+        app.UseSession();
 
         app.MapHub<WebHookHub>("/WebHookHub");
 

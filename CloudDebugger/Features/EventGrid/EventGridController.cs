@@ -14,8 +14,7 @@ namespace CloudDebugger.Features.EventGrid;
 public class EventGridController : Controller
 {
     private readonly ILogger<EventGridController> _logger;
-
-    private static string _accessKey = "";
+    private const string sessionKey = "EventGridAccessKey";
 
     public EventGridController(ILogger<EventGridController> logger)
     {
@@ -34,7 +33,7 @@ public class EventGridController : Controller
             return BadRequest(ModelState);
 
         model ??= new SendEventGridModel();
-        model.AccessKey = _accessKey;
+        model.AccessKey = HttpContext.Session.GetString(sessionKey);
 
         return View("SendEvents", model);
     }
@@ -44,14 +43,17 @@ public class EventGridController : Controller
     {
         if (model != null && ModelState.IsValid)
         {
-            _accessKey = model.AccessKey ?? "";   //Remember access key
+            string accessKey = model.AccessKey ?? "";
+            //Remember access key
+            HttpContext.Session.SetString(sessionKey, accessKey);
+
             model.Exception = "";
             model.Message = "";
             var userAssignedClientID = Environment.GetEnvironmentVariable("USERASSIGNEDCLIENTID") ?? "";
 
             try
             {
-                EventGridPublisherClient? client = CreateEventGridClient(model, userAssignedClientID);
+                EventGridPublisherClient? client = CreateEventGridClient(accessKey, model.TopicEndpoint ?? "", userAssignedClientID);
 
                 int eventId = model.StartNumber;
 
@@ -90,10 +92,9 @@ public class EventGridController : Controller
         return View("SendEvents", model);
     }
 
-    private static EventGridPublisherClient CreateEventGridClient(SendEventGridModel model, string userAssignedClientID)
+    private static EventGridPublisherClient CreateEventGridClient(string accessKey, string topicEndpoint, string userAssignedClientID)
     {
-        EventGridPublisherClient? client = null;
-        if (string.IsNullOrWhiteSpace(_accessKey))
+        if (string.IsNullOrWhiteSpace(accessKey))
         {
             var defaultCredentialOptions = new DefaultAzureCredentialOptions();
 
@@ -105,16 +106,14 @@ public class EventGridController : Controller
                 defaultCredentialOptions.ManagedIdentityClientId = userAssignedClientID;
             }
 
-            client = new EventGridPublisherClient(new Uri(model.TopicEndpoint ?? ""),
+            return new EventGridPublisherClient(new Uri(topicEndpoint),
                                                   new MyDefaultAzureCredential(defaultCredentialOptions));
         }
         else
         {
-            client = new EventGridPublisherClient(new Uri(model.TopicEndpoint ?? ""),
-                                                  new AzureKeyCredential(_accessKey));
+            return new EventGridPublisherClient(new Uri(topicEndpoint),
+                                                new AzureKeyCredential(accessKey));
         }
-
-        return client;
     }
 
     private static CloudEvent CreateEvent(int eventId)
@@ -151,7 +150,6 @@ public class EventGridController : Controller
         }
     }
 }
-
 
 public class OrderEvent
 {

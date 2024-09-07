@@ -17,8 +17,7 @@ namespace CloudDebugger.Features.EventHub;
 public class EventHubController : Controller
 {
     private readonly ILogger<EventHubController> _logger;
-
-    private static string _connectionString = "";
+    private const string sessionKey = "EventHubConnectionString";
 
     public EventHubController(ILogger<EventHubController> logger)
     {
@@ -39,7 +38,7 @@ public class EventHubController : Controller
             return BadRequest(ModelState);
 
         model ??= new SendEventHubModel();
-        model.ConnectionString = _connectionString;
+        model.ConnectionString = HttpContext.Session.GetString(sessionKey);
 
         return View("SendEvents", model);
     }
@@ -52,11 +51,13 @@ public class EventHubController : Controller
 
         if (model != null && ModelState.IsValid)
         {
-            _connectionString = model.ConnectionString ?? "";   //Remember ConnectionString
+            //Remember ConnectionString
+            HttpContext.Session.SetString(sessionKey, model.ConnectionString ?? "");
+
             model.Exception = "";
             model.Message = "";
 
-            var producerClient = new EventHubProducerClient(_connectionString);
+            var producerClient = new EventHubProducerClient(model.ConnectionString ?? "");
 
             try
             {
@@ -128,7 +129,7 @@ public class EventHubController : Controller
             return BadRequest(ModelState);
 
         model ??= new ConsumeEventHubModel();
-        model.ConnectionString = _connectionString;
+        model.ConnectionString = HttpContext.Session.GetString(sessionKey);
 
         return View("ConsumeEvents", model);
     }
@@ -138,14 +139,16 @@ public class EventHubController : Controller
     {
         if (model != null && ModelState.IsValid)
         {
-            _connectionString = model.ConnectionString ?? "";   //Remember ConnectionString
+            //Remember ConnectionString
+            HttpContext.Session.SetString(sessionKey, model.ConnectionString ?? "");
+
             model.Exception = "";
             model.Message = "";
 
             try
             {
                 await using (var consumerClient = new EventHubConsumerClient(consumerGroup: model.ConsumerGroup,
-                                                                connectionString: _connectionString))
+                                                                connectionString: model.ConnectionString ?? ""))
                 {
                     var options = new ReadEventOptions()
                     {

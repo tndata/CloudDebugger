@@ -3,16 +3,17 @@
     ViewData["Title"] = "CloudDebugger - Homepage";
 }
 
-<h3>Read write keys to Redis</h3>
+<h3>Read and write keys to Redis</h3>
 
 
 <form asp-controller="Redis" asp-action="ReadWriteKeys" method="post">
 
     <table class="table">
         <tr>
-            <td class="col-md-2">Connection string</td>
+            <td class="col-md-2">Connection string or<br> host name</td>
             <td class="col-md-10">
                 <input asp-for="ConnectionString" style="min-width:90%"><br />
+                <span asp-validation-for="ConnectionString"></span>               
             </td>
         </tr>
 
@@ -21,22 +22,26 @@
             <td class="col-md-2">Key name</td>
             <td class="col-md-10">
                 <input asp-for="Key"><br />
+                <span asp-validation-for="Key"></span>
+
             </td>
         </tr>
         <tr>
             <td class="col-md-2">Key value</td>
             <td class="col-md-10">
                 <input asp-for="Value"><br />
+                <span asp-validation-for="Value"></span>
             </td>
         </tr>
         <tr>
-            <td class="col-md-2">Key Expire (sec)</td>
+            <td class="col-md-2">Key expire (sec)</td>
             <td class="col-md-10">
-                <input asp-for="Expire"><br />
+                <input asp-for="ExpireSeconds"><br />
+                <span asp-validation-for="ExpireSeconds"></span>
             </td>
         </tr>
     </table>
-    <input type="submit" name="submit" value="Add key" /><br />
+    <input type="submit" name="submit" value="Add key to Redis" /><br />
 
     @if (!String.IsNullOrWhiteSpace(Model?.Exception))
     {
@@ -54,20 +59,42 @@
 
 <br />
 <br />
-@if (Model?.RedisKeys != null)
+@if (Model?.RedisKeys != null && Model?.RedisKeys.Count>0)
 {
     <h4>Keys in the Redis database</h4>
 
-    <table class="table">
+    <table class="table table-bordered">
+
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+            <th>Expires in</th>
+        </tr>
+
         @foreach (var key in Model.RedisKeys)
         {
             <tr>
-                <td>@key</td>
+                <td class="col-md-2">@key.Key</td>
+                <td class="col-md-8">@key.Value</td>
+                <td class="col-md-2">
+                    @if(key.Expiration.HasValue)
+                    {
+                        @key.Expiration.Value.Seconds @:(sec)
+                    }
+                </td>
             </tr>
         }
     </table>
 
-    @:(<a href="/Redis/ReadWriteKeys"> refresh </a>)
+    @:(<a href="/Redis/ReadWriteKeys">refresh</a>)
 }
 
 
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
