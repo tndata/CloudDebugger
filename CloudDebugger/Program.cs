@@ -12,6 +12,7 @@ Console.Title = "CloudDebugger";
 Settings.StartupTime = DateTime.UtcNow;
 
 
+//Startup logging
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .MinimumLevel.Override("Microsoft.AspNetCore.Session", LogEventLevel.Verbose)
@@ -36,6 +37,8 @@ var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Lo
 Log.Information("Project Build time: {StartTime}", versionInfo?.LegalCopyright);
 
 
+
+// TODO: Cleanup
 _ = new AzureEventSourceListener((e, message) =>
 {
     // Only log messages from "Azure-Core" event source
