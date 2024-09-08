@@ -4,6 +4,10 @@ namespace CloudDebugger.Infrastructure;
 
 public static class CustomMiddlewares
 {
+    /// <summary>
+    /// This middleware is used to capture the request body. It is used by the Request Logger tool.
+    /// </summary>
+    /// <param name="app"></param>
     public static void UseRequsetBodyCapture(this WebApplication app)
     {
         app.Use((context, next) =>

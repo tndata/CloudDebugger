@@ -13,7 +13,7 @@
 
 
 <h3>Requests log</h3>
-Here's a list of all the received requests to this service (with a few exceptions). <a href="/RequestLogger/ClearRequestList">Clear the log</a>.
+Here's a list of all the received requests to this service. <a href="/RequestLogger/ClearRequestList">Clear the log</a>.
 <br />
 
 <a href="/RequestLogger">Back</a>
@@ -34,7 +34,7 @@ Here's a list of all the received requests to this service (with a few exception
         {
             <tr>
                 <td>
-                    @entry.EntryTime.ToString("hh:mm:ss")
+                    @entry.EntryTimeUtc.ToString("hh:mm:ss")
                 </td>
                 <td>
                     @entry.Method
@@ -46,3 +46,24 @@ Here's a list of all the received requests to this service (with a few exception
         }
     </tbody>
 </table>
+
+
+The following is ignored by the request logger:<br>
+<ul>
+    <li>
+        Request to /favicon.ico, /robots.txt, /requestlog/*
+    </li>
+    <li>
+        These file extensions are ignored: .css, .js, .png, .jpg, .jpeg, .gif, .ico, .svg, .woff, .woff2, .ttf, .eot, .map
+    </li>
+</ul>
+
+
+
+<br>
+<br>
+<br>
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/RequestLogger">Documentation</a></li>
+</ul>

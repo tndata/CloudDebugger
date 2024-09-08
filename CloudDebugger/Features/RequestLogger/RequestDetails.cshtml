@@ -8,7 +8,6 @@
 <h3>HTTP Request details</h3>
 <a href="/RequestLogger/RequestList">Back</a>
 <br />
-<br />
 
 @if (Model != null)
 {
@@ -36,12 +35,11 @@
 
     <br />
 
-    //Make a table to display the model object
-
+    <h4>Details</h4>
     <table class="table">
         <tr>
             <td class="col-md-2">EntryTime</td>
-            <td class="col-md-10">@Model.EntryTime</td>
+            <td class="col-md-10">@Model.EntryTimeUtc.ToString("HH:mm:ss")</td>
         </tr>
         <tr>
             <td class="col-md-2">Method</td>
@@ -74,7 +72,7 @@
         </tr>
     </table>
 
-
+    <br />
     <h4>Request headers and body</h4>
 
     <table class="table table-borderless">
@@ -83,48 +81,41 @@
                 <pre>
                     @foreach (var header in Model.RequestHeaders)
                     {
-                        @(header + "\r\n")
+@(header + "\r\n")
                     }
+
+@Model.RequestBody
                  </pre>
             </td>
         </tr>
-        <tr>
-            <td>
-                <pre>@Model.RequestBody</pre>
-            </td>
-        </tr>
-
     </table>
-
 
     <h4>Response headers and body</h4>
     <table class="table table-borderless">
         <tr>
             <td>
-                @if (Model.ResponseHeaders.Count > 0)
-                {
-                    foreach (var header in Model.ResponseHeaders)
+                <pre>
+                    @if (Model.ResponseHeaders.Count > 0)
                     {
-                        <pre>@(header + "\r\n")</pre>
+                        foreach (var header in Model.ResponseHeaders)
+                        {
+@(header + "\r\n")
+                        }
                     }
-                }
-                else
-                {
-                    <pre>No response headers...</pre>
-                }
-            </td>
-        </tr>
+                    else
+                    {
+ @:No response headers...
+                    }
 
-        <tr>
-            <td>
-                @if (String.IsNullOrEmpty(Model.ResponseBody))
-                {
-                    <pre>No response body...</pre>
-                }
-                else
-                {
-                    <pre>@(Model.ResponseBody)</pre>
-                }
+                    @if (String.IsNullOrEmpty(Model.ResponseBody))
+                    {
+@:No response body...
+                    }
+                    else
+                    {
+@(Model.ResponseBody)
+                    }
+                </pre>
             </td>
         </tr>
     </table>

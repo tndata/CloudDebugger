@@ -8,7 +8,7 @@ public class RequestLogEntry
     public int RequestNumber { get; set; }
     public string? Protocol { get; set; }
     public string? Method { get; set; }
-    public DateTime EntryTime { get; set; }
+    public DateTime EntryTimeUtc { get; set; }
     public string? Path { get; set; }
     public string? PathBase { get; set; }
     public List<string> RequestHeaders { get; set; } = new();

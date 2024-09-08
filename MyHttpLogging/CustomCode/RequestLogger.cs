@@ -16,6 +16,7 @@ namespace MyHttpLogging.CustomCode;
 public class RequestLogger : ILogger<RequestLogger>
 {
     private static List<RequestLogEntry> requestLog = new();
+    private const int MaxBodyLength = 5000;
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
@@ -29,8 +30,6 @@ public class RequestLogger : ILogger<RequestLogger>
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        //Console.WriteLine(state.GetType().FullName);
-
         //For now, we only care about HttpLog entries
         switch (state)
         {
@@ -99,12 +98,20 @@ public class RequestLogger : ILogger<RequestLogger>
                             break;
                     }
                 }
+
+                if (requestBody != null && requestBody.Length > MaxBodyLength)
+                    requestBody = requestBody.Substring(0, MaxBodyLength) + "...[truncated]...";
+
+                if (responseBody != null && responseBody.Length > MaxBodyLength)
+                    responseBody = responseBody.Substring(0, MaxBodyLength) + "...[truncated]...";
+
+
                 //Populate the object
                 var requestLogEntry = new RequestLogEntry
                 {
                     Protocol = protocol,
                     Method = method,
-                    EntryTime = DateTime.Now,
+                    EntryTimeUtc = DateTime.UtcNow,
                     Path = path,
                     PathBase = pathBase,
                     RequestHeaders = requestHeaders,

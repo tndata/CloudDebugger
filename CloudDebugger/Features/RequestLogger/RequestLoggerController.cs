@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.MyHttpLogging;
 namespace CloudDebugger.Features.RequestLogger;
 
 /// <summary>
-/// Display the request/response log 
+/// Display the request/response log as captured by the custom MyHttpLibrary request middleware.
 /// </summary>
 public class RequestLoggerController : Controller
 {

@@ -47,10 +47,9 @@ internal static class HostingExtensions
     {
         // Custom middleware to capture the request body, used by the request logger tool
         app.UseRequsetBodyCapture();
+        app.UseMyHttpLogging();
 
         app.UseStaticFiles();
-
-        app.UseMyHttpLogging();
 
         app.MapHealthChecks("/healthz");
         app.MapHealthChecks("/health");
