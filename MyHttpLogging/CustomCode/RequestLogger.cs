@@ -118,10 +118,6 @@ public class RequestLogger : ILogger<RequestLogger>
 
                 RequestLog.AddToLog(requestLogEntry);
 
-                // Console.WriteLine("Log " + logLevel + " " + eventId + " " + state + " " + exception?.Message);
-                // Console.WriteLine(formatter(state, exception));
-                // Console.WriteLine(log);
-
                 break;
             default:
                 // Ignore all other log entries

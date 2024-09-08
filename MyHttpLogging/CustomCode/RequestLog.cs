@@ -1,8 +1,7 @@
-﻿
-namespace Microsoft.AspNetCore.MyHttpLogging;
+﻿namespace Microsoft.AspNetCore.MyHttpLogging;
 
 /// <summary>
-/// This class contains the latest log entries
+/// This custom class contains the latest log entries
 /// </summary>
 public static class RequestLog
 {
@@ -20,10 +19,11 @@ public static class RequestLog
     private static int requestNumber = 1;
 
     private static List<RequestLogEntry> log = new();
+    private static readonly object lockObj = new();
 
     public static void ClearLog()
     {
-        lock (log)
+        lock (lockObj)
         {
             log.Clear();
         }
@@ -31,7 +31,7 @@ public static class RequestLog
 
     public static void AddToLog(RequestLogEntry logEntry)
     {
-        lock (log)
+        lock (lockObj)
         {
             if (logEntry != null &&
                 CheckForIgnoredPaths(logEntry.Path) == false &&
@@ -42,11 +42,6 @@ public static class RequestLog
         }
     }
 
-    //private static bool CheckForIgnoredResponseTypes(string? responseContentType)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
     public static RequestLogEntry? LookupLogEntry(int requestNumber)
     {
         return log.FirstOrDefault(x => x.RequestNumber == requestNumber);
@@ -54,25 +49,14 @@ public static class RequestLog
 
     public static List<RequestLogEntry> GetAllLogEntries()
     {
-        lock (log)
+        lock (lockObj)
         {
             return new List<RequestLogEntry>(log);
         }
     }
 
-
     private static void LogRequest(RequestLogEntry logEntry)
     {
-        //if (context.Request != null && CheckIfWeShouldLogTheBody(context.Request.ContentType))
-        //{
-        //    entry.RequestBody = context.Request.PeekBody();
-        //}
-
-        //if (context.Response != null && CheckIfWeShouldLogTheBody(context.Response.ContentType))
-        //{
-        //    entry.ResponseBody = new StreamReader(context.Response.Body)?.ReadToEnd() ?? "";
-        //}
-
         logEntry.RequestNumber = requestNumber++;
 
         log.Add(logEntry);
@@ -81,24 +65,6 @@ public static class RequestLog
         if (log.Count > MaxLogEntries)
             log.RemoveAt(0);
     }
-
-
-
-    //private static bool CheckIfWeShouldLogTheBody(string? contentType)
-    //{
-    //    if (contentType == null)
-    //        return false;
-
-    //    //// Don't log HTML
-    //    //if (contentType.Contains("html"))
-    //    //    return false;
-
-    //    // Just log text or json or xml
-    //    if (contentType.Contains("text") || contentType.Contains("xml") || contentType.Contains("json"))
-    //        return true;
-
-    //    return false;
-    //}
 
     private static bool CheckForIgnoredPaths(string? path)
     {
@@ -113,7 +79,6 @@ public static class RequestLog
 
         return false;
     }
-
 
     private static bool CheckForIgnoredExtensions(string? path)
     {
