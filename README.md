@@ -6,7 +6,11 @@
 
 
 ## Features and tools
-* Redis cache explorer
+
+
+
+## Storage tools
+* Redis explorer
 
 
 
