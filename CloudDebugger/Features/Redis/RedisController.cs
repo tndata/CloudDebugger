@@ -16,6 +16,8 @@ namespace CloudDebugger.Features.Redis;
 public class RedisController : Controller
 {
     private readonly ILogger<RedisController> _logger;
+
+    // Session key for remembering the connection string
     private const string sessionKey = "RedisConnectionString";
 
     public RedisController(ILogger<RedisController> logger)
@@ -62,7 +64,7 @@ public class RedisController : Controller
         {
             string connectionString = model.ConnectionString ?? "";
 
-            // Remember the ConnectionString
+            // Remember the provided ConnectionString
             HttpContext.Session.SetString(sessionKey, connectionString);
 
             try
@@ -114,7 +116,6 @@ public class RedisController : Controller
                 }
             }
         } while (cursor != 0);
-
 
         // Convert the result to a list of RedisKeyInfo
         var resultingKeyList = new List<RedisKeyInfo>();
@@ -172,6 +173,11 @@ public class RedisController : Controller
         return result;
     }
 
+    /// <summary>
+    /// Connect to redis using the access key or managed identity
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <returns></returns>
     private async static Task<ConnectionMultiplexer> GetRedisConnection(string connectionString)
     {
         if (connectionString.Contains("password="))
