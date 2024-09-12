@@ -19,7 +19,7 @@ $AppServicePlan_linux = 'asp-CloudDebugger-Linux'
 $AppServicePlan_win = 'asp-CloudDebugger-Windows'
 
 # The SKU of the App Service Plans
-$AppServicePlanSKU_Linux = 'S1'     # Standard plan 
+$AppServicePlanSKU_Linux = 'P0V3'     # S1 is not available in the region swedencentral?
 $AppServicePlanSKU_Windows = 'S1'   # Standard plan 
 
 # The name of the App Services

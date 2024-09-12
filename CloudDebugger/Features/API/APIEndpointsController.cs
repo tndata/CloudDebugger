@@ -8,10 +8,10 @@ namespace CloudDebugger.Features.Api;
 /// 
 /// This REST API endpoint provides a few useful API endpoints for testing purposes
 /// 
-/// /api/customers      Returns a JSON document with about about 100 customers
-/// /api/customers/1    Returns a specific customer back as JSON
-/// /api/echo           Returns back the received request headers
-/// /api/time           Returns the current time as a string       
+/// /api/customers      Returns a JSON document with  100 customers
+/// /api/customers/1    Returns a specific customer back as JSON (1-100)
+/// /api/echo           Returns back the received request headers as a JSON document.
+/// /api/time           Returns the current time as a string      
 /// </summary>
 [EnableCors("MyCorsPolicy_wildcard")]
 [Route("/api")]

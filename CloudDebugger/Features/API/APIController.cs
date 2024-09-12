@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CloudDebugger.Features.Api;
 
 /// <summary>
-/// Controller for the API HTML summary page
+/// Controller for the REST API HTML HTML page
 /// </summary>
 public class ApiController : Controller
 {

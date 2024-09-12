@@ -1,5 +1,11 @@
 ﻿namespace CloudDebugger.Features.Api;
 
+/// <summary>
+/// CustomerDatabase
+/// ================
+/// 
+/// This class contains a sample in-memory customer database
+/// </summary>
 public class CustomerDatabase
 {
     private readonly List<Customer> m_customers;
@@ -21,25 +27,40 @@ public class CustomerDatabase
             new Customer { Id=11, FirstName = "Antonia", LastName = "Trevino", StreetAddress = "3031 Carson Street", City = "California", ZipCode = "02110"},
         ];
 
-        //Add some more ustomers
+        //Add some more customers
         for (int i = m_customers.Count; i < 100; i++)
         {
-            int zipcode = 25221 + i;
+            int zipcode = 25220 + i;
             var customer = new Customer { FirstName = "Joe-" + i, LastName = "Andersson", Id = i + 1, StreetAddress = "Main street #" + i, ZipCode = zipcode.ToString(), City = "Stockholm" };
             m_customers.Add(customer);
         }
     }
 
+
+    /// <summary>
+    /// Returns a list of all the customers
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<Customer> GetAllCustomers()
     {
         return m_customers;
     }
 
+    /// <summary>
+    /// Get a specific customer
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public Customer? GetCustomer(int id)
     {
         return m_customers.Find(x => x.Id == id);
     }
 
+    /// <summary>
+    /// Add a customer to the database
+    /// </summary>
+    /// <param name="customer"></param>
+    /// <returns></returns>
     public int AddCustomer(Customer customer)
     {
         customer.Id = m_customers.Count + 1;
@@ -47,18 +68,34 @@ public class CustomerDatabase
         return m_customers.LastIndexOf(customer);
     }
 
+    /// <summary>
+    /// Remove a customer from the database
+    /// </summary>
+    /// <param name="id"></param>
     public void RemoveCustomerAt(int id)
     {
         m_customers.RemoveAt(id);
     }
 
-    public void UpdateCustomerAt(int id, Customer newData)
+    /// <summary>
+    /// Update a specific customer
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="newData"></param>
+    /// <returns>True if the customer was found and updated</returns>
+    public bool UpdateCustomerAt(int id, Customer newData)
     {
         if (newData != null && id > 0)
         {
             var pos = m_customers.FindIndex(x => x.Id == id);
 
-            m_customers[pos] = newData;
+            if (pos >= 0)
+            {
+                m_customers[pos] = newData;
+                return true;
+            }
         }
+
+        return false;
     }
 }

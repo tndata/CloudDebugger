@@ -42,6 +42,7 @@ Write-Host "`nWaiting 15s to ensure the identity is fully registered and propaga
 # The AcrPull assignment might otherwise fail.
 Start-Sleep -Seconds 15
 
+
 # Step 3: Query for the Azure Container Registry ID
 Write-Host "`n`nQuerying for the container registry ID"
 $containerRegistry = az acr show `
@@ -74,10 +75,6 @@ $AppService = az webapp create `
 $hostName = $AppService.defaultHostName
 $appServiceID = $AppService.id
 Write-Host "App Service created, id: ${appServiceID}"
-
-Write-Host "`nWaiting 15s to ensure the service is in place."
-# The next step sometimes fails if we don't wait a bit.
-Start-Sleep -Seconds 15
 
 # Step 6: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
 Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."

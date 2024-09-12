@@ -1,5 +1,8 @@
 namespace CloudDebugger.Features.Api;
 
+/// <summary>
+/// Represents a customer in our system
+/// </summary>
 public class Customer
 {
     public int Id { get; set; }
