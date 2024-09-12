@@ -5,10 +5,10 @@ namespace CloudDebugger.Features.CallingApis;
 /// <summary>
 /// Calling external APIs
 /// 
-/// TODO: DOCUMENT!
 /// </summary>
 public class CallingApisController : Controller
 {
+    private const string JSONApiUrl = "https://httpbin.org/json";
     private const string slowApiUrl = "https://httpbin.org/delay/5";
     private const string error500ApiUrl = "https://httpbin.org/status/500";
 
@@ -23,9 +23,21 @@ public class CallingApisController : Controller
     {
         return View();
     }
+
+    public IActionResult JsonApi()
+    {
+        _logger.LogInformation("JSON API endpoint was called");
+
+        var result = MakeCallToExternalApi(JSONApiUrl);
+
+        ViewData["Message"] = "Request sent, result = " + result;
+
+        return View("Index");
+    }
+
     public IActionResult SlowApi()
     {
-        _logger.LogInformation("SlowApi endpoint was called");
+        _logger.LogInformation("Slow API endpoint was called");
 
         var result = MakeCallToExternalApi(slowApiUrl);
 
@@ -36,8 +48,7 @@ public class CallingApisController : Controller
 
     public IActionResult ErrorApi()
     {
-        //TODO: REVIEW!
-        _logger.LogInformation("ErrorApi endpoint was called");
+        _logger.LogInformation("Error API endpoint was called");
 
         var result = MakeCallToExternalApi(error500ApiUrl);
 
@@ -53,10 +64,9 @@ public class CallingApisController : Controller
             var client = new HttpClient();
 
             // We ignore the result from this call.
-            _ = client.GetStringAsync(url).Result;
+            var response = client.GetStringAsync(url).Result;
 
-            //TODO: Handle result?
-            return "OK";
+            return response;
         }
         catch (Exception exc)
         {

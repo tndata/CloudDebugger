@@ -3,20 +3,40 @@
 }
 
 <h3>Calling external APIs</h3>
+The purpose of this call it to make request from within this tool to external APIs.
 
+<br />
+<br />
 
-<a href="/CallingApis/SlowApi">Call external API that takes 5 seconds to complete.</a><br />
-<a href="/CallingApis/ErrorApi">Call external API that returns 500 server error.</a><br />
+<ul>
+    <li>
+        <a href="/CallingApis/jsonApi">Call JSON API</a><br>Send request to <b>https://httpbin.org/json</b> that should return a JSON document.
+    </li>
+    <li>
+        <a href="/CallingApis/SlowApi">Call API that takes 5 seconds to complete.</a><br>Send request to <b> https://httpbin.org/delay/5</b> that takes 5 sec to complete.
+    </li>
+    <li>
+        <a href="/CallingApis/ErrorApi">Call API that returns 500 server error.</a><br>Send <b>https://httpbin.org/status/500</b> that returns a HTTP 500 Server error.
+    </li>
+</ul>
+<br />
 
 
 @{
     var message = ViewData["Message"];
     if (message != null)
     {
-        <br /><h4>Message</h4>
-        <p><b>@message</b></p>
+        <br />
+        <h4>Result</h4>
+        <p><pre>@message</pre></p>
     }
 }
 
 <br />
 <br />
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/CallingAPIs">Documentation</a></li>
+    <li><a href="https://httpbin.org">httpbin.org</a></li>
+</ul>

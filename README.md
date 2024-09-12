@@ -12,7 +12,8 @@
 ### HTTP Request tools
 * [Request logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 * [Current request viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
-s
+* [Calling external APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
+
 
 ### Storage tools
 * [Redis explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
