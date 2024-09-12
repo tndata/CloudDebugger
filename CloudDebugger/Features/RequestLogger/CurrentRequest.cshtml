@@ -4,13 +4,15 @@
     ViewData["Title"] = "CloudDebugger - Request headers";
 }
 
-<h3>Current HTTP Request details</h3>
-This page will show various details about the current request.<br>
+<h3>Current HTTP(s) request details</h3>
+This tool provides detailed insights into the current HTTP(s) request.
+<br>
 <a href="/RequestLogger">Back</a>
 <br />
 <br />
 
 
+<h4>HTTP(s) protocol details</h4>
 <table class="table">
     <tr>
         <td class="col-md-2">Received protocol</td>
@@ -21,7 +23,9 @@ This page will show various details about the current request.<br>
         <td class="col-md-10">@Context.Request.Scheme</td>
     </tr>
 </table>
+
 <br />
+
 @{
     var sslStream = Context.Features.Get<SslStream>();
     if (sslStream != null)
@@ -103,4 +107,13 @@ This page will show various details about the current request.<br>
         </tr>
     }
 </table>
+
+<br>
+<br>
+<h4>Resources</h4>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer">Documentation</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/List_of_HTTP_header_fields">List of HTTP header fields</a> (Wikipedia)</li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">HTTP headers</a> (Mozilla)</li>
+</ul>
 

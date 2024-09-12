@@ -38,11 +38,10 @@ Write-Host "App Service Plan created with id: ${planId}"
 
 
 Write-Host "`nWaiting 15s to ensure the identity is fully registered and propagated in Azure AD..."
+# We do this after creating the App Service Plan to give the identity some time to propagate in the system.
 # The AcrPull assignment might otherwise fail.
 Start-Sleep -Seconds 15
 
-
-# We do this after creating the App Service Plan to give the identity some time to propagate in the system.
 # Step 3: Query for the Azure Container Registry ID
 Write-Host "`n`nQuerying for the container registry ID"
 $containerRegistry = az acr show `
@@ -76,9 +75,14 @@ $hostName = $AppService.defaultHostName
 $appServiceID = $AppService.id
 Write-Host "App Service created, id: ${appServiceID}"
 
+Write-Host "`nWaiting 15s to ensure the service is in place."
+# The next step sometimes fails if we don't wait a bit.
+Start-Sleep -Seconds 15
+
 # Step 6: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
 Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."
-$tmp = az webapp config appsettings set --name $AppServiceName_container_linux `
+$tmp = az webapp config appsettings set `
+    --name $AppServiceName_container_linux `
 	--resource-group $rgname `
 	--settings AZURE_CLIENT_ID=$clientId `
 	--output json | ConvertFrom-Json
