@@ -15,6 +15,13 @@
 * [Calling external APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
 
 
+
+### Compute tools
+* [App Services - File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
+* [App Services - File Local cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
+
+
+
 ### Storage tools
 * [Redis explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 

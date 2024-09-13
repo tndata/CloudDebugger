@@ -4,14 +4,16 @@ public class ShowFilesModel
 {
     public string? HomeDirectory { get; set; }
     public string? TempDirectory { get; set; }
+
+    /// <summary>
+    /// The value returned is the containing directory of the host executable.
+    /// </summary>
     public string? AppDirectory { get; set; }
+
+    /// <summary>
+    /// Describes the operating system on which the app is running.
+    /// </summary>
     public string? OperatingSystem { get; set; }
-
-
-    public string? LocalCacheEnabled { get; set; }
-    public string? LocalCacheReady { get; set; }
-    public string? LocalCacheOption { get; set; }
-    public string? LocalCacheSize { get; set; }
 
     public List<string> HomeDirFolders { get; set; } = [];
     public List<string> HomeDirFiles { get; set; } = [];
