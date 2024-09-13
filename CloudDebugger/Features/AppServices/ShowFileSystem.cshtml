@@ -3,11 +3,13 @@
     ViewData["Title"] = "ShowFileSystem";
 }
 
-<h1>App Services - ShowFileSystem</h1>
+<h3>App Services - ShowFileSystem</h3>
+This tool will show the content of the most essential directories in an App Service. See also the more generic <a href="/FileSystem/index">File explorer tool</a>.
 <a href="/AppServices">Back</a>
 <br />
+<br />
 
-
+<h4>App Service details</h4>
 <table class="table">
     <tr>
         <td class="col-md-2">Operating System</td>
@@ -27,31 +29,10 @@
     </tr>
 </table>
 
-<h3>App Service local cache details</h3>
-For more information, visit <a href="https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache">this link</a> and 
-<a href="https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings">this link</a>.
-<table class="table">
-    <tr>
-        <td class="col-md-2">LocalCache Enabled</td>
-        <td class="col-md-10">@Model.LocalCacheEnabled</td>
-    </tr>
-    <tr>
-        <td class="col-md-2">LocalCache Ready</td>
-        <td class="col-md-10">@Model.LocalCacheReady (Read-only flag indicating if the app using local cache).</td>
-    </tr>
-    <tr>
-        <td class="col-md-2">LocalCache Option</td>
-        <td class="col-md-10">@Model.LocalCacheOption (Default, Always, Diabled)</td>
-    </tr>
-    <tr>
-        <td class="col-md-2">LocalCache Size</td>
-        <td class="col-md-10">@Model.LocalCacheSize MB (1-2000)</td>
-    </tr>
-</table>
-
 <br>
-
-<h3>Folders and files in the application directory</h3>
+<br>
+@* 
+<h4>Folders and files in the application directory</h4>
 <table class="table">
     @foreach (var dir in Model.AppDirFolders)
     {
@@ -71,11 +52,12 @@ For more information, visit <a href="https://learn.microsoft.com/en-us/azure/app
 
 </table>
 
-<br>
+<br />
 <br />
 
 
-<h3>Folders and files in the home directory</h3>
+
+<h4>Folders and files in the home directory</h4>
 <table class="table">
     @foreach (var dir in Model.HomeDirFolders)
     {
@@ -83,7 +65,7 @@ For more information, visit <a href="https://learn.microsoft.com/en-us/azure/app
             <td class="col-md-12">
                 <b>\@dir</b>
             </td>
-        </tr>   
+        </tr>
     }
 
     @foreach (var file in Model.HomeDirFiles)
@@ -94,26 +76,101 @@ For more information, visit <a href="https://learn.microsoft.com/en-us/azure/app
     }
 
 </table>
+ *@
+
+<br>
+<br />
 
 
-<br><br />
 
-<h3>Folders and files in the temp directory</h3>
-<table class="table">
-    @foreach (var dir in Model.TempDirFolders)
-    {
+
+<table class="table table-bordered">
+    <thead>
         <tr>
-            <td class="col-md-12">
-                <b>\@dir</b>
+            <th><b>Home Directory</b></th>
+            <th><b>Application directory</b></th>
+            <th><b>Temp directory</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="col-md-4">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <b>
+<pre>
+@foreach (var dir in Model.HomeDirFolders)
+{
+@(dir + "\r\n")
+}
+</pre>
+</b>
+<pre>
+@foreach (var file in Model.HomeDirFiles)
+{
+@(file + "\r\n")
+}
+</pre>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="col-md-4">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <b>
+<pre>
+@foreach (var dir in Model.AppDirFolders)
+{
+@(dir + "\r\n")
+}
+</pre>
+</b>
+<pre>
+@foreach (var file in Model.AppDirFiles)
+{
+@(file + "\r\n")
+}
+</pre>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="col-md-4">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <b>
+<pre>
+@foreach (var dir in Model.TempDirFolders)
+{
+@(dir + "\r\n")
+}
+</pre>
+                            </b>
+                            <pre>
+@foreach (var file in Model.TempDirFiles)
+{
+@(file + "\r\n")
+}
+</pre>
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
-    }
+    </tbody>
 
-    @foreach (var file in Model.TempDirFiles)
-    {
-        <tr>
-            <td class="col-md-12">@file</td>
-        </tr>
-    }
+
+
 
 </table>
+
+
+
+
+
+
+

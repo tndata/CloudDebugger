@@ -39,10 +39,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="Features\AppServices\Benchmark.cshtml">
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
 		<Content Update="Features\FileSystem\Index.cshtml">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

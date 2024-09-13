@@ -1,0 +1,57 @@
+﻿@model CloudDebugger.Features.AppServices.LocalCacheModel
+@{
+    ViewData["Title"] = "App Services - Display local cache details";
+}
+
+<h3>App Services - Local cache</h3>
+This tool displays details about the App Services Local Cache feature, indicating whether it is enabled. This feature is only available for <b>Windows-based, non-container</b> apps.
+<br />
+<a href="/AppServices">Back</a>
+<br />
+<br />
+
+
+<h4>App Service Local Cache details</h4>
+<table class="table table-bordered">
+    <tr>
+        <td class="col-md-2">LocalCache Option</td>
+        <td class="col-md-10"><b>@Model.LocalCacheOption</b> (Default, Always, Diabled)</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Size</td>
+        <td class="col-md-10"><b>@Model.LocalCacheSize</b> MB (1-2000 MB, the default is 1000 MB if not set.)</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Read-Write options</td>
+        <td class="col-md-10">
+            <b>
+                @Model.LocalCacheReadWriteOptions
+            </b>
+            <br />Optional, available options are:<br />
+            - ReadOnly: Cache is read-only.<br />
+            - WriteButDiscardChanges: Allow writes to local cache but discard changes made locally.<br />
+        </td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Enabled</td>
+        <td class="col-md-10"><b>@Model.LocalCacheEnabled</b></td>
+    </tr>
+    <tr>
+        <td class="col-md-2">LocalCache Ready</td>
+        <td class="col-md-10"><b>@Model.LocalCacheReady</b><br />(Read-only flag indicating if the app using local cache).</td>
+    </tr>
+    <tr>
+        <td class="col-md-2">Website Volume Type</td>
+        <td class="col-md-10"><b>@Model.WebSiteVolumeType</b><br />(Shows the storage volume type currently in use. Should either be PrimaryStorageVolume or LocalCache if set).</td>
+    </tr>
+</table>
+
+<br>
+<br>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/AppServices">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache">Azure App Service Local Cache overview</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings">Environment variables and app settings in Azure App Service</a></li>
+</ul>
