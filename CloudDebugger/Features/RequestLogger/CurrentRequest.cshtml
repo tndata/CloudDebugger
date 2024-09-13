@@ -13,7 +13,7 @@ This tool provides detailed insights into the current HTTP(s) request.
 
 
 <h4>HTTP(s) protocol details</h4>
-<table class="table">
+<table class="table table-bordered">
     <tr>
         <td class="col-md-2">Received protocol</td>
         <td class="col-md-10">@Context.Request.Protocol</td>
@@ -31,7 +31,7 @@ This tool provides detailed insights into the current HTTP(s) request.
     if (sslStream != null)
     {
         <h4>TLS/SSL details</h4>
-        <table class="table">
+        <table class="table table-bordered">
             <tr>
                 <td class="col-md-2">Protocol</td>
                 <td class="col-md-10">@sslStream.SslProtocol</td>
@@ -94,7 +94,7 @@ This tool provides detailed insights into the current HTTP(s) request.
 
 <h4>Request headers</h4>
 
-<table class="table">
+<table class="table table-bordered">
     @foreach (var header in Context.Request.Headers.OrderBy(h => h.Key))
     {
         <tr>
