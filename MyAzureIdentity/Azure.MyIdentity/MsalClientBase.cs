@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Core;
+using Microsoft.Identity.Client;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
-using Microsoft.Identity.Client;
 
 namespace Azure.MyIdentity
 {
@@ -44,7 +44,7 @@ namespace Azure.MyIdentity
             DisableInstanceDiscovery = options is ISupportsDisableInstanceDiscovery supportsDisableInstanceDiscovery && supportsDisableInstanceDiscovery.DisableInstanceDiscovery;
             ISupportsTokenCachePersistenceOptions cacheOptions = options as ISupportsTokenCachePersistenceOptions;
             _tokenCachePersistenceOptions = cacheOptions?.TokenCachePersistenceOptions;
-            IsSupportLoggingEnabled = options?.IsUnsafeSupportLoggingEnabled ?? false;
+            IsSupportLoggingEnabled = true;     //HACK: Set to true
             Pipeline = pipeline;
             TenantId = tenantId;
             ClientId = clientId;

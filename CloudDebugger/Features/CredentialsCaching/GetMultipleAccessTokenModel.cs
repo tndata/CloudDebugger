@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.Credentials;
+﻿namespace CloudDebugger.Features.CredentialsCaching;
 
 public class GetMultipleAccessTokenModel
 {

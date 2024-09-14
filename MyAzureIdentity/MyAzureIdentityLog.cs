@@ -15,7 +15,7 @@
 
                 Log.Add(new AzureIdentityLogEntry()
                 {
-                    EntryTime = DateTime.Now,
+                    EntryTime = DateTime.UtcNow,
                     Context = context,
                     Message = message
                 });

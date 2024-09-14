@@ -1,64 +1,23 @@
 using Azure.Core;
 using Azure.MyIdentity;
-using Flurl;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CloudDebugger.Features.Credentials;
+namespace CloudDebugger.Features.CredentialsCaching;
 
-public class CredentialsController : Controller
+public class CredentialsCachingController : Controller
 {
-    private readonly ILogger<CredentialsController> _logger;
+    private readonly ILogger<CredentialsCachingController> _logger;
 
-    // The double slash is intentional for public cloud.
-    // private static readonly string[] scopes = ["https://graph.microsoft.com/.default"];
     private static readonly string[] scopes = ["https://management.azure.com//.default"];
 
-    public CredentialsController(ILogger<CredentialsController> logger)
+    public CredentialsCachingController(ILogger<CredentialsCachingController> logger)
     {
         _logger = logger;
     }
 
+
     public IActionResult Index()
-    {
-        return View();
-    }
-
-    public IActionResult GetAccessToken()
-    {
-        var model = new GetAccessTokenModel();
-
-        var totalTimeSw = new Stopwatch();
-        totalTimeSw.Start();
-
-        try
-        {
-            model.MyDefaultAzureCredential = CreateMyDefaultAzureCredentialInstance();
-            model.AccessToken = GetAccessToken(model.MyDefaultAzureCredential);
-
-            // Customization we have made to the MyDefaultAzureCredential class
-            model.SelectedTokenCredential = model.MyDefaultAzureCredential.SelectedTokenCredential;
-            model.Log = MyDefaultAzureCredential.LogText.ToString();
-
-            if (model.AccessToken.Token != null)
-                model.UrlToJWTIOSite = new Uri("https://jwt.io").SetFragment("value=" + model.AccessToken.Token);
-
-            model.Scopes = string.Join(',', scopes);
-        }
-        catch (Exception exc)
-        {
-            string str = $"Exception:\r\n{exc.Message}";
-            model.ErrorMessage = str;
-            _logger.LogInformation(exc, "Failed to retrieve access token");
-        }
-        totalTimeSw.Stop();
-        model.ExecutionTime = $"{totalTimeSw.Elapsed.TotalMilliseconds} ms";
-
-        return View(model);
-    }
-
-
-    public IActionResult GetMultipleAccessTokens()
     {
         var model = new GetMultipleAccessTokenModel();
 
@@ -154,29 +113,6 @@ public class CredentialsController : Controller
     }
 
 
-    public IActionResult ViewLog()
-    {
-        // Get the internal custom log from the custom MyAzureIdentity library
-        var model = new ViewLogModel()
-        {
-            Log = MyAzureIdentityLog.Log
-        };
-
-        return View(model);
-    }
-
-    public IActionResult ClearLog()
-    {
-        MyAzureIdentityLog.ClearLog();
-        return RedirectToAction("Index");
-    }
-
-    public IActionResult RetryPolicy()
-    {
-        return View();
-    }
-
-
     private static AccessToken GetAccessToken(MyDefaultAzureCredential credential)
     {
         var tokenRequestContext = new TokenRequestContext(scopes);
@@ -197,6 +133,8 @@ public class CredentialsController : Controller
                             LoggedQueryParameters = { "*" },
                             IsAccountIdentifierLoggingEnabled=true,
                             IsLoggingContentEnabled=true,
+                            IsDistributedTracingEnabled=true,
+                            IsTelemetryEnabled=true
                         },
         };
 

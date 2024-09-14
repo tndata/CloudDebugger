@@ -28,6 +28,14 @@ namespace Azure.MyIdentity
             var sb = new StringBuilder();
             sb.AppendLine("ManagedIdentityCredential");
 
+            if (_clientId != null)
+            {
+                sb.AppendLine(" - clientId=" + _clientId.ToString());
+            }
+
+            sb.AppendLine(" - logAccountDetails=" + _logAccountDetails.ToString());
+            sb.AppendLine("");
+
             if (Client != null)
             {
                 sb.AppendLine(" - Client=" + Client.ToString());
@@ -36,6 +44,8 @@ namespace Azure.MyIdentity
             {
                 return " - Client=NULL";
             }
+
+
 
             return sb.ToString();
         }
@@ -122,6 +132,8 @@ namespace Azure.MyIdentity
         private async ValueTask<AccessToken> GetTokenImplAsync(bool async, TokenRequestContext requestContext, CancellationToken cancellationToken)
         {
             using CredentialDiagnosticScope scope = _pipeline.StartGetTokenScope("ManagedIdentityCredential.GetToken", requestContext);
+
+            MyAzureIdentityLog.AddToLog("ManagedIdentityCredential", "GetToken() was called");
 
             try
             {

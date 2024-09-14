@@ -116,6 +116,8 @@ namespace Azure.MyIdentity
 
         private async ValueTask<AccessToken> GetTokenImplAsync(bool async, TokenRequestContext requestContext, CancellationToken cancellationToken)
         {
+            MyAzureIdentityLog.AddToLog("ChainedTokenCredential", "GetToken was called");
+
             var groupScopeHandler = new ScopeGroupHandler(default);
             try
             {
@@ -138,10 +140,10 @@ namespace Azure.MyIdentity
 
                         var lifetime = token.ExpiresOn - DateTimeOffset.UtcNow;
 
-                        LogText.AppendLine($"We successfully got a token");
+                        LogText.AppendLine($"We successfully got a token using ChainedTokenCredential");
                         LogText.AppendLine($" - Token.Hash={token.Token.GetHashCode()}");
                         LogText.AppendLine($" - Token={token.Token}");
-                        LogText.AppendLine($" - Expires={token.ExpiresOn} (lifetime={(int)(lifetime.TotalMinutes)} minutes");
+                        LogText.AppendLine($" - Expires={token.ExpiresOn.ToUniversalTime()} (lifetime={(int)(lifetime.TotalMinutes)} minutes");
 
                         MyAzureIdentityLog.AddToLog("ChainedTokenCredential", LogText.ToString());
 

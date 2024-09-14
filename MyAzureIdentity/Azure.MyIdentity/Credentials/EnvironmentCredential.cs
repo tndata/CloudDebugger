@@ -140,7 +140,9 @@ namespace Azure.MyIdentity
             log.AppendLine($" - username = {username}");
             log.AppendLine($" - password = {safeUserPassword}");
             log.AppendLine();
-
+            log.AppendLine("Based on the provided environment variables, this TokenCredential will select either:");
+            log.AppendLine("ClientSecretCredential, ClientCertificateCredential, or UsernamePasswordCredential.");
+            log.AppendLine();
 
             if (!string.IsNullOrEmpty(tenantId) && !string.IsNullOrEmpty(clientId))
             {
