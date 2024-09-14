@@ -1,17 +1,18 @@
 ﻿@model CloudDebugger.Features.CredentialsCaching.GetMultipleAccessTokenModel
 @{
-    ViewData["Title"] = "CloudDebugger - Token caching";
+    ViewData["Title"] = "CloudDebugger - Exploring Token Caching";
 }
 
-<h5>Get the access token multiple times</h5>
-This page explores what happens when we request multipel access tokens against DefaultAzureCredential.
+<h4>Exploring Token Caching</h4>
+This page demonstrates the behavior of access token requests when using different instances of DefaultAzureCredential.
 <br />
-<a href="/Credentials">Back</a>
+<a href="/DefaultAzureCredentials">Back</a>
 <br />
 <br />
 
-<h5>Get the access token multiple times on the same instance</h5>
-What happens if we call GetToken multiple times on the same instance of MyDefaultAzureCredential?
+<h5>Using the Same Instance</h5>
+Observe the behavior when GetToken() is called multiple times on the same instance of DefaultAzureCredential.
+<br />
 <br />
 <table class="table table-bordered">
 
@@ -25,6 +26,15 @@ What happens if we call GetToken multiple times on the same instance of MyDefaul
                 </td>
             </tr>
         }
+
+        <tr>
+            <td>Sample access token</td>
+        </tr>
+        <tr>
+            <td id="access_token" style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                @(Model.SingleInstanceAccessToken ?? "No token found")
+            </td>
+        </tr>
     }
     else
     {
@@ -34,10 +44,12 @@ What happens if we call GetToken multiple times on the same instance of MyDefaul
     }
 </table>
 
+<br />
+<br />
 
-
-<h5>Get the access token multiple times on the same instance</h5>
-What happens if we call GetToken multiple times on the a new instance of MyDefaultAzureCredential each time?
+<h5>Using a New Instance Each Time</h5>
+Observe the behavior when GetToken() is called multiple times, each time using a new instance of MyDefaultAzureCredential.
+<br />
 <br />
 
 <table class="table table-bordered">
@@ -52,6 +64,14 @@ What happens if we call GetToken multiple times on the a new instance of MyDefau
                 </td>
             </tr>
         }
+        <tr>
+            <td>Sample access token</td>
+        </tr>
+        <tr>
+            <td id="access_token" style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                @(Model.MultipleInstanceAccessToken ?? "No token found")
+            </td>
+        </tr>
     }
     else
     {
@@ -64,23 +84,22 @@ What happens if we call GetToken multiple times on the a new instance of MyDefau
 
 
 
-@if (String.IsNullOrWhiteSpace(Model.ErrorMessage) == false)
+@if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
 {
     <div class="alert alert-danger" role="alert">
         <pre>@Model.ErrorMessage</pre>
     </div>
 }
 
-@if (String.IsNullOrWhiteSpace(Model.Message) == false)
+@if (!String.IsNullOrWhiteSpace(Model.Message))
 {
     <b>@Model.Message</b>
 }
 
 
-
-
-
-<h5>Conclusions</h5>
+<br />
+<br />
+<h5>Resources</h5>
 <ul>
-    <li>Reusing the same instance improves performance because we can use the cached access token.</li>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/TokenCaching">Documentation</a></li>
 </ul>

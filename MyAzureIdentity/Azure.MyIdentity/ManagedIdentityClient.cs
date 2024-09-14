@@ -96,8 +96,8 @@ namespace Azure.MyIdentity
             var lifetime = result.ExpiresOn - DateTimeOffset.UtcNow;
 
             log.AppendLine("Got access token: " + result.AccessToken);
-            log.AppendLine("ExpiresOn: " + result.ExpiresOn);
-            log.AppendLine("lifetime: " + lifetime.TotalMinutes + " minutes");
+            log.AppendLine("ExpiresOn: " + result.ExpiresOn.ToString("HH:mm:ss"));
+            log.AppendLine("lifetime: " + ((int)lifetime.TotalMinutes) + " minutes (until it expires)");
 
             return new AccessToken(result.AccessToken, result.ExpiresOn);
         }
