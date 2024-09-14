@@ -29,7 +29,8 @@
 ### Identity tools
 * [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
 * [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
-* [Token caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
+* [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
+* [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 
 

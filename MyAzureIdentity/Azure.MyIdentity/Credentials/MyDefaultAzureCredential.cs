@@ -192,7 +192,9 @@ namespace Azure.MyIdentity
 
 
             LogText = new StringBuilder();
-            LogText.AppendLine("\r\nGetTokenFromSourcesAsync");
+            LogText.AppendLine("\r\nMyDefaultAzureCredential.GetTokenFromSourcesAsync was called");
+
+
             MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", "GetTokenFromSourcesAsync started");
 
 
@@ -283,6 +285,15 @@ namespace Azure.MyIdentity
             Validations.ValidateAuthorityHost(options?.AuthorityHost ?? AzureAuthorityHosts.GetDefault());
 
             return options;
+        }
+
+        /// <summary>
+        /// Hack: Custom ToString() method to return the log text
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "MyDefaultAzureCredential\r\n\r\n" + LogText.ToString();
         }
     }
 }

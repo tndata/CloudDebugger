@@ -23,7 +23,6 @@ public class CredentialsCachingController : Controller
         try
         {
             var result1 = GetTokensUsingSingleInstance();
-
             model.SingleInstanceLog = result1.log;
             model.SingleInstanceAccessToken = result1.AccessToken;
 

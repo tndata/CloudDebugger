@@ -1,0 +1,130 @@
+﻿@using Azure.MyIdentity
+@model CloudDebugger.Features.TokenCredentailsExplorer.TokenCredentailsExplorerModel
+@{
+    ViewData["Title"] = "CloudDebugger - TokenCredentials Explorer";
+}
+
+<h5>TokenCredentials Explorer</h5>
+
+<br />
+
+<br />
+
+
+
+
+@if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model.Message))
+{
+    <b>@Model.Message</b>
+}
+
+
+
+
+<table class="table table-bordered">
+    <tr>
+
+        <!-- Column 1 start -->
+        <td class="col-md-6">
+            <h4>Token Credentials</h4>
+            Select a token credentials to explore.
+            <br /><br />
+
+            @*      <a href="Index?Credential=1">AuthorizationCodeCredential</a><br>*@
+            <a href="Index?Credential=2">AzureCliCredential</a><br>
+            <a href="Index?Credential=3">AzureDeveloperCliCredential</a><br>
+            <a href="Index?Credential=4">AzurePowerShellCredential</a><br>
+            @* <a href="Index?Credential=5">ChainedTokenCredential</a><br> *@
+            @* <a href="Index?Credential=6">ClientAssertionCredential</a><br> *@
+           @*  <a href="Index?Credential=7">ClientCertificateCredential</a><br> *@
+            @* <a href="Index?Credential=8">ClientSecretCredential</a><br> *@
+            <a href="Index?Credential=9">DefaultAzureCredential</a><br>
+            @* <a href="Index?Credential=10">DeviceCodeCredential</a><br> *@
+            <a href="Index?Credential=11">EnvironmentCredential</a><br>
+            <a href="Index?Credential=12">InteractiveBrowserCredential</a><br>
+            <a href="Index?Credential=13">ManagedIdentityCredential</a><br>
+            @* <a href="Index?Credential=14">OnBehalfOfCredential</a><br>  *@
+            @* <a href="Index?Credential=15">SharedTokenCacheCredential</a><br> *@
+            @* <a href="Index?Credential=16">UsernamePasswordCredential</a><br> *@
+            <a href="Index?Credential=17">VisualStudioCodeCredential</a><br>
+            <a href="Index?Credential=18">VisualStudioCredential</a><br>
+            <a href="Index?Credential=19">WorkloadIdentityCredential</a><br />
+
+        </td>
+        <!-- Column 1 end -->
+        <!-- Column 2 start -->
+        <td class="col-md-6">
+
+            <table>
+
+                @if (Model.Log != null && Model.Log.Count > 0)
+                {
+                    <tr>
+                        <td>
+                            <h5>Internal Execution log</h5>
+                        </td>
+                    </tr>
+
+                    foreach (var entry in Model.Log)
+                    {
+                        <tr>
+                            <td>
+                                <pre>@entry</pre>
+                            </td>
+                        </tr>
+                    }
+                }
+
+                @if (Model.AccessToken.Token != null)
+                {
+                    <tr>
+                        <td>
+                            <h5>Access Token</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="access_token" style="width: 500px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                            @(Model.AccessToken.Token ?? "No token found")
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            @if (Model.UrlToJWTIOSite != null)
+                            {
+                                @:Explore the access token on <a href="@Model.UrlToJWTIOSite" target="_blank">https://jwt.io</a> or <a href="@Model.UrlToJWTMSSite" target="_blank">https://jwt.ms</a><br />
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </td>
+
+        <!-- Column 2 end -->
+    </tr>
+
+</table>
+
+
+
+
+<br />
+<br />
+
+
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/TokenExplorer">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/dotnet/api/azure.identity">Azure.Identity Namespace</a></li>
+</ul>

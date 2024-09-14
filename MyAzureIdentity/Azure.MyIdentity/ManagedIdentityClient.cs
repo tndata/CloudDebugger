@@ -27,21 +27,21 @@ namespace Azure.MyIdentity
             if (_identitySource != null)
                 sb.AppendLine($" - _identitySource = {_identitySource.ToString()}");
 
-            sb.AppendLine(" - ClientId=" + ClientId.ToString());
+            if (ClientId != null)
+                sb.AppendLine(" - ClientId=" + ClientId.ToString());
 
             if (ResourceIdentifier != null)
             {
-                sb.AppendLine(" - ResourceIdentifier=" + ResourceIdentifier.ToString());
+                sb.AppendLine(" - ResourceIdentifier=" + ResourceIdentifier?.ToString());
                 sb.AppendLine(" - ResourceIdentifier.Name=" + ResourceIdentifier.Name?.ToString());
                 sb.AppendLine(" - ResourceIdentifier.Location=" + ResourceIdentifier.Location?.ToString());
                 sb.AppendLine(" - ResourceIdentifier.Parent=" + ResourceIdentifier.Parent?.ToString());
                 sb.AppendLine(" - ResourceIdentifier.Provider=" + ResourceIdentifier.Provider?.ToString());
                 sb.AppendLine(" - ResourceIdentifier.ResourceGroupName=" + ResourceIdentifier.ResourceGroupName?.ToString());
                 sb.AppendLine(" - ResourceIdentifier.ResourceType=" + ResourceIdentifier.ResourceType.ToString());
-                sb.AppendLine(" - ResourceIdentifier.SubscriptionId=" + ResourceIdentifier.SubscriptionId.ToString());
+                sb.AppendLine(" - ResourceIdentifier.SubscriptionId=" + ResourceIdentifier.SubscriptionId?.ToString());
                 sb.AppendLine("");
             }
-
 
             if (log.Length > 0)
                 sb.AppendLine(log.ToString());
