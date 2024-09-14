@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Core;
 using Microsoft.Identity.Client;
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -44,7 +45,7 @@ namespace Azure.MyIdentity
             DisableInstanceDiscovery = options is ISupportsDisableInstanceDiscovery supportsDisableInstanceDiscovery && supportsDisableInstanceDiscovery.DisableInstanceDiscovery;
             ISupportsTokenCachePersistenceOptions cacheOptions = options as ISupportsTokenCachePersistenceOptions;
             _tokenCachePersistenceOptions = cacheOptions?.TokenCachePersistenceOptions;
-            IsSupportLoggingEnabled = options?.IsUnsafeSupportLoggingEnabled ?? false;
+            IsSupportLoggingEnabled = true;     //HACK: Set to true
             Pipeline = pipeline;
             TenantId = tenantId;
             ClientId = clientId;
@@ -68,8 +69,19 @@ namespace Azure.MyIdentity
             var client = await CreateClientAsync(enableCae, async, cancellationToken).ConfigureAwait(false);
 
             TokenCache tokenCache = null;
+
+
             if (_tokenCachePersistenceOptions != null)
             {
+                //HACK: Custom hack
+                var log = new StringBuilder();
+                log.AppendLine("Token cache persistence supported");
+                log.AppendLine("TokenCachePersistenceOptions:");
+                log.AppendLine(" - Name: " + _tokenCachePersistenceOptions.Name);
+                log.AppendLine(" - UnsafeAllowUnencryptedStorage: " + _tokenCachePersistenceOptions.UnsafeAllowUnencryptedStorage);
+                log.AppendLine(" - IsConfidentialClient: " + (client is IConfidentialClientApplication).ToString());
+                MyAzureIdentityLog.AddToLog("MsalClientBase", log.ToString());
+
                 tokenCache = new TokenCache(_tokenCachePersistenceOptions, enableCae);
                 await tokenCache.RegisterCache(async, client.UserTokenCache, cancellationToken).ConfigureAwait(false);
 
@@ -78,6 +90,13 @@ namespace Azure.MyIdentity
                     await tokenCache.RegisterCache(async, cca.AppTokenCache, cancellationToken).ConfigureAwait(false);
                 }
             }
+            else
+            {
+                //HACK: Custom hack
+                MyAzureIdentityLog.AddToLog("MsalClientBase", "No token caching options supported");
+
+            }
+
 
             asyncLock.SetValue((Client: client, Cache: tokenCache));
             return client;

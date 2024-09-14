@@ -1,6 +1,6 @@
 ﻿using Azure.MyIdentity;
 
-namespace CloudDebugger.Features.Credentials;
+namespace CloudDebugger.Features.CredentialsEventLog;
 
 public class ViewLogModel
 {

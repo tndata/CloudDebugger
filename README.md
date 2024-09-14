@@ -26,15 +26,11 @@
 * [Redis explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 
 
-
-
-
-
-
-
-
-
-
+### Identity tools
+* [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
+* [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
+* [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
+* [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 
 

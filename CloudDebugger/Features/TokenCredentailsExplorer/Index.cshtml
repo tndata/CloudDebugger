@@ -1,0 +1,263 @@
+﻿@using Azure.MyIdentity
+@model CloudDebugger.Features.TokenCredentailsExplorer.TokenCredentailsExplorerModel
+@{
+    ViewData["Title"] = "CloudDebugger - TokenCredentials Explorer";
+
+}
+
+<h5>TokenCredentials Explorer</h5>
+This tool will help you explore somne of the different TokenCredentials in Azure.
+<br />
+<br />
+
+
+
+
+@if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model.Message))
+{
+    <b>@Model.Message</b>
+}
+
+
+
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>
+            <h4>Token Credentials</h4>
+        </th>
+        <th>
+            @if (Model.CredentialName != null)
+            {
+                <h5>@Model.CredentialName</h5>
+            }
+        </th>
+    </tr>
+
+
+    <tr>
+
+        <!-- Column 1 start -->
+        <td class="col-md-3">
+
+            Select a token credentials to explore.
+            <br /><br />
+
+            @* Not all credentials are supported for various reasons *@
+            @*      <a href="Index?Credential=1">AuthorizationCodeCredential</a><br>*@
+
+            @if (Model.CurrentCredentialIndex == 2)
+            {
+                <a href="Index?Credential=2"><b>AzureCliCredential</b></a>
+
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=2">AzureCliCredential</a>
+
+                <br>
+            }
+
+            @if (Model.CurrentCredentialIndex == 3)
+            {
+                <a href="Index?Credential=3"><b>AzureDeveloperCliCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=3">AzureDeveloperCliCredential</a>
+                <br>
+            }
+
+            @if (Model.CurrentCredentialIndex == 4)
+            {
+                <a href="Index?Credential=4"><b>AzurePowerShellCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=4">AzurePowerShellCredential</a>
+                <br>
+            }
+
+            @* <a href="Index?Credential=5">ChainedTokenCredential</a><br> *@
+            @* <a href="Index?Credential=6">ClientAssertionCredential</a><br> *@
+            @*  <a href="Index?Credential=7">ClientCertificateCredential</a><br> *@
+            @* <a href="Index?Credential=8">ClientSecretCredential</a><br> *@
+
+            @if (Model.CurrentCredentialIndex == 9)
+            {
+                <a href="Index?Credential=9"><b>DefaultAzureCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=9">DefaultAzureCredential</a>
+                <br>
+            }
+
+            @* <a href="Index?Credential=10">DeviceCodeCredential</a><br> *@
+
+            @if (Model.CurrentCredentialIndex == 11)
+            {
+                <a href="Index?Credential=11"><b>EnvironmentCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=11">EnvironmentCredential</a>
+                <br>
+            }
+
+            @if (Model.CurrentCredentialIndex == 12)
+            {
+                <a href="Index?Credential=12"><b>InteractiveBrowserCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=12">InteractiveBrowserCredential</a>
+                <br>
+            }
+
+            @if (Model.CurrentCredentialIndex == 13)
+            {
+                <a href="Index?Credential=13"><b>ManagedIdentityCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=13">ManagedIdentityCredential</a>
+                <br>
+            }
+
+            @* <a href="Index?Credential=14">OnBehalfOfCredential</a><br>  *@
+            @* <a href="Index?Credential=15">SharedTokenCacheCredential</a><br> *@
+            @* <a href="Index?Credential=16">UsernamePasswordCredential</a><br> *@
+
+            @if (Model.CurrentCredentialIndex == 17)
+            {
+                <a href="Index?Credential=17"><b>VisualStudioCodeCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=17">VisualStudioCodeCredential</a>
+                <br>
+            }
+
+            @if (Model.CurrentCredentialIndex == 18)
+            {
+                <a href="Index?Credential=18"><b>VisualStudioCredential</b></a>
+                <br>
+            }
+            else
+            {
+                <a href="Index?Credential=18">VisualStudioCredential</a>
+                <br>
+            }
+
+            @if (Model.CurrentCredentialIndex == 19)
+            {
+                <a href="Index?Credential=19"><b>WorkloadIdentityCredential</b></a>
+                <br />
+            }
+            else
+            {
+                <a href="Index?Credential=19">WorkloadIdentityCredential</a>
+                <br />
+            }
+
+        </td>
+        <!-- Column 1 end -->
+        <!-- Column 2 start -->
+        <td class="col-md-9">
+
+            <table>
+                <tr>
+                    <th></th>
+                </tr>
+
+
+                @if (Model.CredentialMessage != null)
+                {
+                    <tr>
+                        <td>
+                            @Model.CredentialMessage<br />
+                        </td>
+                    </tr>
+                }
+
+                @if (Model.Log != null && Model.Log.Count > 0)
+                {
+                    <tr>
+                        <td>
+                            <h6>Internal Execution log</h6>
+                        </td>
+                    </tr>
+
+                    foreach (var entry in Model.Log)
+                    {
+                        <tr>
+                            <td>
+                                <pre>@entry</pre>
+                            </td>
+                        </tr>
+                    }
+                }
+
+                @if (Model.AccessToken.Token != null)
+                {
+                    <tr>
+                        <td>
+                            <h5>Access Token</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="access_token" style="width: 500px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                            @(Model.AccessToken.Token ?? "No token found")
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            @if (Model.UrlToJWTIOSite != null)
+                            {
+                                @:Explore the access token on <a href="@Model.UrlToJWTIOSite" target="_blank">https://jwt.io</a> or <a href="@Model.UrlToJWTMSSite" target="_blank">https://jwt.ms</a><br />
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </td>
+
+        <!-- Column 2 end -->
+    </tr>
+
+</table>
+
+
+
+
+<br />
+<br />
+
+
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/TokenExplorer">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/dotnet/api/azure.identity">Azure.Identity Namespace</a></li>
+</ul>

@@ -15,13 +15,13 @@ public class CachingController : Controller
 
     public IActionResult GetTimeNoCacheControl()
     {
-        return Ok(DateTime.Now.ToString());
+        return Ok(DateTime.UtcNow.ToString());
     }
 
     public IActionResult GetTimeWithCacheControl()
     {
         Response.Headers.CacheControl = "public, max-age=5";
-        return Ok("Cache max for 5 seconds: " + DateTime.Now.ToString());
+        return Ok("Cache max for 5 seconds: " + DateTime.UtcNow.ToString());
     }
 
     public IActionResult GetTimePrivateCacheControl()
@@ -32,6 +32,6 @@ public class CachingController : Controller
         Response.Headers.Pragma = "no-cache";
         Response.Headers.Expires = "0";
 
-        return Ok("Should not be cached: " + DateTime.Now.ToString());
+        return Ok("Should not be cached: " + DateTime.UtcNow.ToString());
     }
 }

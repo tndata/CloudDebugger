@@ -130,6 +130,9 @@ namespace Azure.MyIdentity
         {
             using CredentialDiagnosticScope scope = _pipeline.StartGetTokenScopeGroup("DefaultAzureCredential.GetToken", requestContext);
 
+            MyAzureIdentityLog.AddToLog("ManagedIdentityCredential", "GetToken() was called");
+
+
             try
             {
                 using var asyncLock = await _credentialLock.GetLockOrValueAsync(async, cancellationToken).ConfigureAwait(false);
@@ -149,7 +152,7 @@ namespace Azure.MyIdentity
 
                     asyncLock.SetValue(credential);
 
-                    MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", "DefaultAzureCredentialCredentialSelected: " + credential.GetType().FullName);
+                    MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", "DefaultAzureCredential.Credential selected: " + credential.GetType().FullName);
 
                     //HACK: Added by me, remember/save the choosen credential
                     SelectedTokenCredential = credential;
@@ -189,7 +192,9 @@ namespace Azure.MyIdentity
 
 
             LogText = new StringBuilder();
-            LogText.AppendLine("\r\nGetTokenFromSourcesAsync");
+            LogText.AppendLine("\r\nMyDefaultAzureCredential.GetTokenFromSourcesAsync was called");
+
+
             MyAzureIdentityLog.AddToLog("MyDefaultAzureCredential", "GetTokenFromSourcesAsync started");
 
 
@@ -227,11 +232,11 @@ namespace Azure.MyIdentity
                     var lifetime = token.ExpiresOn - DateTimeOffset.UtcNow;
 
                     sw.Stop();
-                    LogText.AppendLine($"We successfully got a token");
+                    LogText.AppendLine($"We successfully got a token using MyDefaultAzureCredential");
                     LogText.AppendLine($" - Took {sw.ElapsedMilliseconds} ms");
                     LogText.AppendLine($" - Token.Hash={token.Token.GetHashCode()}");
                     LogText.AppendLine($" - Token={token.Token}");
-                    LogText.AppendLine($" - Expires={token.ExpiresOn} (lifetime={(int)(lifetime.TotalMinutes)} minutes)");
+                    LogText.AppendLine($" - Expires={token.ExpiresOn.ToUniversalTime()} (lifetime={(int)(lifetime.TotalMinutes)} minutes)");
 
                     LogText.AppendLine($"\r\nTotal time taken for checking all credentials: {totalTimeSw.ElapsedMilliseconds} ms");
 
@@ -280,6 +285,15 @@ namespace Azure.MyIdentity
             Validations.ValidateAuthorityHost(options?.AuthorityHost ?? AzureAuthorityHosts.GetDefault());
 
             return options;
+        }
+
+        /// <summary>
+        /// Hack: Custom ToString() method to return the log text
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "MyDefaultAzureCredential\r\n\r\n" + LogText.ToString();
         }
     }
 }

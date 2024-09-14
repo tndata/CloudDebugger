@@ -81,7 +81,7 @@ public class ApiEndpointsController : ControllerBase
     {
         _logger.LogInformation("/api/time REST API endpoint was called");
 
-        return Ok(DateTime.Now.ToString("HH:mm:ss"));
+        return Ok(DateTime.UtcNow.ToString("HH:mm:ss"));
     }
 }
 

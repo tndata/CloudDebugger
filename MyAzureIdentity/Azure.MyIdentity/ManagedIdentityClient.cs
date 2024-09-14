@@ -27,6 +27,22 @@ namespace Azure.MyIdentity
             if (_identitySource != null)
                 sb.AppendLine($" - _identitySource = {_identitySource.ToString()}");
 
+            if (ClientId != null)
+                sb.AppendLine(" - ClientId=" + ClientId.ToString());
+
+            if (ResourceIdentifier != null)
+            {
+                sb.AppendLine(" - ResourceIdentifier=" + ResourceIdentifier?.ToString());
+                sb.AppendLine(" - ResourceIdentifier.Name=" + ResourceIdentifier.Name?.ToString());
+                sb.AppendLine(" - ResourceIdentifier.Location=" + ResourceIdentifier.Location?.ToString());
+                sb.AppendLine(" - ResourceIdentifier.Parent=" + ResourceIdentifier.Parent?.ToString());
+                sb.AppendLine(" - ResourceIdentifier.Provider=" + ResourceIdentifier.Provider?.ToString());
+                sb.AppendLine(" - ResourceIdentifier.ResourceGroupName=" + ResourceIdentifier.ResourceGroupName?.ToString());
+                sb.AppendLine(" - ResourceIdentifier.ResourceType=" + ResourceIdentifier.ResourceType.ToString());
+                sb.AppendLine(" - ResourceIdentifier.SubscriptionId=" + ResourceIdentifier.SubscriptionId?.ToString());
+                sb.AppendLine("");
+            }
+
             if (log.Length > 0)
                 sb.AppendLine(log.ToString());
 
@@ -66,8 +82,6 @@ namespace Azure.MyIdentity
             //_msal
         }
 
-
-
         internal CredentialPipeline Pipeline { get; }
 
         internal protected string ClientId { get; }
@@ -82,8 +96,8 @@ namespace Azure.MyIdentity
             var lifetime = result.ExpiresOn - DateTimeOffset.UtcNow;
 
             log.AppendLine("Got access token: " + result.AccessToken);
-            log.AppendLine("ExpiresOn: " + result.ExpiresOn);
-            log.AppendLine("lifetime: " + lifetime.TotalMinutes + " minutes");
+            log.AppendLine("ExpiresOn: " + result.ExpiresOn.ToString("HH:mm:ss"));
+            log.AppendLine("lifetime: " + ((int)lifetime.TotalMinutes) + " minutes (until it expires)");
 
             return new AccessToken(result.AccessToken, result.ExpiresOn);
         }

@@ -1,0 +1,117 @@
+﻿@model CloudDebugger.Features.CredentialsCaching.GetMultipleAccessTokenModel
+@{
+    ViewData["Title"] = "CloudDebugger - Exploring Token Caching";
+}
+
+<h4>Exploring Token Caching</h4>
+This page demonstrates the behavior of access token requests when using different instances of DefaultAzureCredential.
+<br />
+<a href="/DefaultAzureCredentials">Back</a>
+<br />
+<br />
+
+<h5>Using the Same Instance</h5>
+Observe the behavior when GetToken() is called multiple times on the same instance of DefaultAzureCredential.
+<br />
+<br />
+<table class="table table-bordered">
+
+    <tr>
+            
+        <th>
+           Results
+        </th>
+
+    </tr>
+
+    @if (Model.SingleInstanceLog != null && Model.SingleInstanceLog.Count > 0)
+    {
+        foreach (var entry in Model.SingleInstanceLog)
+        {
+            <tr>
+                <td>
+                    <pre>@entry</pre>
+                </td>
+            </tr>
+        }
+
+        <tr>
+            <td>Sample access token</td>
+        </tr>
+        <tr>
+            <td id="access_token" style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                @(Model.SingleInstanceAccessToken ?? "No token found")
+            </td>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <td>No log data found</td>
+        </tr>
+    }
+</table>
+
+<br />
+<br />
+
+<h5>Using a New Instance Each Time</h5>
+Observe the behavior when GetToken() is called multiple times, each time using a new instance of MyDefaultAzureCredential.
+<br />
+<br />
+
+<table class="table table-bordered">
+
+    <th>
+        Results
+    </th>
+
+    @if (Model.MultipleInstancesLog != null && Model.MultipleInstancesLog.Count > 0)
+    {
+        foreach (var entry in Model.MultipleInstancesLog)
+        {
+            <tr>
+                <td>
+                    <pre>@entry</pre>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>Sample access token</td>
+        </tr>
+        <tr>
+            <td id="access_token" style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                @(Model.MultipleInstanceAccessToken ?? "No token found")
+            </td>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <td>No log data found</td>
+        </tr>
+    }
+</table>
+
+
+
+
+@if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model.Message))
+{
+    <b>@Model.Message</b>
+}
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/TokenCaching">Documentation</a></li>
+</ul>

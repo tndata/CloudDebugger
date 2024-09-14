@@ -15,7 +15,7 @@ public static class WebHookUtility
     {
         var logEntry = new WebHookLogEntry()
         {
-            EntryTime = DateTime.Now,
+            EntryTime = DateTime.UtcNow,
             Comment = ""
         };
 

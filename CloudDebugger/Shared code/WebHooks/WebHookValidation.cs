@@ -129,7 +129,7 @@ public static class WebHookValidation
         {
             var newLogEntry = new WebHookLogEntry()
             {
-                EntryTime = DateTime.Now,
+                EntryTime = DateTime.UtcNow,
                 Url = callbackUrl,
                 HttpMethod = "GET",
                 Comment = comment

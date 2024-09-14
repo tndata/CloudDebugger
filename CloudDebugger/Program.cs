@@ -50,6 +50,11 @@ _ = new AzureEventSourceListener((e, message) =>
     {
         MyAzureIdentityLog.AddToLog(e.EventSource.Name.ToString(), message);
     }
+    else
+    {
+        Console.WriteLine(e.EventSource.Name);
+    }
+
 },
     level: EventLevel.Verbose);
 
