@@ -5,13 +5,11 @@
 }
 
 <h5>Get Access Token</h5>
-This page will retrieve an access token using a custom version of DefaultAzureCredential.<br />
+This page will retrieve an access token using a custom version of DefaultAzureCredential.
+<br />
 <a href="/Credentials">Back</a>
 <br />
-
 <br />
-
-
 
 
 @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
@@ -25,8 +23,6 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
 {
     <b>@Model.Message</b>
 }
-
-
 
 
 <table class="table table-bordered">
@@ -133,16 +129,19 @@ This is the token credential that successfully retrieved an access token.
 <br />
 
 <h5>Credential sources</h5>
-These are the sources that DefaultAzureCredential will execute if needed. 
+These are the sources that DefaultAzureCredential will execute if needed.
 @if (Model.MyDefaultAzureCredential != null && Model.MyDefaultAzureCredential._sources != null)
 {
     <table class="table table-bordered">
         @foreach (var source in Model.MyDefaultAzureCredential._sources)
         {
-            <tr>
-                <td>@source.GetType().Name</td>
-                <td>@Html.Raw(@source?.ToString()?.Replace("\n", "\n<br>"))</td>
-            </tr>
+            if (source != null)
+            {
+                <tr>
+                    <td>@source.GetType().Name</td>
+                    <td><pre>@source.ToString()</pre></td>
+                </tr>
+            }
         }
     </table>
 }
@@ -151,18 +150,17 @@ else
     <b>No credential sources found</b>
 }
 
-
-
 <br />
 <br />
-<h5>DefaultAzureCredential log</h5>
+
+<h5>DefaultAzureCredential Log</h5>
 This is an internal DefaultAzureCredential log.
 @if (Model.MyDefaultAzureCredentialLog != null)
 {
-    <table>
+    <table class="table table-bordered">
         <tr>
             <td>
-                <pre>@Html.Raw(Model.MyDefaultAzureCredentialLog.Replace("<", "&lt"))</pre>
+                <pre>@Model.MyDefaultAzureCredentialLog</pre>
             </td>
         </tr>
     </table>
@@ -204,7 +202,7 @@ The default retry policy for DefaultAzureCredential as defined in DefaultAzureCr
         <td>NetworkTimeout</td>
         <td><b>@options.Retry.NetworkTimeout.TotalSeconds sec</b> (The timeout applied to an individual network operations)</td>
     </tr>
-    @if(@options.RetryPolicy != null)
+    @if (@options.RetryPolicy != null)
     {
         <tr>
             <td>RetryPolicy</td>

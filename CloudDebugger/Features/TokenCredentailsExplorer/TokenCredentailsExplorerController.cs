@@ -23,18 +23,24 @@ public class TokenCredentailsExplorerController : Controller
             return BadRequest(ModelState);
 
         var model = new TokenCredentailsExplorerModel();
+        model.CurrentCredentialIndex = credential;
+
         var result = new List<string>();
 
         var totalTimeSw = new Stopwatch();
         totalTimeSw.Start();
 
+        CredentialResult? cred = null;
         try
         {
-            var tokenCredential = CreateTokenCredentialInstance(credential);
+            cred = CreateTokenCredentialInstance(credential);
 
-            if (tokenCredential != null)
+            if (cred != null && cred.Credential != null)
             {
-                model.AccessToken = GetAccessToken(tokenCredential);
+                model.CredentialMessage = cred.Message;
+                model.CredentialName = cred.Credential.GetType().Name;
+
+                model.AccessToken = GetAccessToken(cred.Credential);
 
                 if (model.AccessToken.Token != null)
                 {
@@ -42,25 +48,27 @@ public class TokenCredentailsExplorerController : Controller
                     model.UrlToJWTMSSite = new Uri("https://jwt.ms").SetFragment("access_token=" + model.AccessToken.Token);
                 }
 
-                result.Add(tokenCredential.ToString());
+                result.Add(cred.Credential?.ToString() ?? "");
             }
-
-            totalTimeSw.Stop();
-            result.Add("");
-            result.Add($"Total time {((int)totalTimeSw.Elapsed.TotalMilliseconds)} ms");
         }
         catch (Exception exc)
         {
+            if (cred != null)
+                result.Add(cred.Credential?.ToString() ?? "");
+
             model.ErrorMessage = $"Exception:\r\n{exc.Message}";
             _logger.LogError(exc, "Failed to retrieve access token");
         }
+
+        totalTimeSw.Stop();
+        result.Add($"\r\nTotal time {((int)totalTimeSw.Elapsed.TotalMilliseconds)} ms");
 
         model.Log = result;
 
         return View(model);
     }
 
-    private static TokenCredential? CreateTokenCredentialInstance(int credential)
+    private static CredentialResult? CreateTokenCredentialInstance(int credential)
     {
 
         return credential switch
@@ -89,7 +97,7 @@ public class TokenCredentailsExplorerController : Controller
 
     }
 
-    private static TokenCredential CreateAuthorizationCodeCredential()
+    private static CredentialResult CreateAuthorizationCodeCredential()
     {
         throw new NotImplementedException();
     }
@@ -99,10 +107,10 @@ public class TokenCredentailsExplorerController : Controller
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    private static AzureCliCredential CreateAzureCliCredential()
+    private static CredentialResult CreateAzureCliCredential()
     {
 
-        return new AzureCliCredential(new AzureCliCredentialOptions
+        var credential = new AzureCliCredential(new AzureCliCredentialOptions
         {
             Diagnostics =
                         {
@@ -115,11 +123,13 @@ public class TokenCredentailsExplorerController : Controller
                             IsTelemetryEnabled=true
                         }
         });
+
+        return new() { Credential = credential, Message = "" };
     }
 
-    private static AzureDeveloperCliCredential CreateAzureDeveloperCliCredential()
+    private static CredentialResult CreateAzureDeveloperCliCredential()
     {
-        return new AzureDeveloperCliCredential(new AzureDeveloperCliCredentialOptions
+        var credential = new AzureDeveloperCliCredential(new AzureDeveloperCliCredentialOptions
         {
             Diagnostics =
                         {
@@ -132,11 +142,13 @@ public class TokenCredentailsExplorerController : Controller
                             IsTelemetryEnabled=true
                         }
         });
+
+        return new() { Credential = credential, Message = "" };
     }
 
-    private static AzurePowerShellCredential CreateAzurePowerShellCredential()
+    private static CredentialResult CreateAzurePowerShellCredential()
     {
-        return new AzurePowerShellCredential(new AzurePowerShellCredentialOptions
+        var credential = new AzurePowerShellCredential(new AzurePowerShellCredentialOptions
         {
             Diagnostics =
                         {
@@ -149,24 +161,26 @@ public class TokenCredentailsExplorerController : Controller
                             IsTelemetryEnabled=true
                         }
         });
+
+        return new() { Credential = credential, Message = "" };
     }
 
-    private static TokenCredential CreateClientAssertionCredential()
+    private static CredentialResult CreateClientAssertionCredential()
     {
         throw new NotImplementedException();
     }
 
-    private static TokenCredential CreateClientCertificateCredential()
+    private static CredentialResult CreateClientCertificateCredential()
     {
         throw new NotImplementedException();
     }
 
-    private static ClientSecretCredential CreateClientSecretCredential()
+    private static CredentialResult CreateClientSecretCredential()
     {
         throw new NotImplementedException();
     }
 
-    private static MyDefaultAzureCredential CreateDefaultAzureCredential()
+    private static CredentialResult CreateDefaultAzureCredential()
     {
         var options = new DefaultAzureCredentialOptions
         {
@@ -183,17 +197,19 @@ public class TokenCredentailsExplorerController : Controller
         };
 
         //We use our custom hacked version for improved insights
-        return new MyDefaultAzureCredential(options);
+        var credential = new MyDefaultAzureCredential(options);
+
+        return new() { Credential = credential, Message = "" };
     }
 
-    private static TokenCredential CreateDeviceCodeCredential()
+    private static CredentialResult CreateDeviceCodeCredential()
     {
         throw new NotImplementedException();
     }
 
-    private static EnvironmentCredential CreateEnvironmentCredential()
+    private static CredentialResult CreateEnvironmentCredential()
     {
-        return new EnvironmentCredential(new EnvironmentCredentialOptions
+        var credential = new EnvironmentCredential(new EnvironmentCredentialOptions
         {
             Diagnostics =
                         {
@@ -204,17 +220,19 @@ public class TokenCredentailsExplorerController : Controller
                             IsLoggingContentEnabled=true,
                             IsDistributedTracingEnabled=true,
                             IsTelemetryEnabled=true
-                        }
+            }
         });
+
+        return new() { Credential = credential, Message = "Refer to the documentation for the required environment variables that must be set." };
     }
 
     /// <summary>
     /// This one only works for non-server side applications (desktop, console, mobile....)
     /// </summary>
     /// <returns></returns>
-    private static InteractiveBrowserCredential CreateInteractiveBrowserCredential()
+    private static CredentialResult CreateInteractiveBrowserCredential()
     {
-        return new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions
+        var credential = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions
         {
             Diagnostics =
                         {
@@ -224,18 +242,21 @@ public class TokenCredentailsExplorerController : Controller
                             IsAccountIdentifierLoggingEnabled=true,
                             IsLoggingContentEnabled=true,
                             IsDistributedTracingEnabled=true,
-                            IsTelemetryEnabled=true
+                IsTelemetryEnabled=true
                         }
         });
+
+        return new() { Credential = credential, Message = "This credential is designed for non-browser-based applications, such as console, desktop, or mobile apps, and will not work in browser-based applications." };
     }
 
-    private static ManagedIdentityCredential CreateManagedIdentityCredential()
+    private static CredentialResult CreateManagedIdentityCredential()
     {
         var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
 
-        if (clientId != null)
+        if (!string.IsNullOrEmpty(clientId))
         {
-            return new ManagedIdentityCredential(clientId, new TokenCredentialOptions()
+            // User-assigned managed identity  
+            var credential = new ManagedIdentityCredential(clientId, new TokenCredentialOptions()
             {
                 Diagnostics =
                         {
@@ -247,35 +268,37 @@ public class TokenCredentailsExplorerController : Controller
                             IsDistributedTracingEnabled=true,
                             IsTelemetryEnabled=true
                         }
-            }
-            );
+            });
+
+            return new() { Credential = credential, Message = "This credential works only within Azure. For a user-assigned managed identity, the AZURE_CLIENT_ID environment variable must be set with the Client ID. If not provided, the system-assigned managed identity is used." };
         }
         else
         {
-            return new ManagedIdentityCredential();
+            var credential = new ManagedIdentityCredential();
+            return new() { Credential = credential, Message = "" };
         }
     }
 
-    private static TokenCredential CreateOnBehalfOfCredential()
+    private static CredentialResult CreateOnBehalfOfCredential()
     {
         throw new NotImplementedException();
     }
 
-    private static TokenCredential CreateSharedTokenCacheCredential()
+    private static CredentialResult CreateSharedTokenCacheCredential()
     {
         // This mechanism for Visual Studio authentication has been replaced by the VisualStudioCredential.
         throw new NotImplementedException();
     }
 
-    private static TokenCredential CreateUsernamePasswordCredential()
+    private static CredentialResult CreateUsernamePasswordCredential()
     {
         // https://learn.microsoft.com/en-us/dotnet/api/azure.identity.usernamepasswordcredential?view=azure-dotnet
         throw new NotImplementedException();
     }
 
-    private static VisualStudioCodeCredential CreateVisualStudioCodeCredential()
+    private static CredentialResult CreateVisualStudioCodeCredential()
     {
-        return new VisualStudioCodeCredential(new VisualStudioCodeCredentialOptions
+        var credential = new VisualStudioCodeCredential(new VisualStudioCodeCredentialOptions
         {
             Diagnostics =
                         {
@@ -286,13 +309,15 @@ public class TokenCredentailsExplorerController : Controller
                             IsLoggingContentEnabled=true,
                             IsDistributedTracingEnabled=true,
                             IsTelemetryEnabled=true
-                        }
+            }
         });
+
+        return new() { Credential = credential, Message = "" };
     }
 
-    private static VisualStudioCredential CreateVisualStudioCredential()
+    private static CredentialResult CreateVisualStudioCredential()
     {
-        return new VisualStudioCredential(new VisualStudioCredentialOptions
+        var credential = new VisualStudioCredential(new VisualStudioCredentialOptions
         {
             Diagnostics =
                         {
@@ -302,14 +327,16 @@ public class TokenCredentailsExplorerController : Controller
                             IsAccountIdentifierLoggingEnabled=true,
                             IsLoggingContentEnabled=true,
                             IsDistributedTracingEnabled=true,
-                            IsTelemetryEnabled=true
+                IsTelemetryEnabled=true
                         }
         });
+
+        return new() { Credential = credential, Message = "" };
     }
 
-    private static WorkloadIdentityCredential CreateWorkloadIdentityCredential()
+    private static CredentialResult CreateWorkloadIdentityCredential()
     {
-        return new WorkloadIdentityCredential(new WorkloadIdentityCredentialOptions
+        var credential = new WorkloadIdentityCredential(new WorkloadIdentityCredentialOptions
         {
             Diagnostics =
                         {
@@ -322,7 +349,10 @@ public class TokenCredentailsExplorerController : Controller
                             IsTelemetryEnabled=true
                         }
         });
+
+        return new() { Credential = credential, Message = "supports Microsoft Entra Workload ID authentication on Kubernetes and other hosts supporting workload identity." };
     }
+
 
     private static AccessToken GetAccessToken(TokenCredential credential)
     {
@@ -334,4 +364,10 @@ public class TokenCredentailsExplorerController : Controller
     }
 
 
+    public class CredentialResult
+    {
+        public TokenCredential? Credential { get; set; }
+        public string? Message { get; set; }
+    }
 }
+

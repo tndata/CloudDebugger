@@ -9,6 +9,14 @@ public class TokenCredentailsExplorerModel
     /// </summary>
     public AccessToken AccessToken { get; set; }
 
+    /// <summary>
+    /// Optional message to display next to the selected token credential details
+    /// </summary>
+    public string? CredentialMessage { get; set; }
+    public string? CredentialName { get; set; }
+    public int CurrentCredentialIndex { get; set; }
+
+
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
 
