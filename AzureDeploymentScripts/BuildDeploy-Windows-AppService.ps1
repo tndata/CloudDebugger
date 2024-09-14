@@ -96,5 +96,12 @@ Write-Host "App Service deployment completed with id: ${deploymentId}, provision
 Write-Host "`nAssigning the User-Assigned Identity to the Web App."
 $tmp = az webapp identity assign --name $AppServiceName_win --resource-group $rgname --identities $identityId
 
+
+# Step 11: Restart the App Service to apply the latest deployment
+Write-Host "`nRestarting the App Service to apply the latest deployment."
+az webapp restart `
+    --name $AppServiceName_win `
+    --resource-group $rgname
+
 # Final Output
 Write-Host "`n`nWindows App Service hostname: https://${hostName}`n`n" -ForegroundColor Green

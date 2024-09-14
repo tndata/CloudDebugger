@@ -7,6 +7,9 @@ public class AppServicesController : Controller
 {
     private readonly ILogger<AppServicesController> _logger;
 
+    private const int MaxNumberOfDirectories = 50;
+    private const int MaxNumberOfFiles = 100;
+
     public AppServicesController(ILogger<AppServicesController> logger)
     {
         _logger = logger;
@@ -16,6 +19,32 @@ public class AppServicesController : Controller
     {
         return View();
     }
+
+    /// <summary>
+    /// References
+    /// https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings
+    /// https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult LocalCache()
+    {
+        var notSet = "[Not set]";
+
+        var model = new LocalCacheModel()
+        {
+            LocalCacheEnabled = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_ENABLED") ?? notSet,
+            LocalCacheReady = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_READY") ?? notSet,
+
+            LocalCacheOption = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_OPTION") ?? notSet,
+            LocalCacheSize = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_SIZEINMB") ?? notSet,
+            LocalCacheReadWriteOptions = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_READWRITE_OPTION") ?? notSet,
+
+            WebSiteVolumeType = Environment.GetEnvironmentVariable("WEBSITE_VOLUME_TYPE") ?? notSet
+        };
+
+        return View(model);
+    }
+
 
 
     public IActionResult ShowFileSystem()
@@ -33,21 +62,15 @@ public class AppServicesController : Controller
         }
         else
         {
-            model.TempDirectory = "/tmp";  //Linux Path
+            model.TempDirectory = "/tmp";  //Linux Path. The variable is not set for Linux services.
         }
-
-        // https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings
-        // https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache
-        model.LocalCacheEnabled = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_ENABLED") ?? "Disabled";
-        model.LocalCacheReady = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_READY") ?? "False";
-        model.LocalCacheOption = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_OPTION") ?? "[Not set]";
-        model.LocalCacheSize = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_SIZEINMB") ?? "Unknown";
 
         model.AppDirectory = AppContext.BaseDirectory;
         model.OperatingSystem = RuntimeInformation.OSDescription;
 
         if (model.HomeDirectory != null && Directory.Exists(model.HomeDirectory))
         {
+            model.HomeDirectory = "d:\\";
             model.HomeDirFolders = GetFolders(model.HomeDirectory);
             model.HomeDirFiles = GetFiles(model.HomeDirectory);
         }
@@ -55,7 +78,6 @@ public class AppServicesController : Controller
         {
             model.HomeDirFolders.Add("Directory does not exist or is empty");
         }
-
 
         if (model.TempDirectory != null && Directory.Exists(model.TempDirectory))
         {
@@ -66,7 +88,6 @@ public class AppServicesController : Controller
         {
             model.TempDirFolders.Add("Directory does not exist or is empty");
         }
-
 
         if (model.AppDirectory != null && Directory.Exists(model.AppDirectory))
         {
@@ -84,36 +105,53 @@ public class AppServicesController : Controller
     private static List<string> GetFiles(string path)
     {
         var result = new List<string>();
-        int count = 0;
-        foreach (var file in Directory.EnumerateFiles(path).OrderBy(n => n))
+        try
         {
-            string name = Path.GetFileName(file.TrimEnd(Path.DirectorySeparatorChar));
-
-            result.Add(name);
-            if (count++ > 50)
+            int count = 0;
+            foreach (var file in Directory.EnumerateFiles(path).OrderBy(n => n))
             {
-                result.Add(".......");
-                break;
+                string name = Path.GetFileName(file.TrimEnd(Path.DirectorySeparatorChar));
+
+                result.Add(name);
+                if (count++ > MaxNumberOfFiles)
+                {
+                    result.Add($"...Displays the first {MaxNumberOfFiles} files....");
+                    break;
+                }
             }
         }
+        catch (Exception exc)
+        {
+            result.Add($"An exception occured getting the files: {exc.Message}");
+        }
+
         return result;
     }
 
     private static List<string> GetFolders(string path)
     {
         var result = new List<string>();
-        int count = 0;
-        foreach (var dir in Directory.EnumerateDirectories(path).OrderBy(n => n))
-        {
-            string name = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
 
-            result.Add(name);
-            if (count++ > 50)
+        try
+        {
+            int count = 0;
+            foreach (var dir in Directory.EnumerateDirectories(path).OrderBy(n => n))
             {
-                result.Add(".......");
-                break;
+                string name = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
+
+                result.Add($"\\{name}");
+                if (count++ > MaxNumberOfDirectories)
+                {
+                    result.Add($"...Displays the first {MaxNumberOfDirectories} directories....");
+                    break;
+                }
             }
         }
+        catch (Exception exc)
+        {
+            result.Add($"An exception occured getting the folders: {exc.Message}");
+        }
+
         return result;
     }
 }
