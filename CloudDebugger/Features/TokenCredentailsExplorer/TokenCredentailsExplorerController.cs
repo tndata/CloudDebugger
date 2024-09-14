@@ -22,8 +22,10 @@ public class TokenCredentailsExplorerController : Controller
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var model = new TokenCredentailsExplorerModel();
-        model.CurrentCredentialIndex = credential;
+        var model = new TokenCredentailsExplorerModel()
+        {
+            CurrentCredentialIndex = credential
+        };
 
         var result = new List<string>();
 

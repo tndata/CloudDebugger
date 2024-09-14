@@ -26,12 +26,16 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
 
 
 <table class="table table-bordered">
-    <tr>
 
+
+    <tr>
+        <th><h4>Execution details</h4></th>
+        <th><h4>Access token</h4></th>
+    </tr>
+
+    <tr>
         <!-- Column 1 start -->
         <td class="col-md-6">
-            <h4>Execution details</h4>
-
             <table>
                 <tr>
                     <td>Calling GetToken took:</td>
@@ -56,7 +60,7 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
         <!-- Column 1 end -->
         <!-- Column 2 start -->
         <td class="col-md-6">
-            <h4>Access token</h4>
+
             @if (Model.UrlToJWTIOSite != null)
             {
                 @:Explore the access token on <a href="@Model.UrlToJWTIOSite" target="_blank">https://jwt.io</a> or <a href="@Model.UrlToJWTMSSite" target="_blank">https://jwt.ms</a><br />
@@ -101,12 +105,13 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
 <h4>Selected credential provider</h4>
 This is the token credential that successfully retrieved an access token.
 <table class="table table-bordered">
+
     @if (Model.SelectedTokenCredential != null)
     {
         <tr>
-            <td>
+            <th>
                 Selected TokenCredential: <b>@Model.SelectedTokenCredential.GetType().Name</b>
-            </td>
+            </th>
         </tr>
         <tr>
             <td>
@@ -133,6 +138,12 @@ These are the sources that DefaultAzureCredential will execute if needed.
 @if (Model.MyDefaultAzureCredential != null && Model.MyDefaultAzureCredential._sources != null)
 {
     <table class="table table-bordered">
+
+        <tr>
+            <th>Name</th>
+            <th>Log</th>
+        </tr>
+
         @foreach (var source in Model.MyDefaultAzureCredential._sources)
         {
             if (source != null)
@@ -159,6 +170,10 @@ This is an internal DefaultAzureCredential log.
 {
     <table class="table table-bordered">
         <tr>
+            <th>
+            </th>
+        </tr>
+        <tr>
             <td>
                 <pre>@Model.MyDefaultAzureCredentialLog</pre>
             </td>
@@ -182,6 +197,14 @@ else
 <h5>Default Retry Policy</h5>
 The default retry policy for DefaultAzureCredential as defined in DefaultAzureCredentialOptions.
 <table class="table table-bordered">
+    <tr>
+        <th>
+            Property
+        </th>
+        <th>
+            Value
+        </th>
+    </tr>
     <tr>
         <td>Delay</td>
         <td><b>@options.Retry.Delay.TotalSeconds sec</b> (The delay between retry attempts)</td>

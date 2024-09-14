@@ -29,11 +29,25 @@ This tool will help you explore somne of the different TokenCredentials in Azure
 
 
 <table class="table table-bordered">
+
+    <tr>
+        <th>
+            <h4>Token Credentials</h4>
+        </th>
+        <th>
+            @if (Model.CredentialName != null)
+            {
+                <h5>@Model.CredentialName</h5>
+            }
+        </th>
+    </tr>
+
+
     <tr>
 
         <!-- Column 1 start -->
-        <td class="col-md-6">
-            <h4>Token Credentials</h4>
+        <td class="col-md-3">
+
             Select a token credentials to explore.
             <br /><br />
 
@@ -166,18 +180,14 @@ This tool will help you explore somne of the different TokenCredentials in Azure
         </td>
         <!-- Column 1 end -->
         <!-- Column 2 start -->
-        <td class="col-md-6">
+        <td class="col-md-9">
 
             <table>
+                <tr>
+                    <th></th>
+                </tr>
 
-                @if (Model.CredentialName != null)
-                {
-                    <tr>
-                        <td>
-                            <h5>@Model.CredentialName</h5>
-                        </td>
-                    </tr>
-                }
+
                 @if (Model.CredentialMessage != null)
                 {
                     <tr>

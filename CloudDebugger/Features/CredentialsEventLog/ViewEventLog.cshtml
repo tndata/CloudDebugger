@@ -14,6 +14,11 @@ This page will display the internal log of the MyAzureIdentityLibrary.
 <h5>The internal event log</h5>
 <table class="table table-bordered">
 
+    <tr>
+        <th>Time</th>
+        <th>Log entry</th>
+    </tr>
+
     @if (Model.Log != null && Model.Log.Count > 0)
     {
         foreach (var entry in Model.Log)

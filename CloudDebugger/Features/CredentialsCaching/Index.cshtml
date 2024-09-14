@@ -16,6 +16,14 @@ Observe the behavior when GetToken() is called multiple times on the same instan
 <br />
 <table class="table table-bordered">
 
+    <tr>
+            
+        <th>
+           Results
+        </th>
+
+    </tr>
+
     @if (Model.SingleInstanceLog != null && Model.SingleInstanceLog.Count > 0)
     {
         foreach (var entry in Model.SingleInstanceLog)
@@ -53,6 +61,10 @@ Observe the behavior when GetToken() is called multiple times, each time using a
 <br />
 
 <table class="table table-bordered">
+
+    <th>
+        Results
+    </th>
 
     @if (Model.MultipleInstancesLog != null && Model.MultipleInstancesLog.Count > 0)
     {
