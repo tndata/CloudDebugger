@@ -28,16 +28,18 @@ public class AppServicesController : Controller
     /// <returns></returns>
     public IActionResult LocalCache()
     {
+        var notSet = "[Not set]";
+
         var model = new LocalCacheModel()
         {
-            LocalCacheEnabled = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_ENABLED") ?? "[Not set]",
-            LocalCacheReady = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_READY") ?? "[Not set]",
+            LocalCacheEnabled = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_ENABLED") ?? notSet,
+            LocalCacheReady = Environment.GetEnvironmentVariable("WEBSITE_LOCALCACHE_READY") ?? notSet,
 
-            LocalCacheOption = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_OPTION") ?? "[Not set]",
-            LocalCacheSize = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_SIZEINMB") ?? "[Not set]",
-            LocalCacheReadWriteOptions = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_READWRITE_OPTION") ?? "[Not set]",
+            LocalCacheOption = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_OPTION") ?? notSet,
+            LocalCacheSize = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_SIZEINMB") ?? notSet,
+            LocalCacheReadWriteOptions = Environment.GetEnvironmentVariable("WEBSITE_LOCAL_CACHE_READWRITE_OPTION") ?? notSet,
 
-            WebSiteVolumeType = Environment.GetEnvironmentVariable("WEBSITE_VOLUME_TYPE") ?? "[Not set]"
+            WebSiteVolumeType = Environment.GetEnvironmentVariable("WEBSITE_VOLUME_TYPE") ?? notSet
         };
 
         return View(model);
