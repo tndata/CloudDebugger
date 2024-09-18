@@ -1,0 +1,63 @@
+﻿@model CloudDebugger.Features.Diagnostics.SystemRuntimeDetailsModel
+
+@{
+    ViewData["Title"] = "CloudDebugger - Runtime and system information";
+}
+
+<h3>Runtime and System information</h3>
+This tool shows various internal system and runtime information.
+<a href="/diagnostics">Back</a>
+<br />
+<br />
+
+<h4>System and runtime information</h4>
+<table class="table table-hover table-bordered">
+    <tr>
+        <td>Framework Description</td>
+        <td>@Model.FrameworkDescription</td>
+    </tr>
+    <tr>
+        <td>OS Architecture</td>
+        <td>@Model.OSArchitecture</td>
+    </tr>
+    <tr>
+        <td>OS Description</td>
+        <td>@Model.OSDescription</td>
+    </tr>
+    <tr>
+        <td>Process Architecture</td>
+        <td>@Model.ProcessArchitecture</td>
+    </tr>
+    <tr>
+        <td>Runtime Identifier</td>
+        <td>@Model.RuntimeIdentifier</td>
+    </tr>
+    <tr>
+        <td>Runtime Directory</td>
+        <td>@Model.RuntimeDirectory</td>
+    </tr>
+    <tr>
+        <td>System Version</td>
+        <td>@Model.SystemVersion</td>
+    </tr>  
+    <tr>
+        <td>Running in container</td>
+        <td>@Model.RunningInContainer</td>
+    </tr>
+</table>
+
+<br>
+<br>
+
+<h4>Server Addresses</h4>
+This is a list of the addresses that this applications listen on.
+<table class="table table-hover table-bordered">
+   
+    @foreach (var address in Model.ServerAddresses)
+    {
+        <tr>
+            <td>@address</td>
+        </tr>
+    }
+
+</table>
