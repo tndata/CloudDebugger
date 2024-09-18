@@ -31,7 +31,7 @@ This page will display the internal log of the MyAzureIdentityLibrary.
                     <pre>@Html.Raw(@entry.Context.ToString())</pre>
                 </td>
                 <td style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                    <pre>@Html.Raw(@entry.Message.ToString())</pre>
+                    <pre>@Html.Raw(@entry.Message.ToString().Replace("]","]\r\n"))</pre>
                 </td>
             </tr>
         }

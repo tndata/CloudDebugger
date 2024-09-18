@@ -69,9 +69,14 @@ public class CredentialsCachingController : Controller
             result.Add($"Attempt {i} took {(int)sw.Elapsed.TotalMilliseconds}ms - Token.Hashcode={hash}");
         }
 
+
+
         totalTimeSw.Stop();
         result.Add("");
         result.Add($"Total time {totalTimeSw.Elapsed.TotalSeconds} sec");
+
+        var selectedCredential = cred.SelectedTokenCredential;
+        result.Add("Selected TokenCredential: " + selectedCredential?.GetType().Name);
 
         return (result, token.Token);
     }
@@ -88,6 +93,8 @@ public class CredentialsCachingController : Controller
         var totalTimeSw = new Stopwatch();
         totalTimeSw.Start();
 
+        MyDefaultAzureCredential? cred = null;
+
         AccessToken token = new();
         for (int i = 0; i < 10; i++)
         {
@@ -95,7 +102,7 @@ public class CredentialsCachingController : Controller
             sw.Start();
 
             //We create a new instance each time
-            var cred = CreateMyDefaultAzureCredentialInstance();
+            cred = CreateMyDefaultAzureCredentialInstance();
             token = GetAccessToken(cred);
             var hash = token.Token.GetHashCode();
 
@@ -106,6 +113,12 @@ public class CredentialsCachingController : Controller
         totalTimeSw.Stop();
         result.Add("");
         result.Add($"Total time {totalTimeSw.Elapsed.TotalSeconds} sec");
+
+        if (cred != null)
+        {
+            var selectedCredential = cred.SelectedTokenCredential;
+            result.Add("Selected TokenCredential: " + selectedCredential?.GetType().Name);
+        }
 
         return (result, token.Token);
     }
