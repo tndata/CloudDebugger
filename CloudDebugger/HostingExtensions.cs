@@ -54,7 +54,6 @@ internal static class HostingExtensions
         app.MapHealthChecks("/healthz");
         app.MapHealthChecks("/health");
 
-        //// Configure the HTTP request pipeline.
         //if (!app.Environment.IsDevelopment())
         //{
         //    app.UseExceptionHandler("/Home/Error");
