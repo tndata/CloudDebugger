@@ -8,18 +8,15 @@
 ## Features and tools
 
 
-
 ### HTTP Request tools
 * [Request logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 * [Current request viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
 * [Calling external APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
 
 
-
 ### Compute tools
 * [App Services - File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 * [App Services - File Local cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
-
 
 
 ### Storage tools

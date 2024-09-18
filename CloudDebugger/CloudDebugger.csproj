@@ -45,6 +45,10 @@
 		</Content>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Features\RuntimeDetails\" />
+	</ItemGroup>
+
 
 	<!--Set the build date https://stackoverflow.com/a/50607951/68490-->
 	<PropertyGroup>
