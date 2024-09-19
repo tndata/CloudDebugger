@@ -10,7 +10,7 @@ public static class CustomMiddlewares
     /// <param name="app"></param>
     public static void UseRequsetBodyCapture(this WebApplication app)
     {
-        app.Use((context, next) =>
+        app.Use(async (context, next) =>
         {
             context.Request.EnableBuffering();
 
@@ -22,7 +22,7 @@ public static class CustomMiddlewares
                 // AND, the most important: keep stream opened
                 using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, true, 1024, true))
                 {
-                    bodyStr = reader.ReadToEndAsync().Result;
+                    bodyStr = await reader.ReadToEndAsync();
 
                     context.Items.Add("RequestBody", bodyStr);
                 }
@@ -34,7 +34,7 @@ public static class CustomMiddlewares
 
             context.Request.Body.Position = 0;
 
-            return next();
+            await next();
         });
     }
 }

@@ -56,7 +56,7 @@ public class DefaultAzureCredentialsController : Controller
 
             // Using a customization we have made to the MyDefaultAzureCredential class,
             // that exposes the active token credentials used.
-            model.CredentialSources = model.MyDefaultAzureCredential._sources;
+            model.CredentialSources = model.MyDefaultAzureCredential._sources.ToList();
 
             model.Scopes = string.Join(',', scopes);
         }

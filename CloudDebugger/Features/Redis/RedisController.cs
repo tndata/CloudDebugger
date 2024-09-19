@@ -60,7 +60,7 @@ public class RedisController : Controller
     {
         _logger.LogInformation("Redis.ReadWriteKeys (POST) called was called");
 
-        if (ModelState.IsValid)
+        if (ModelState.IsValid && model != null)
         {
             string connectionString = model.ConnectionString ?? "";
 

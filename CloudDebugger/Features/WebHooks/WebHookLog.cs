@@ -1,4 +1,4 @@
-﻿using CloudDebugger.Shared_code.WebHooks;
+﻿using CloudDebugger.SharedCode.WebHooks;
 
 namespace CloudDebugger.Features.WebHooks;
 
@@ -25,6 +25,8 @@ public class WebHookLog : IWebHookLog
 
     public void AddToLog(int hookId, WebHookLogEntry logEntry)
     {
+        ArgumentNullException.ThrowIfNull(logEntry);
+
         lock (lockObj)
         {
             logEntry.HookId = hookId;

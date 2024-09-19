@@ -32,9 +32,8 @@ public class LoggingController : Controller
     [HttpPost("/Logging/WriteToLog")]
     public IActionResult WriteToLogAction(LoggingModel model)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid && model != null)
         {
-            model.LogMessage = "";
             string message = model.LogMessage ?? "This is my log message!";
 
             WriteToLog(message, LogLevel.Trace);

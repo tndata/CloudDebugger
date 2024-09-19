@@ -19,7 +19,7 @@ public class HealthController : Controller
     {
         var model = new HealthModel
         {
-            CurrentServiceHealth = Settings.ServiceHealth,
+            CurrentServiceHealth = DebuggerSettings.ServiceHealth,
             CurrentCustomHealth = CustomHealthEndpointStatus
         };
 
@@ -41,25 +41,25 @@ public class HealthController : Controller
             switch (mode)
             {
                 case "Healthy":
-                    Settings.ServiceHealth = HealthStatusEnum.Healthy;
+                    DebuggerSettings.ServiceHealth = HealthStatusEnum.Healthy;
 
                     break;
                 case "Degraded":
-                    Settings.ServiceHealth = HealthStatusEnum.Degraded;
+                    DebuggerSettings.ServiceHealth = HealthStatusEnum.Degraded;
                     break;
                 case "Unhealthy":
-                    Settings.ServiceHealth = HealthStatusEnum.Unhealthy;
+                    DebuggerSettings.ServiceHealth = HealthStatusEnum.Unhealthy;
                     break;
                 default:
                     //No change
                     break;
             }
 
-            _logger.LogInformation("Set ServiceHealthMode action called, mode={Mode}", Settings.ServiceHealth);
+            _logger.LogInformation("Set ServiceHealthMode action called, mode={Mode}", DebuggerSettings.ServiceHealth);
 
             model ??= new HealthModel();
 
-            model.CurrentServiceHealth = Settings.ServiceHealth;
+            model.CurrentServiceHealth = DebuggerSettings.ServiceHealth;
             model.CurrentCustomHealth = CustomHealthEndpointStatus;
         }
 
@@ -102,7 +102,7 @@ public class HealthController : Controller
 
             model ??= new HealthModel();
 
-            model.CurrentServiceHealth = Settings.ServiceHealth;
+            model.CurrentServiceHealth = DebuggerSettings.ServiceHealth;
             model.CurrentCustomHealth = CustomHealthEndpointStatus;
         }
 

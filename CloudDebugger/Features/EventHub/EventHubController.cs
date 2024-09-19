@@ -57,45 +57,46 @@ public class EventHubController : Controller
             model.Exception = "";
             model.Message = "";
 
-            var producerClient = new EventHubProducerClient(model.ConnectionString ?? "");
-
-            try
+            await using (var producerClient = new EventHubProducerClient(model.ConnectionString ?? ""))
             {
-                int eventId = model.StartNumber;
-                EventData? eventData = null;
-
-                for (int i = 0; i < model.NumberOfEvents; i++)
+                try
                 {
-                    if (eventId % 2 == 0)
+                    int eventId = model.StartNumber;
+                    EventData? eventData = null;
+
+                    for (int i = 0; i < model.NumberOfEvents; i++)
                     {
-                        var @event = new EventHubOrderEvent()
+                        if (eventId % 2 == 0)
                         {
-                            OrderId = eventId,
-                            CustomerName = "Customer " + eventId
-                        };
-                        eventData = new EventData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event)));
-                        await SendEvent(producerClient, eventData, partitionKey: "order");
-                    }
-                    else
-                    {
-                        var @event = new EventHubProductEvent()
+                            var @event = new EventHubOrderEvent()
+                            {
+                                OrderId = eventId,
+                                CustomerName = "Customer " + eventId
+                            };
+                            eventData = new EventData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event)));
+                            await SendEvent(producerClient, eventData, partitionKey: "order");
+                        }
+                        else
                         {
-                            ProductId = eventId,
-                            ProductName = "Product " + eventId
-                        };
-                        eventData = new EventData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event)));
-                        await SendEvent(producerClient, eventData, partitionKey: "product");
+                            var @event = new EventHubProductEvent()
+                            {
+                                ProductId = eventId,
+                                ProductName = "Product " + eventId
+                            };
+                            eventData = new EventData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event)));
+                            await SendEvent(producerClient, eventData, partitionKey: "product");
+                        }
+
+                        eventId++;
                     }
 
-                    eventId++;
+                    model.StartNumber = eventId;
+                    model.Message = "Events sent!";
                 }
-
-                model.StartNumber = eventId;
-                model.Message = "Events sent!";
-            }
-            catch (Exception exc)
-            {
-                model.Exception = exc.ToString();
+                catch (Exception exc)
+                {
+                    model.Exception = exc.ToString();
+                }
             }
         }
 
@@ -117,7 +118,7 @@ public class EventHubController : Controller
         {
             eventBatch.TryAdd(eventData);
 
-            producerClient.SendAsync(eventBatch).Wait();
+            await producerClient.SendAsync(eventBatch);
         }
     }
 
@@ -155,8 +156,8 @@ public class EventHubController : Controller
                         MaximumWaitTime = TimeSpan.FromSeconds(1)  //If specified, should there be no events available before this waiting period expires, an empty event will be returned, allowing control to return to the reader that was waiting.
                     };
 
-                    // It is important to note that this method does not guarantee fairness amongst the partitions during iteration;
-                    // each of the partitions compete to publish events to be read by the enumerator. Depending on service communication,
+                    // It is important to note that this method does not guarantee fairness amongst the partitions during iteration.
+                    // each of the partitions compete to publish events to be read by the enumerator. Depending on service communication
                     // there may be a clustering of events per partition and/or there may be a noticeable bias for a given partition or
                     // subset of partitions.
                     // https://learn.microsoft.com/en-us/dotnet/api/azure.messaging.eventhubs.consumer.eventhubconsumerclient.readeventsasync

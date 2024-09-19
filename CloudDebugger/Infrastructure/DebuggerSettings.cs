@@ -2,7 +2,7 @@
 
 namespace CloudDebugger.Infrastructure;
 
-public static class Settings
+public static class DebuggerSettings
 {
     /// <summary>
     /// The date and time when this service was started

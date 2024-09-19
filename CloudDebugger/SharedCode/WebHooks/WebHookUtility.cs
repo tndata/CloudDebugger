@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace CloudDebugger.Shared_code.WebHooks;
+namespace CloudDebugger.SharedCode.WebHooks;
 
 public static class WebHookUtility
 {
@@ -9,9 +9,9 @@ public static class WebHookUtility
     /// Get the request and package it up into a WebHookLogEntry
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="_logger"></param>
+    /// <param name="logger"></param>
     /// <returns></returns>
-    public async static Task<WebHookLogEntry> GetRequestDetails(HttpRequest request, ILogger _logger)
+    public async static Task<WebHookLogEntry> GetRequestDetails(HttpRequest request, ILogger logger)
     {
         var logEntry = new WebHookLogEntry()
         {
@@ -46,7 +46,7 @@ public static class WebHookUtility
                         {
                             logEntry.Subject = dynObj.subject ?? "[Subject missing]";
 
-                            _logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
+                            logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
                         }
                     }
                     catch

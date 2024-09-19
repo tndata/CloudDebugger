@@ -13,7 +13,7 @@ public class AppHealthCheck : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        return Settings.ServiceHealth switch
+        return DebuggerSettings.ServiceHealth switch
         {
             HealthStatusEnum.Healthy => Task.FromResult(HealthCheckResult.Healthy("OK")),
             HealthStatusEnum.Degraded => Task.FromResult(HealthCheckResult.Degraded("Degraded")),

@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Text;
 
-namespace CloudDebugger.Shared_code.WebHooks;
+namespace CloudDebugger.SharedCode.WebHooks;
 
 /// <summary>
 /// WebHook Validation logic

@@ -13,7 +13,7 @@ public class GetAccessTokenModel
     /// <summary>
     /// List of TokenCredentials that MyDefaultAzureCredential will try to get token from.
     /// </summary>
-    public TokenCredential[]? CredentialSources { get; set; }
+    public List<TokenCredential>? CredentialSources { get; set; }
 
     /// <summary>
     /// MyDefaultAzureCredential is the customized version of DefaultAzureCredential that includes various logging and debugging features.

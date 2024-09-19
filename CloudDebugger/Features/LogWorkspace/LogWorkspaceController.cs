@@ -11,8 +11,10 @@ public class LogWorkspaceController : Controller
     private readonly ILogger<LogWorkspaceController> _logger;
 
     //"remember" the workspaceId and workspaceKey
-    private readonly static string workspaceId = "";
-    private readonly static string workspaceKey = "";
+
+    //TODO: Use session here
+    private static string workspaceId;
+    private static string workspaceKey;
 
     // The name of the table to write to in Log Analytics workspace
     // We keep it hardcoded for now. The table will be automatically created if not found. 
@@ -21,6 +23,9 @@ public class LogWorkspaceController : Controller
     public LogWorkspaceController(ILogger<LogWorkspaceController> logger)
     {
         _logger = logger;
+
+        workspaceId = "";
+        workspaceKey = "";
     }
 
     public IActionResult Index()
@@ -51,13 +56,14 @@ public class LogWorkspaceController : Controller
     public async Task<IActionResult> PostSendEvents(LogWorkspaceModel model)
     {
         _logger.LogInformation("LogWorkspace.PostSendEvents was called");
-        model.Exception = "";
-        model.Message = "";
 
-        if (ModelState.IsValid && model.WorkspaceId != null && model.WorkspaceKey != null)
+        if (ModelState.IsValid && model != null && model.WorkspaceId != null && model.WorkspaceKey != null)
         {
             try
             {
+                model.Exception = "";
+                model.Message = "";
+
                 var logStatements = GenerateLogStatements(model.LogMessage);
 
                 await SendLogStatements(logStatements, logType, model.WorkspaceId, model.WorkspaceKey);

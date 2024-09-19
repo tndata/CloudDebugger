@@ -8,9 +8,9 @@ namespace CloudDebugger.Features.CallingApis;
 /// </summary>
 public class CallingApisController : Controller
 {
-    private const string JSONApiUrl = "https://httpbin.org/json";
-    private const string slowApiUrl = "https://httpbin.org/delay/5";
-    private const string error500ApiUrl = "https://httpbin.org/status/500";
+    private readonly Uri JSONApiUrl = new("https://httpbin.org/json");
+    private readonly Uri slowApiUrl = new("https://httpbin.org/delay/5");
+    private readonly Uri error500ApiUrl = new("https://httpbin.org/status/500");
 
     private readonly ILogger<CallingApisController> _logger;
 
@@ -24,47 +24,47 @@ public class CallingApisController : Controller
         return View();
     }
 
-    public IActionResult JsonApi()
+    public async Task<IActionResult> JsonApi()
     {
         _logger.LogInformation("JSON API endpoint was called");
 
-        var result = MakeCallToExternalApi(JSONApiUrl);
+        var result = await MakeCallToExternalApi(JSONApiUrl);
 
         ViewData["Message"] = "Request sent, result = " + result;
 
         return View("Index");
     }
 
-    public IActionResult SlowApi()
+    public async Task<IActionResult> SlowApi()
     {
         _logger.LogInformation("Slow API endpoint was called");
 
-        var result = MakeCallToExternalApi(slowApiUrl);
+        var result = await MakeCallToExternalApi(slowApiUrl);
 
         ViewData["Message"] = "Request sent, result = " + result;
 
         return View("Index");
     }
 
-    public IActionResult ErrorApi()
+    public async Task<IActionResult> ErrorApi()
     {
         _logger.LogInformation("Error API endpoint was called");
 
-        var result = MakeCallToExternalApi(error500ApiUrl);
+        var result = await MakeCallToExternalApi(error500ApiUrl);
 
         ViewData["Message"] = "Request sent, result = " + result;
 
         return View("Index");
     }
 
-    private static string MakeCallToExternalApi(string url)
+    private static async Task<string> MakeCallToExternalApi(Uri url)
     {
         try
         {
-            var client = new HttpClient();
+            using var client = new HttpClient();
 
             // We ignore the result from this call.
-            var response = client.GetStringAsync(url).Result;
+            var response = await client.GetStringAsync(url);
 
             return response;
         }

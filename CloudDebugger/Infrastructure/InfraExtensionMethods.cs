@@ -55,6 +55,8 @@ public static class InfraExtensionMethods
     /// <param name="builder"></param>
     public static void AddAndConfigureControllersAndViews(this WebApplicationBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         //Support features folder structure
         builder.Services.Configure<RazorViewEngineOptions>(rvo =>
         {

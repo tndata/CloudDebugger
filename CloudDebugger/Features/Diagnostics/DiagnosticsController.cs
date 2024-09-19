@@ -62,7 +62,7 @@ public class DiagnosticsController : Controller
 
             RunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") ?? "No",
 
-            ServerAddresses = server.Features.Get<IServerAddressesFeature>()?.Addresses?.ToList() ?? new()
+            ServerAddresses = server?.Features.Get<IServerAddressesFeature>()?.Addresses?.ToList() ?? []
         };
 
         return View(model);

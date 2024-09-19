@@ -50,7 +50,7 @@ public class TokenCredentailsExplorerController : Controller
                     model.UrlToJWTMSSite = new Uri("https://jwt.ms").SetFragment("access_token=" + model.AccessToken.Token);
                 }
 
-                result.Add(cred.Credential?.ToString() ?? "");
+                result.Add(cred.Credential.ToString() ?? "");
             }
         }
         catch (Exception exc)
@@ -365,8 +365,7 @@ public class TokenCredentailsExplorerController : Controller
         return token;
     }
 
-
-    public class CredentialResult
+    private sealed class CredentialResult
     {
         public TokenCredential? Credential { get; set; }
         public string? Message { get; set; }

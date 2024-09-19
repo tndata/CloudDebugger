@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Shared_code.WebHooks;
+﻿namespace CloudDebugger.SharedCode.WebHooks;
 
 public class WebHookLogEntry
 {

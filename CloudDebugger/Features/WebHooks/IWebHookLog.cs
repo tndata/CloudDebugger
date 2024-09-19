@@ -1,4 +1,4 @@
-﻿using CloudDebugger.Shared_code.WebHooks;
+﻿using CloudDebugger.SharedCode.WebHooks;
 
 namespace CloudDebugger.Features.WebHooks;
 

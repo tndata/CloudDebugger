@@ -1,4 +1,4 @@
-﻿using CloudDebugger.Shared_code.WebHooks;
+﻿using CloudDebugger.SharedCode.WebHooks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace CloudDebugger.Infrastructure;
 
-
+#pragma warning disable S6664  // The code block contains too many logging calls
 /// <summary>
 /// Startup banners
 /// 
@@ -40,15 +40,19 @@ public static class Banners
     {
         Console.WriteLine("========================================================="); //We don't wan this in the log
 
-        var urlList = app.Urls;
-        string urls = string.Join(" ", urlList);
+        var urls = "";
+        if (app != null)
+        {
+            var urlList = app.Urls;
+            urls = string.Join(" ", urlList);
+        }
 
         Log.Information("CloudDebugger started, listening to: {Urls}", urls);
         Console.ResetColor();
 
         Log.Information("Runtime: {FrameworkDescription} - {EnvironmentName}, Platform: {OSDescription} ({OSArchitecture})",
                             RuntimeInformation.FrameworkDescription,
-                            builder.Environment.EnvironmentName,
+                            builder?.Environment.EnvironmentName ?? "",
                             RuntimeInformation.OSDescription,
                             RuntimeInformation.OSArchitecture);
 

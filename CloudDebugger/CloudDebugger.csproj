@@ -8,6 +8,7 @@
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
 		<ResourceLanguages>en</ResourceLanguages>
+		<AnalysisMode>All</AnalysisMode>
 	</PropertyGroup>
 
 	<ItemGroup>

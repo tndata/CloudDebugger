@@ -52,14 +52,18 @@ public static class LogSender
     {
         string url = "https://" + workspaceId + ".ods.opinsights.azure.com/api/logs?api-version=2016-04-01";
 
-        var _client = new HttpClient();
-        _client.DefaultRequestHeaders.Add("Accept", "application/json");
-        _client.DefaultRequestHeaders.Add("Log-Type", logName);
-        _client.DefaultRequestHeaders.Add("Authorization", signature);
-        _client.DefaultRequestHeaders.Add("x-ms-date", date);
+        using (var _client = new HttpClient())
+        {
+            using (var httpContent = new StringContent(json, Encoding.UTF8))
+            {
+                _client.DefaultRequestHeaders.Add("Accept", "application/json");
+                _client.DefaultRequestHeaders.Add("Log-Type", logName);
+                _client.DefaultRequestHeaders.Add("Authorization", signature);
+                _client.DefaultRequestHeaders.Add("x-ms-date", date);
 
-        HttpContent httpContent = new StringContent(json, Encoding.UTF8);
-        httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        return await _client.PostAsync(new Uri(url), httpContent);
+                httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                return await _client.PostAsync(new Uri(url), httpContent);
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ using Serilog.Events;
 using System.Diagnostics.Tracing;
 
 Console.Title = "CloudDebugger";
-Settings.StartupTime = DateTime.UtcNow;
+DebuggerSettings.StartupTime = DateTime.UtcNow;
 
 
 //Startup logging
@@ -22,7 +22,7 @@ Log.Logger = new LoggerConfiguration()
 Banners.DisplayPreStartupBanner();
 
 // TODO: Cleanup
-_ = new AzureEventSourceListener((e, message) =>
+var eventListener = new AzureEventSourceListener((e, message) =>
 {
     // Only log messages from "Azure-Core" event source
     //Azure-Messaging-ServiceBus
@@ -75,6 +75,7 @@ catch (Exception ex)
 }
 finally
 {
+    eventListener.Dispose();
     Log.Information("Shut down complete");
     await Log.CloseAndFlushAsync();
 }
