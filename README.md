@@ -2,9 +2,6 @@
 
 
 
-
-
-
 ## Features and tools
 
 
@@ -29,6 +26,10 @@
 * [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
 * [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
+### Diagnostics and system information
+* [RuntimeDetails](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [EnvironmentVariables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Network](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 
 
 ### Related Azure blog posts:

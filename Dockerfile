@@ -5,7 +5,6 @@ WORKDIR /src
 # Phase #1, copy solution + csproj and restore as distinct layers  ----
 
 COPY *.sln .
-COPY .editorconfig CloudDebugger/.
 
 COPY MyHttpLogging MyHttpLogging/.
 RUN dotnet restore MyHttpLogging/MyHttpLogging.csproj
@@ -14,6 +13,10 @@ COPY MyAzureIdentity MyAzureIdentity/.
 RUN dotnet restore MyAzureIdentity/MyAzureIdentity.csproj
 
 COPY CloudDebugger CloudDebugger/.
+
+# Copy the solution level .editorconfig into the project to avoid warning
+COPY .editorconfig CloudDebugger
+
 RUN dotnet restore CloudDebugger/CloudDebugger.csproj
 
 RUN dotnet publish CloudDebugger/CloudDebugger.csproj -c Release -o /app --no-restore 
