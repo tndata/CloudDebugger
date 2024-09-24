@@ -95,7 +95,7 @@ public class DiagnosticsController : Controller
                 IPAddress = uni.Address.ToString(),
                 SubnetMask = uni.IPv4Mask?.ToString() ?? "N/A"
             })
-            .ToList() ?? new List<IPAddressV4Info>();
+            .ToList() ?? [];
     }
 
     private static List<IPAddressV6Info> GetIPv6AddressInfos(NetworkInterface adapter)
@@ -107,14 +107,14 @@ public class DiagnosticsController : Controller
                 IPAddress = uni.Address.ToString(),
                 PrefixLength = $"/{uni.PrefixLength}"
             })
-            .ToList() ?? new List<IPAddressV6Info>();
+            .ToList() ?? [];
     }
 
     private static List<string> GetGatewayAddresses(NetworkInterface adapter)
     {
         return adapter.GetIPProperties()?.GatewayAddresses
             .Select(gw => gw.Address.ToString())
-            .ToList() ?? new List<string>();
+            .ToList() ?? [];
     }
 
     private static List<string> GetWinsServers(NetworkInterface adapter)
