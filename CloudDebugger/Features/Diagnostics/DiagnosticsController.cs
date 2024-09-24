@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 
 namespace CloudDebugger.Features.Diagnostics;
 
 /// <summary>
+/// Diagnostics
+/// 
+/// Tool that display various system and diagnostic information.
 /// 
 /// </summary>
 public class DiagnosticsController : Controller
@@ -19,18 +24,100 @@ public class DiagnosticsController : Controller
         return View();
     }
 
+
+    /// <summary>
+    /// Show all the environment variables
+    /// </summary>
+    /// <returns></returns>
     public IActionResult EnvironmentVariables()
     {
-        return View();
+        var vars = Environment.GetEnvironmentVariables();
+        var model = new List<EnvironmentVariableModel>();
+
+        if (vars != null)
+        {
+            foreach (DictionaryEntry entry in vars)
+            {
+                string? key = entry.Key?.ToString();
+                string? value = entry.Value?.ToString();
+
+                if (key != null && value != null)
+                {
+                    model.Add(new EnvironmentVariableModel { Key = key, Value = value });
+                }
+            }
+        }
+
+        // Sort the model by key
+        model = model.OrderBy(m => m.Key).ToList();
+
+        return View(model);
     }
 
+
+    /// <summary>
+    /// Inspiration:
+    /// https://learn.microsoft.com/en-us/dotnet/api/system.net.networkinformation.networkinterface
+    /// https://github.com/dotnet/dotnet-api-docs/blob/main/snippets/csharp/System.Net.NetworkInformation/IcmpV4Statistics/Overview/netinfo.cs
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Network()
     {
-        //TODO: FIX!!
-        //Inspiration https://learn.microsoft.com/en-us/dotnet/api/system.net.networkinformation.networkinterface?view=net-8.0&redirectedfrom=MSDN
+        var model = new NetworkDetailsModel
+        {
+            HostName = IPGlobalProperties.GetIPGlobalProperties().HostName,
+            DomainName = IPGlobalProperties.GetIPGlobalProperties().DomainName,
+            NetworkInterfaces = NetworkInterface.GetAllNetworkInterfaces().Select(adapter => new NetworkInterfaceModel
+            {
+                Name = adapter.Name,
+                Description = adapter.Description,
+                NetworkInterfaceType = adapter.NetworkInterfaceType.ToString(),
+                OperationalStatus = adapter.OperationalStatus.ToString(),
+                IPVersions = GetSupportedIPVersions(adapter),
+                DnsSuffix = adapter.GetIPProperties().DnsSuffix,
+                DnsAddresses = adapter.GetIPProperties().DnsAddresses.Select(dns => dns.ToString()).ToList(),
+                UnicastAddresses = adapter.GetIPProperties().UnicastAddresses.Select(uni => uni.Address.ToString()).ToList(),
+                WinsServers = GetWinsServers(adapter)
+            }).ToList()
+        };
 
-        // More code here https://github.com/dotnet/dotnet-api-docs/blob/a4cef208decae4c2863337173050b2805ec8f706/snippets/csharp/System.Net.NetworkInformation/IcmpV4Statistics/Overview/netinfo.cs#L316
-        return View();
+        return View(model);
+    }
+
+
+    private static List<string> GetWinsServers(NetworkInterface adapter)
+    {
+        var winsServers = new List<string>();
+
+        if (adapter.Supports(NetworkInterfaceComponent.IPv4))
+        {
+            var ipv4Properties = adapter.GetIPProperties()?.GetIPv4Properties();
+            if (ipv4Properties != null && (OperatingSystem.IsLinux() || OperatingSystem.IsWindows()) && ipv4Properties.UsesWins)
+            {
+                var winsAddresses = adapter.GetIPProperties()?.WinsServersAddresses;
+                if (winsAddresses != null)
+                {
+                    winsServers = winsAddresses.Select(wins => wins.ToString()).ToList();
+                }
+            }
+        }
+
+        return winsServers;
+    }
+
+
+    private static string GetSupportedIPVersions(NetworkInterface adapter)
+    {
+        var versions = new List<string>();
+        if (adapter.Supports(NetworkInterfaceComponent.IPv4))
+        {
+            versions.Add("IPv4");
+        }
+        if (adapter.Supports(NetworkInterfaceComponent.IPv6))
+        {
+            versions.Add("IPv6");
+        }
+        return string.Join(" ", versions);
     }
 
 

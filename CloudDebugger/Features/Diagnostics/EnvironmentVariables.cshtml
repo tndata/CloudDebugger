@@ -1,49 +1,42 @@
-﻿@using System.Collections
+﻿@model List<CloudDebugger.Features.Diagnostics.EnvironmentVariableModel>
 
 @{
-    ViewData["Title"] = "CloudDebugger - EnvironmentVariables";
+    ViewData["Title"] = "CloudDebugger - Environment Variables";
 }
 
-<h3>Environment variables</h3>
+<h3>Environment Variables</h3>
 <a href="/diagnostics">Back</a>
 <br />
 
 
-
 <table class="table table-hover table-bordered">
-
-
     <thead>
         <tr>
-            <th class="col-md-1">Variable</th>  
+            <th class="col-md-1">Variable</th>
             <th class="col-md-11">Value</th>
         </tr>
     </thead>
     <tbody>
-    @{
-        var vars = Environment.GetEnvironmentVariables();
-
-        if (vars != null)
+        @if (Model != null)
         {
-            var sortedDict = new SortedDictionary<string, string>();
-
-            foreach (DictionaryEntry entry in vars)
-            {
-                string? key = entry.Key?.ToString();
-                string? value = entry.Value?.ToString();
-
-                if (key != null && value != null)
-                    sortedDict.Add(key, value);
-            }
-
-            foreach (var entry in sortedDict)
+            @foreach (var entry in Model)
             {
                 <tr>
-                        <td class="col-md-2">@entry.Key</td>
-                        <td class="col-md-10">@entry.Value</td>
+                    <td class="col-md-2">@entry.Key</td>
+                    <td class="col-md-10">@entry.Value</td>
                 </tr>
             }
         }
-    }
     </tbody>
 </table>
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings">Environment variables and app settings in Azure App Service</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/service-fabric/service-fabric-environment-variables-reference">Service Fabric environment variables</a></li>
+</ul>
+
+

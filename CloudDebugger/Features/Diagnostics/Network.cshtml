@@ -1,162 +1,89 @@
-﻿@using System.Net.NetworkInformation
-@using System.Net
+﻿@model CloudDebugger.Features.Diagnostics.NetworkDetailsModel
 
 @{
     ViewData["Title"] = "CloudDebugger - Network summary";
 }
 
-<h3>Network</h3>
+<h3>Network summary</h3>
 <a href="/diagnostics">Back</a>
 <br />
 <br />
 
 
-@{
-    IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
-
-}
 <table class="table table-hover table-bordered">
     <tr>
         <td class="col-md-2">HostName</td>
-        <td class="col-md-10">@computerProperties.HostName</td>
+        <td class="col-md-10">@Model.HostName</td>
     </tr>
     <tr>
         <td class="col-md-2">DomainName</td>
-        <td class="col-md-10">@computerProperties.DomainName</td>
+        <td class="col-md-10">@Model.DomainName</td>
     </tr>
 </table>
 
 
 
-<br />
-<h4>Network interfaces</h4>
-@{
-    NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-}
-
-@foreach (var adapter in nics)
+@if (Model.NetworkInterfaces != null)
 {
     <br />
-    <h5>Interface: @adapter.Name</h5>
+    <h4>Network interfaces</h4>
 
-    <table class="table table-hover table-bordered">
+    @foreach (var adapter in Model.NetworkInterfaces)
+    {
+        <br />
+        <h5>Interface: @adapter.Name</h5>
 
-        <tr>
-            <td class="col-md-2">Adapter</td>
-            <td class="col-md-10">@adapter.Description</td>
-        </tr>
-        <tr>
-            <td class="col-md-2">Interface type</td>
-            <td class="col-md-10">@adapter.NetworkInterfaceType</td>
-        </tr>
-        <tr>
-            <td class="col-md-2">Operational status</td>
-            <td class="col-md-10">@adapter.OperationalStatus</td>
-        </tr>
-        <tr>
-
-            @{
-                string versions = "";
-
-                // Create a display string for the supported IP versions.
-                if (adapter.Supports(NetworkInterfaceComponent.IPv4))
-                {
-                    versions = "IPv4";
-                }
-                if (adapter.Supports(NetworkInterfaceComponent.IPv6))
-                {
-                    if (versions.Length > 0)
-                    {
-                        versions += " ";
-                    }
-                    versions += "IPv6";
-                }
-
-            }
-            <td class="col-md-2">IP version</td>
-            <td class="col-md-10">@versions</td>
-        </tr>
-
-        @{
-            IPInterfaceProperties properties = adapter.GetIPProperties();
-
-            ShowIPAddresses2(properties);
-
-            if (adapter.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-md-2">Adapter</td>
+                <td class="col-md-10">@adapter.Description</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">Interface type</td>
+                <td class="col-md-10">@adapter.NetworkInterfaceType</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">Operational status</td>
+                <td class="col-md-10">@adapter.OperationalStatus</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">IP version</td>
+                <td class="col-md-10">@adapter.IPVersions</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">DNS suffix</td>
+                <td class="col-md-10">@adapter.DnsSuffix</td>
+            </tr>
+            @if (adapter.DnsAddresses != null)
             {
-
-                <tr>
-                    <td class="col-md-2">DNS suffix</td>
-                    <td class="col-md-10">@properties.DnsSuffix</td>
-                </tr>
-
-                string label;
-                if (adapter.Supports(NetworkInterfaceComponent.IPv4))
+                @foreach (var dns in adapter.DnsAddresses)
                 {
-                    IPv4InterfaceProperties ipv4 = properties.GetIPv4Properties();
-                    if (ipv4.UsesWins)
-                    {
-
-                        IPAddressCollection winsServers = properties.WinsServersAddresses;
-                        if (winsServers.Count > 0)
-                        {
-                            label = "  WINS Servers ............................ :";
-                            ShowIPAddresses(label, winsServers);
-                        }
-                    }
+                    <tr>
+                        <td class="col-md-2">DNS Servers</td>
+                        <td class="col-md-10">@dns</td>
+                    </tr>
                 }
-
-
-                void ShowIPAddresses(string label, IPAddressCollection addresses)
-                {
-                    if (addresses.Count == 0)
-                        return;
-
-                    foreach (IPAddress ip in addresses)
-                    {
-                        string address = ip.ToString();
-                        string line = address.PadLeft(label.Length + address.Length + 1);
-
-                        <tr>
-                            <td class="col-md-2">IP Address</td>
-                            <td class="col-md-10">@line</td>
-                        </tr>
-                        // Console.WriteLine("{0}", line);
-                    }
-                }
-
             }
-
-
-            void ShowIPAddresses2(IPInterfaceProperties adapterProperties)
+            @if (adapter.UnicastAddresses != null)
             {
-                IPAddressCollection dnsServers = adapterProperties.DnsAddresses;
-                if (dnsServers != null)
+                @foreach (var uni in adapter.UnicastAddresses)
                 {
-                    foreach (IPAddress dns in dnsServers)
-                    {
-                        <tr>
-                            <td class="col-md-2">DNS Servers</td>
-                            <td class="col-md-10">@dns</td>
-                        </tr>
-                    }
-                }
-
-                UnicastIPAddressInformationCollection uniCast = adapterProperties.UnicastAddresses;
-                if (uniCast != null)
-                {
-                    foreach (UnicastIPAddressInformation uni in uniCast)
-                    {
-                        <tr>
-                            <td class="col-md-2">Unicast Address</td>
-                            <td class="col-md-10">@uni.Address</td>
-                        </tr>
-                    }
+                    <tr>
+                        <td class="col-md-2">Unicast Address</td>
+                        <td class="col-md-10">@uni</td>
+                    </tr>
                 }
             }
-
-
-        }
-    </table>
+            @if (adapter.WinsServers != null)
+            {
+                @foreach (var wins in adapter.WinsServers)
+                {
+                    <tr>
+                        <td class="col-md-2">WINS Servers</td>
+                        <td class="col-md-10">@wins</td>
+                    </tr>
+                }
+            }
+        </table>
+    }
 }
-
