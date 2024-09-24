@@ -5,6 +5,7 @@ WORKDIR /src
 # Phase #1, copy solution + csproj and restore as distinct layers  ----
 
 COPY *.sln .
+COPY .editorconfig CloudDebugger/.
 
 COPY MyHttpLogging MyHttpLogging/.
 RUN dotnet restore MyHttpLogging/MyHttpLogging.csproj

@@ -3,6 +3,13 @@
 . .\_Settings.ps1
 
 
+# Delete the .URL files if they exist
+Remove-Item -Path ".\Link-WindowsAppService.url" -ErrorAction SilentlyContinue
+Remove-Item -Path ".\Link-LinuxAppService.url" -ErrorAction SilentlyContinue
+Remove-Item -Path ".\Link-LinuxContainerAppService.url" -ErrorAction SilentlyContinue
+Remove-Item -Path ".\Link-ContainerInstance.url" -ErrorAction SilentlyContinue
+Remove-Item -Path ".\Link-ContainerApp.url" -ErrorAction SilentlyContinue
+
 
 Write-Host "`n`n";
 
@@ -22,10 +29,22 @@ Write-Host "Linux Container hostname:              https://${linuxContaiinerAppS
 
 
 $containerInstance = az container show --resource-group $rgname --name $containerInstanceName  --output json | ConvertFrom-Json
-$hostName = $containerInstance.ipAddress.fqdn
-Write-Host "Container Instance hostname:           http://${hostName}:8080"
+$containerInstanceHostName = $containerInstance.ipAddress.fqdn
+Write-Host "Container Instance hostname:           http://${containerInstanceHostName}:8080"
 
 
 $containerApp = az containerapp show --name $containerAppName --resource-group $rgname --output json | ConvertFrom-Json
-$hostName = $containerApp.properties.configuration.ingress.fqdn
-Write-Host "Container App hostname:                https://${hostName}"
+$containerAppHostName = $containerApp.properties.configuration.ingress.fqdn
+Write-Host "Container App hostname:                https://${containerAppHostName}"
+
+
+# Generate .URL files to each service
+"[InternetShortcut]`nURL=https://${windowsAppServiceUrl}" | Out-File -FilePath ".\Link-WindowsAppService.url"
+"[InternetShortcut]`nURL=https://${linuxAppServiceUrl}" | Out-File -FilePath ".\Link-LinuxAppService.url"
+"[InternetShortcut]`nURL=https://${linuxContaiinerAppServiceUrl}" | Out-File -FilePath ".\Link-LinuxContainerAppService.url"
+"[InternetShortcut]`nURL=http://${containerInstanceHostName}:8080" | Out-File -FilePath ".\Link-ContainerInstance.url"
+"[InternetShortcut]`nURL=https://${containerAppHostName}" | Out-File -FilePath ".\Link-ContainerApp.url"
+Write-Host "`n`n";
+
+
+
