@@ -76,14 +76,46 @@ public class DiagnosticsController : Controller
                 IPVersions = GetSupportedIPVersions(adapter),
                 DnsSuffix = adapter.GetIPProperties().DnsSuffix,
                 DnsAddresses = adapter.GetIPProperties().DnsAddresses.Select(dns => dns.ToString()).ToList(),
-                UnicastAddresses = adapter.GetIPProperties().UnicastAddresses.Select(uni => uni.Address.ToString()).ToList(),
-                WinsServers = GetWinsServers(adapter)
+                WinsServers = GetWinsServers(adapter),
+                IPv4AddressInfos = GetIPv4AddressInfos(adapter),
+                IPv6AddressInfos = GetIPv6AddressInfos(adapter),
+                GatewayAddresses = GetGatewayAddresses(adapter),
             }).ToList()
         };
 
         return View(model);
     }
 
+    private static List<IPAddressV4Info> GetIPv4AddressInfos(NetworkInterface adapter)
+    {
+        return adapter.GetIPProperties()?.UnicastAddresses
+            .Where(uni => uni.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            .Select(uni => new IPAddressV4Info
+            {
+                IPAddress = uni.Address.ToString(),
+                SubnetMask = uni.IPv4Mask?.ToString() ?? "N/A"
+            })
+            .ToList() ?? new List<IPAddressV4Info>();
+    }
+
+    private static List<IPAddressV6Info> GetIPv6AddressInfos(NetworkInterface adapter)
+    {
+        return adapter.GetIPProperties()?.UnicastAddresses
+            .Where(uni => uni.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+            .Select(uni => new IPAddressV6Info
+            {
+                IPAddress = uni.Address.ToString(),
+                PrefixLength = $"/{uni.PrefixLength}"
+            })
+            .ToList() ?? new List<IPAddressV6Info>();
+    }
+
+    private static List<string> GetGatewayAddresses(NetworkInterface adapter)
+    {
+        return adapter.GetIPProperties()?.GatewayAddresses
+            .Select(gw => gw.Address.ToString())
+            .ToList() ?? new List<string>();
+    }
 
     private static List<string> GetWinsServers(NetworkInterface adapter)
     {

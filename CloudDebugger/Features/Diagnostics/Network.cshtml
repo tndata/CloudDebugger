@@ -59,21 +59,67 @@
                 @foreach (var dns in adapter.DnsAddresses)
                 {
                     <tr>
-                        <td class="col-md-2">DNS Servers</td>
+                        <td class="col-md-2">DNS Server</td>
                         <td class="col-md-10">@dns</td>
                     </tr>
                 }
             }
-            @if (adapter.UnicastAddresses != null)
+
+            @if (adapter.GatewayAddresses != null)
             {
-                @foreach (var uni in adapter.UnicastAddresses)
+                @foreach (var gw in adapter.GatewayAddresses)
                 {
                     <tr>
-                        <td class="col-md-2">Unicast Address</td>
-                        <td class="col-md-10">@uni</td>
+                        <td class="col-md-2">Gateway Address</td>
+                        <td class="col-md-10">@gw</td>
                     </tr>
                 }
             }
+
+            @if (adapter.IPv4AddressInfos != null)
+            {
+                <tr>
+                    <td class="col-md-2">IPv4 Addresses</td>
+                    <td class="col-md-10">
+                        <table class="table table-hover table-bordered">
+                            @foreach (var info in adapter.IPv4AddressInfos)
+                            {
+                                <tr>
+                                    <td class="col-md-2">IP Address</td>
+                                    <td class="col-md-10">@info.IPAddress</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-2">Subnet Mask</td>
+                                    <td class="col-md-10">@info.SubnetMask</td>
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                </tr>
+            }
+
+            @if (adapter.IPv6AddressInfos != null)
+            {
+                <tr>
+                    <td class="col-md-2">IPv6 Addresses</td>
+                    <td class="col-md-10">
+                        <table class="table table-hover table-bordered">
+                            @foreach (var info in adapter.IPv6AddressInfos)
+                            {
+                                <tr>
+                                    <td class="col-md-2">IP Address</td>
+                                    <td class="col-md-10">@info.IPAddress</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-2">Prefix Length</td>
+                                    <td class="col-md-10">@info.PrefixLength</td>
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                </tr>
+            }
+
             @if (adapter.WinsServers != null)
             {
                 @foreach (var wins in adapter.WinsServers)

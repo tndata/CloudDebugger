@@ -9,6 +9,8 @@ public class NetworkInterfaceModel
     public string? IPVersions { get; set; }
     public string? DnsSuffix { get; set; }
     public List<string>? DnsAddresses { get; set; }
-    public List<string>? UnicastAddresses { get; set; }
     public List<string>? WinsServers { get; set; }
+    public List<string>? GatewayAddresses { get; set; }
+    public List<IPAddressV4Info>? IPv4AddressInfos { get; set; }
+    public List<IPAddressV6Info>? IPv6AddressInfos { get; set; }
 }
