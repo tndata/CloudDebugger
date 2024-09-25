@@ -1,10 +1,13 @@
 ﻿@model CloudDebugger.Features.BlobStorage.BlobStorageModel
 @{
-    ViewData["Title"] = "AccessBlobs";
+    ViewData["Title"] = "Access Blob Storage";
 }
 
-<h1>AccessBlobs</h1>
-
+<h4>Access Blob Storage</h4>
+This tool allows you to create 
+<br />
+<a href="/BlobStorage">Back</a>
+<br>
 
 <form asp-controller="BlobStorage" asp-action="AccessBlobs" method="post">
 
@@ -29,7 +32,7 @@
             <td class="col-md-2">SAS Access key or<br /> SAS Token/URL</td>
             <td class="col-md-10">
                 <input asp-for="SASToken" style="min-width:100%"><br />
-                (If missing it will authenticate using DefaultAzureCredential)
+                (If missing it will authenticate using Managed Identity using DefaultAzureCredential)
             </td>
         </tr>
 
@@ -43,10 +46,8 @@
             <td class="col-md-6">
 
                 <!-- First Column start -->
-
-
-                <br />
                 <h5>Blobs in this container</h5>
+                @ViewData["authenticationApproach"]
                 <table class="table table-bordered">
 
                     @if (Model.ContainerContent.Count > 0)
@@ -149,3 +150,11 @@
     }
 
 </form>
+
+<br />
+<br />
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-AccessBlobs">Documentation</a></li>
+</ul>

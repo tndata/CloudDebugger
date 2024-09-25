@@ -2,19 +2,13 @@ using Azure.MyIdentity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Sas;
 using CloudDebugger.Features.FileSystem;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.BlobStorage;
 
-
 /// <summary>
-/// To get the User delegation key demo to work
-/// 1. Create a storage account named clouddebuggerstorage
-/// 2. In it, create a blog container named clouddebugger
-/// 3. In it, upload a blob named MyBlob.txt
-/// 4. On the storage account. Assign the role "Storage Blob Data Reader" to the identity of this tool.
+/// This tool allows you to read and write blobs to an Azure Storage Account.
 /// </summary>
 public class BlobStorageController : Controller
 {
@@ -30,97 +24,25 @@ public class BlobStorageController : Controller
         return View();
     }
 
-    [HttpGet]
-    public IActionResult GetUserDelegationSASToken()
-    {
-        var model = new UserDelegationModel();
-        return View(model);
-    }
-
-    /// <summary>
-    /// Resources:
-    /// https://learn.microsoft.com/en-us/azure/storage/common/storage-account-sas-create-dotnet
-    /// https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-dotnet
-    /// https://azure.microsoft.com/fr-fr/blog/announcing-user-delegation-sas-tokens-preview-for-azure-storage-blobs/ 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    [HttpPost]
-    public IActionResult GetUserDelegationSASToken(UserDelegationModel model)
-    {
-        _logger.LogInformation("GetUserDelegationSASToken was called");
-
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        if (model == null)
-            return View(new UserDelegationModel());
-
-        model.Message = "";
-        model.ErrorMessage = "";
-        model.SASToken = "";
-        model.DelegationKey = null;
-        ModelState.Clear();
-
-        try
-        {
-            var blobStorageUri = $"https://{model.StorageAccountName}.blob.core.windows.net";
-
-            // Step #1, get an authentication token from Entra ID
-            var credentials = new MyDefaultAzureCredential();
-
-            // Step #2, get a BlobServiceClient with these credentials
-            var client = new BlobServiceClient(new Uri(blobStorageUri), credentials);
-
-            // Step #3, get a user delegation key from Entra ID
-            var startsOn = DateTimeOffset.UtcNow.AddMinutes(-1); // To avoid clock skew issues
-            var expiresOn = startsOn.AddDays(1);                 // Max 7 days
-
-            var userDelegationKey = client.GetUserDelegationKey(startsOn, expiresOn);
-            model.DelegationKey = userDelegationKey;
-
-            // Step #4, Define the permissions for the SAS token
-            var sasBuilder = new BlobSasBuilder()
-            {
-                BlobContainerName = model.ContainerName,
-                BlobName = model.BlobName,
-                Resource = "b",
-                StartsOn = DateTimeOffset.UtcNow,
-                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
-            };
-
-            // Step #5, Specify the necessary permissions
-            sasBuilder.SetPermissions(BlobSasPermissions.Read);
-
-            // Step #6, Build the SAS token
-            model.SASToken = sasBuilder.ToSasQueryParameters(userDelegationKey, model.StorageAccountName).ToString();
-
-        }
-        catch (Exception exc)
-        {
-            string str = $"Exception:\r\n{exc.Message}";
-            model.ErrorMessage = str;
-        }
-
-        return View(model);
-    }
 
     [HttpGet]
     public IActionResult AccessBlobs()
     {
-        _logger.LogInformation("AccessBlobs was called");
-
-        var model = new BlobStorageModel();
+        var model = new BlobStorageModel()
+        {
+            StorageAccountName = "clouddebuggerstorage",
+            ContainerName = "clouddebugger",
+            BlobName = "MyBlob.txt"
+        };
 
         model.ContainerContent = TryGetContainerContent(model);
+
         return View(model);
     }
 
     [HttpPost]
     public IActionResult AccessBlobs(BlobStorageModel model, string button)
     {
-
-
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
@@ -155,19 +77,38 @@ public class BlobStorageController : Controller
             string str = $"Exception:\r\n{exc.Message}";
             model.ErrorMessage = str;
 
+
+        }
+
+        try
+        {
             model.ContainerContent = TryGetContainerContent(model);
+        }
+        catch (Exception exc)
+        {
+            string str = $"Exception:\r\n{exc.Message}";
+            model.ErrorMessage = str;
         }
 
         return View(model);
     }
 
-    private static List<(string name, string size)> TryGetContainerContent(BlobStorageModel model)
+
+
+    /// <summary>
+    /// Try to get a list of all the blobs for a given container
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns>Returns an empty list if it can't access the content</returns>
+    private List<(string name, string size)> TryGetContainerContent(BlobStorageModel model)
     {
         try
         {
+            var containerName = model.ContainerName?.Trim() ?? "";
+
             var client = GetBlobServiceClient(model);
 
-            var container = client.GetBlobContainerClient(model.ContainerName);
+            var container = client.GetBlobContainerClient(containerName);
 
             var blobs = container.GetBlobs().ToList();
 
@@ -189,7 +130,7 @@ public class BlobStorageController : Controller
         }
     }
 
-    private static string? LoadBlob(BlobStorageModel model)
+    private string? LoadBlob(BlobStorageModel model)
     {
         var client = GetBlobServiceClient(model);
 
@@ -201,7 +142,7 @@ public class BlobStorageController : Controller
     }
 
 
-    private static void WriteBlob(BlobStorageModel model)
+    private void WriteBlob(BlobStorageModel model)
     {
         var client = GetBlobServiceClient(model);
 
@@ -214,57 +155,64 @@ public class BlobStorageController : Controller
 
     /// <summary>
     /// Get a BlobServiceClient 
-    /// 
     /// Supports:
     /// * Connection string     "BlobEndpoint=https://clouddebuggerstorage.blob.core.windows.net/;..."
     /// * SAS token             "sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2024-08-21T21:31:22Z&st=2..."
     /// * Blob service SAS URL  "https://clouddebuggerstorage.blob.core.windows.net/?sv=2022-11-02&ss=bf..."
     /// * Access token          "8v9oGniVMKa2Oy495obZ6qc/+xz+mX0bIPPVO65sO1SKOe9b1MrOvpyRJXJzvdWNAT8b/5IQ1z..."
     /// * Managed Identity
+    /// 
+    /// Resources:
+    /// https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string
+    /// https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-dotnet-get-started?tabs=sas-token
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    private static BlobServiceClient GetBlobServiceClient(BlobStorageModel model)
+    private BlobServiceClient GetBlobServiceClient(BlobStorageModel model)
     {
-        //https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string
-        //https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-dotnet-get-started?tabs=sas-token
+        var storageAccountName = model.StorageAccountName?.ToLower().Trim() ?? "";
+        var sasToken = model.SASToken?.Trim() ?? "";
 
-        var options = new BlobClientOptions()
+        var storageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
+
+        var blobOptions = new BlobClientOptions()
         {
-            //TODO: 
         };
 
-        var storageUri = new Uri($"https://{model.StorageAccountName}.blob.core.windows.net");
-
-        if (string.IsNullOrEmpty(model.SASToken))
+        if (string.IsNullOrEmpty(sasToken))
         {
             //Use managed identity
+            ViewData["authenticationApproach"] = "Authenticated using managed identity";
             var credentials = new MyDefaultAzureCredential();
-            return new BlobServiceClient(storageUri, credentials, options);
+            return new BlobServiceClient(storageUri, credentials, blobOptions);
         }
         else
         {
-            if (model.SASToken.StartsWith("BlobEndpoint"))
+            if (sasToken.StartsWith("BlobEndpoint"))
             {
                 // SAS Connection string
-                return new BlobServiceClient(model.SASToken.ToString(), options);
+                ViewData["authenticationApproach"] = "Authenticated using SAS Connection string";
+                return new BlobServiceClient(sasToken.ToString(), blobOptions);
             }
-            else if (model.SASToken.StartsWith("http"))
+            else if (sasToken.StartsWith("http"))
             {
                 // SAS Connection string
-                return new BlobServiceClient(new Uri(model.SASToken), options);
+                ViewData["authenticationApproach"] = "Authenticated using SAS Connection string";
+                return new BlobServiceClient(new Uri(sasToken), blobOptions);
             }
-            else if (model.SASToken.Contains("sig="))
+            else if (sasToken.Contains("sig="))
             {
                 // SAS token
-                var url = new Uri($"{storageUri}?{model.SASToken}");
-                return new BlobServiceClient(url, options);
+                ViewData["authenticationApproach"] = "Authenticated using SAS token";
+                var url = new Uri($"{storageUri}?{sasToken}");
+                return new BlobServiceClient(url, blobOptions);
             }
             else
             {
                 // Account access key
-                var sharedKeyCredential = new StorageSharedKeyCredential(model.StorageAccountName, model.SASToken);
-                return new BlobServiceClient(storageUri, sharedKeyCredential, options);
+                ViewData["authenticationApproach"] = "Authenticated using account access key";
+                var sharedKeyCredential = new StorageSharedKeyCredential(storageAccountName, sasToken);
+                return new BlobServiceClient(storageUri, sharedKeyCredential, blobOptions);
             }
         }
     }

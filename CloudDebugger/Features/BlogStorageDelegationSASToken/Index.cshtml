@@ -1,16 +1,19 @@
-﻿@model CloudDebugger.Features.BlobStorage.UserDelegationModel
+﻿@model CloudDebugger.Features.BlogStorageDelegationSASToken.UserDelegationModel
 @{
     ViewData["Title"] = "Create a user delegate SAS token";
 }
 
 <h4>Get a user delegation SAS token</h4>
-This tool will genereate a user delegation access token, that then ca be used anyone out side azure to read a specific blob.<br />
+This tool will genereate a user delegation access token, that then ca be used anyone out side azure to read a specific blob.
+<br />
+<a href="/BlobStorage">Back</a>
+
+<br />
 <br />
 
 To get this to work, the following requirements must be met:
 <ul>
     <li>The CloudDebugger must be able to authenticate against Entra ID (DefaultAzureCredentials)</li>
-    <li>The CloudDebugger must have access to the storage account</li>
     <li>
         The CloudDebugger must have one of these roles set on the storage account level:
         <ul>
@@ -39,32 +42,35 @@ To get this to work, the following requirements must be met:
 
 <br />
 <h4>Storage account and blob details</h4>
-<form asp-controller="BlobStorage" asp-action="GetUserDelegationSASToken" method="post">
+<form asp-controller="BlogStorageDelegationSASToken" asp-action="Index" method="post">
 
     <table class="table">
         <tr>
-            <td class="col-md-2">
+            <td class="col-md-4">
                 Storage account name
             </td>
-            <td class="col-md-10">
-                <input asp-for="StorageAccountName" style="min-width:30%">
+            <td class="col-md-8">
+                <input asp-for="StorageAccountName" style="min-width:60%">
+                <span asp-validation-for="StorageAccountName"></span>
             </td>
         </tr>
         <tr>
-            <td class="col-md-2">Container name</td>
-            <td class="col-md-6">
-                <input asp-for="ContainerName" style="min-width:30%">
+            <td class="col-md-4">
+                Container name
+                </td>
+            <td class="col-md-8">
+                <input asp-for="ContainerName" style="min-width:60%">
                 <span asp-validation-for="ContainerName"></span>
             </td>
-            <td class="col-md-4"></td>
         </tr>
         <tr>
-            <td class="col-md-2">Blob name</td>
-            <td class="col-md-6">
-                <input asp-for="BlobName" style="min-width:30%">
+            <td class="col-md-4">
+                Blob name
+            </td>
+            <td class="col-md-8">
+                <input asp-for="BlobName" style="min-width:60%">
                 <span asp-validation-for="BlobName"></span>
             </td>
-            <td class="col-md-4"></td>
         </tr>
 
     </table>
@@ -86,6 +92,12 @@ To get this to work, the following requirements must be met:
             <td class="col-md-2">SAS token</td>
             <td class="col-md-10">
                 <input asp-for="SASToken" style="min-width:100%"><br />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Blob URL</td>
+            <td class="col-md-10">
+                <input asp-for="BlobUrl" style="min-width:100%"><br />
             </td>
         </tr>
     </table>
@@ -157,3 +169,12 @@ To get this to work, the following requirements must be met:
 {
     <b>@Model.Message</b>
 }
+
+
+
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-delegationToken">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/rest/api/storageservices/create-user-delegation-sas">Create a user delegation SAS</a></li>
+</ul>

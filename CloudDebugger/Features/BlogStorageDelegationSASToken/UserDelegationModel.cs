@@ -1,14 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Azure.Storage.Blobs.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace CloudDebugger.Features.BlobStorage;
+namespace CloudDebugger.Features.BlogStorageDelegationSASToken;
 
-public class BlobStorageModel
+public class UserDelegationModel
 {
-    /// <summary>
-    /// Storage account SAS token (optional), if not provided, it will authenticate using DefaultAzureCredential 
-    /// </summary>
-    public string? SASToken { get; set; }
-
     /// <summary>
     /// Storage account name (must be lowercase)
     /// </summary>
@@ -27,15 +23,20 @@ public class BlobStorageModel
     [Required]
     public string? BlobName { get; set; }
 
-    public List<(string name, string size)> ContainerContent { get; set; } = [];
-
-    public string? FileContent { get; set; }
+    /// <summary>
+    /// Generated SAS token
+    /// </summary>
+    public string? SASToken { get; set; }
 
     /// <summary>
-    /// How did we try to authenticate?
+    /// Calculated blob URL
     /// </summary>
-    public string? AuthenticationApproach { get; set; }
+    public string? BlobUrl { get; set; }
 
+    /// <summary>
+    /// The delegation key received from Entra ID to sign the SAS token
+    /// </summary>
+    public UserDelegationKey? DelegationKey { get; set; }
 
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
