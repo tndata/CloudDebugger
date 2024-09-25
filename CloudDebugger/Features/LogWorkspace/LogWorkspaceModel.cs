@@ -5,11 +5,11 @@ namespace CloudDebugger.Features.LogWorkspace;
 public class LogWorkspaceModel
 {
     [Required]
-    public string? LogMessage { get; set; } = "This is my custom message";
+    public string? LogMessage { get; set; }
 
+    [Required]
     /// <summary>
     /// The name of the table to write to in Log Analytics workspace
-    /// We keep it hardcoded for now. The table will be automatically crated 
     /// </summary>
     public string? LogType { get; set; }
 

@@ -3,59 +3,67 @@ using System.Text.RegularExpressions;
 
 namespace CloudDebugger.Features.Logging;
 
+/// <summary>
+/// This tool will write a message to each of the 6 different log levels
+/// </summary>
 public class LoggingController : Controller
 {
-    private readonly ILogger<LoggingController> _logger;
+    private readonly ILoggerFactory loggerFactory;
 
-    public LoggingController(ILogger<LoggingController> logger)
+    public LoggingController(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        this.loggerFactory = loggerFactory;
     }
 
     public IActionResult Index()
     {
-        return View();
-    }
-
-    [HttpGet("/Logging/WriteToLog")]
-    public IActionResult GetWriteToLogPage(LoggingModel model)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        //TODO: Refactor!!
-        model ??= new LoggingModel();
-
-        return View("WriteToLog", model);
-    }
-
-    [HttpPost("/Logging/WriteToLog")]
-    public IActionResult WriteToLogAction(LoggingModel model)
-    {
-        if (ModelState.IsValid && model != null)
+        var model = new LoggingModel()
         {
-            string message = model.LogMessage ?? "This is my log message!";
+            LogMessage = "This is my log message!",
+            LogCategory = typeof(LoggingController).FullName
+        };
 
-            WriteToLog(message, LogLevel.Trace);
-            WriteToLog(message, LogLevel.Debug);
-            WriteToLog(message, LogLevel.Information);
-            WriteToLog(message, LogLevel.Warning);
-            WriteToLog(message, LogLevel.Error);
-            WriteToLog(message, LogLevel.Critical);
+        return View(model);
+    }
 
-            model.Message = "Log messages written successfully!";
+    [HttpPost]
+    public IActionResult Index(LoggingModel model)
+    {
+        try
+        {
+            model.Message = "";
+            model.Exception = "";
+
+            if (ModelState.IsValid)
+            {
+                string message = model.LogMessage ?? "This is my log message!";
+
+                WriteToLog(message, model.LogCategory, LogLevel.Trace);
+                WriteToLog(message, model.LogCategory, LogLevel.Debug);
+                WriteToLog(message, model.LogCategory, LogLevel.Information);
+                WriteToLog(message, model.LogCategory, LogLevel.Warning);
+                WriteToLog(message, model.LogCategory, LogLevel.Error);
+                WriteToLog(message, model.LogCategory, LogLevel.Critical);
+
+                model.Message = "Log messages written successfully!";
+            }
+        }
+        catch (Exception exc)
+        {
+            model.Exception = exc.ToString();
         }
 
-        return View("WriteToLog", model);
+        return View(model);
     }
 
-    private void WriteToLog(string message, LogLevel logLevel)
+    private void WriteToLog(string message, string? logCategory, LogLevel logLevel)
     {
         // Define the regex pattern to allow only spaces, numerical, and alphabetical characters
         string pattern = @"[^a-zA-Z0-9\s]";
         // Replace all unwanted characters with an empty string
         string filteredMessage = Regex.Replace(message, pattern, "", RegexOptions.None, TimeSpan.FromMilliseconds(250));
 
-        _logger.Log(logLevel, "This message was written with the {LogLevel} log level. {Message}", logLevel, filteredMessage);
+        var log = loggerFactory.CreateLogger(logCategory ?? typeof(LoggingController).FullName!);
+        log.Log(logLevel, "This message was written with the {LogLevel} log level. {Message}", logLevel, filteredMessage);
     }
 }

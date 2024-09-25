@@ -5,10 +5,13 @@ public class LoggingModel
     /// <summary>
     /// Message to write to the log
     /// </summary>
-    public string? LogMessage { get; set; } = "This is my log message!";
+    public string? LogMessage { get; set; }
 
     /// <summary>
-    /// Message to the user
+    /// The desired log category (typically the fully qualified type name, like MyApp.Controllers.HomeController)
     /// </summary>
+    public string? LogCategory { get; set; }
+
+    public string? Exception { get; set; }
     public string? Message { get; set; }
 }
