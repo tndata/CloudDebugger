@@ -10,65 +10,53 @@ public class LogWorkspaceController : Controller
 {
     private readonly ILogger<LogWorkspaceController> _logger;
 
-    //"remember" the workspaceId and workspaceKey
-
-    //TODO: Use session here
-    private static string workspaceId;
-    private static string workspaceKey;
-
-    // The name of the table to write to in Log Analytics workspace
-    // We keep it hardcoded for now. The table will be automatically created if not found. 
-    private const string logType = "MyApplicationLog";
+    private const string workspaceId = "LogAnalyticsWorkspaceId";
+    private const string workspaceKey = "LogAnalyticsWorkspaceKey";
+    private const int NumberOfLogStatementsToSend = 10;
 
     public LogWorkspaceController(ILogger<LogWorkspaceController> logger)
     {
         _logger = logger;
-
-        workspaceId = "";
-        workspaceKey = "";
     }
 
     public IActionResult Index()
     {
-        return View();
+        var model = new LogWorkspaceModel()
+        {
+            LogMessage = "This is my custom message",
+            LogType = "MyApplicationLog",
+            WorkspaceId = HttpContext.Session.GetString(workspaceId),
+            WorkspaceKey = HttpContext.Session.GetString(workspaceKey)
+        };
+
+        return View(model);
     }
 
-    [HttpGet("/LogWorkspace/SendEvents")]
-    public IActionResult GetSendEvents(LogWorkspaceModel model)
+    [HttpPost]
+    public async Task<IActionResult> Index(LogWorkspaceModel model)
     {
-        _logger.LogInformation("LogWorkspace.GetSendEvents was called");
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-
-        //TODO: Refactor!!
-        model ??= new LogWorkspaceModel();
-
-        model.WorkspaceId = workspaceId;
-        model.WorkspaceKey = workspaceKey;
-        model.LogType = logType;
-        ModelState.Clear();
-
-        return View("SendEvents", model);
-    }
-
-    [HttpPost("/LogWorkspace/SendEvents")]
-    public async Task<IActionResult> PostSendEvents(LogWorkspaceModel model)
-    {
-        _logger.LogInformation("LogWorkspace.PostSendEvents was called");
-
-        if (ModelState.IsValid && model != null && model.WorkspaceId != null && model.WorkspaceKey != null)
+        if (ModelState.IsValid && model != null)
         {
             try
             {
+                ArgumentNullException.ThrowIfNullOrEmpty(model.LogType);
+                ArgumentNullException.ThrowIfNullOrEmpty(model.WorkspaceId);
+                ArgumentNullException.ThrowIfNullOrEmpty(model.WorkspaceKey);
+
                 model.Exception = "";
                 model.Message = "";
 
-                var logStatements = GenerateLogStatements(model.LogMessage);
+                //Remember access ID and key
+                HttpContext.Session.SetString(workspaceId, model.WorkspaceId);
+                HttpContext.Session.SetString(workspaceKey, model.WorkspaceKey);
 
-                await SendLogStatements(logStatements, logType, model.WorkspaceId, model.WorkspaceKey);
+                var logStatements = GenerateSampleLogStatements(model.LogMessage);
 
-                model.Message = $"Log statements sent to table {logType} in your Log Analytics Workspace! It will take a few minutes before the data shows up in the table.";
+                await LogSender.SendLogStatements(logStatements, model.LogType!, model.WorkspaceId!, model.WorkspaceKey!);
+
+                model.Message = $"Log statements sent to table {model.LogType} in your Log Analytics Workspace! It will take a few minutes before the data shows up in your Workspace.";
+
+                _logger.LogInformation("Send log statements to Log Analytics Workspace.");
             }
             catch (Exception exc)
             {
@@ -77,27 +65,21 @@ public class LogWorkspaceController : Controller
             }
         }
 
-        return View("SendEvents", model);
+        return View(model);
     }
 
-    private static Task SendLogStatements(List<LogWorkspaceLogEntry> logStatements, string logType, string workspaceId, string workspaceKey)
-    {
-        return LogSender.SendLogStatements(logStatements, logType, workspaceId, workspaceKey);
-    }
-
-    private static List<LogWorkspaceLogEntry> GenerateLogStatements(string? logMessage)
+    private static List<LogWorkspaceLogEntry> GenerateSampleLogStatements(string? logMessage)
     {
         var tmp = new List<LogWorkspaceLogEntry>();
 
         var severity = new List<string>() { "Information", "Warning", "Error" };
+        var random = new Random();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < NumberOfLogStatementsToSend; i++)
         {
             //Select a random severity  
-            var random = new Random();
             var index = random.Next(severity.Count);
             var logData = new LogWorkspaceLogEntry()
-
             {
                 Message = logMessage + " #" + i,
                 Severity = severity[index],
