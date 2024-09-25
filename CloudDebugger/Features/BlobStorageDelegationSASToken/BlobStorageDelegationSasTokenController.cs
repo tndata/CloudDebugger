@@ -4,7 +4,7 @@ using Azure.Storage.Sas;
 using CloudDebugger.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.BlogStorageDelegationSASToken;
+namespace CloudDebugger.Features.BlobStorageDelegationSASToken;
 
 /// <summary>
 /// Create a user delegation SAS token
@@ -21,11 +21,11 @@ namespace CloudDebugger.Features.BlogStorageDelegationSASToken;
 /// https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-dotnet
 /// https://azure.microsoft.com/fr-fr/blog/announcing-user-delegation-sas-tokens-preview-for-azure-storage-blobs/ 
 /// </summary>
-public class BlogStorageDelegationSasTokenController : Controller
+public class BlobStorageDelegationSasTokenController : Controller
 {
-    private readonly ILogger<BlogStorageDelegationSasTokenController> _logger;
+    private readonly ILogger<BlobStorageDelegationSasTokenController> _logger;
 
-    public BlogStorageDelegationSasTokenController(ILogger<BlogStorageDelegationSasTokenController> logger)
+    public BlobStorageDelegationSasTokenController(ILogger<BlobStorageDelegationSasTokenController> logger)
     {
         _logger = logger;
     }

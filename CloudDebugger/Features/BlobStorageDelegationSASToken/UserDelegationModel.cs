@@ -1,7 +1,7 @@
 ﻿using Azure.Storage.Blobs.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace CloudDebugger.Features.BlogStorageDelegationSASToken;
+namespace CloudDebugger.Features.BlobStorageDelegationSASToken;
 
 public class UserDelegationModel
 {
