@@ -1,6 +1,7 @@
 using Azure.MyIdentity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
+using CloudDebugger.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.BlogStorageDelegationSASToken;
@@ -49,19 +50,19 @@ public class BlogStorageDelegationSasTokenController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
+        var storageAccountName = model.StorageAccountName?.ToLower().Trim().SanitizeInput() ?? "";
+        var containerName = model.ContainerName?.ToLower().Trim().SanitizeInput() ?? "";
+        string blobName = model.BlobName?.Trim() ?? "";
+
         try
         {
-            var storageAccountName = model.StorageAccountName?.ToLower().Trim() ?? "";
-            var containerName = model.ContainerName?.ToLower().Trim() ?? "";
-            string blobName = model.BlobName?.Trim() ?? "";
-
-            var blobStorageUri = $"https://{storageAccountName}.blob.core.windows.net";
+            var blobStorageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
 
             // Step #1, get an authentication token from Entra ID
             var credentials = new MyDefaultAzureCredential();
 
             // Step #2, get a BlobServiceClient with these credentials
-            var client = new BlobServiceClient(new Uri(blobStorageUri), credentials);
+            var client = new BlobServiceClient(blobStorageUri, credentials);
 
             // Step #3, get a user delegation key from Entra ID
             var startsOn = DateTimeOffset.UtcNow.AddMinutes(-1); // To avoid clock skew issues
@@ -92,7 +93,10 @@ public class BlogStorageDelegationSasTokenController : Controller
         {
             string str = $"Exception:\r\n{exc.Message}";
             model.ErrorMessage = str;
-            _logger.LogError(exc, "An error occurred while generating the SAS token for storage account {StorageAccountName}, container {ContainerName}, and blob {BlobName}.", model.StorageAccountName, model.ContainerName, model.BlobName);
+            _logger.LogError(exc, "An error occurred while generating the SAS token for storage account {StorageAccountName}, container {ContainerName}, and blob {BlobName}.",
+                                    storageAccountName,
+                                    containerName,
+                                    blobName.SanitizeInput());
         }
 
         return View(model);
