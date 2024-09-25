@@ -31,6 +31,12 @@ public class BlobStorageModel
 
     public string? FileContent { get; set; }
 
+    /// <summary>
+    /// How did we try to authenticate?
+    /// </summary>
+    public string? AuthenticationApproach { get; set; }
+
+
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
 }

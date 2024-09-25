@@ -46,10 +46,8 @@ This tool allows you to create
             <td class="col-md-6">
 
                 <!-- First Column start -->
-
-
-                <br />
                 <h5>Blobs in this container</h5>
+                @ViewData["authenticationApproach"]
                 <table class="table table-bordered">
 
                     @if (Model.ContainerContent.Count > 0)
