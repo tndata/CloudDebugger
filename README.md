@@ -6,19 +6,19 @@
 
 
 ### HTTP Request tools
-* [Request logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
-* [Current request viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
-* [Calling external APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
+* [Request Logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
+* [Current Request Viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
+* [Calling External APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
 
 
 ### Compute tools
 * [App Services - File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
-* [App Services - File Local cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
+* [App Services - File Local Cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 
 
 ### Storage tools
-* [Redis explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
-
+* [Blob Storage Tools](https://github.com/tndata/CloudDebugger/wiki/BlobStorage)
+* [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 
 ### Identity tools
 * [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
@@ -27,9 +27,15 @@
 * [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 ### Diagnostics and system information
-* [RuntimeDetails](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
-* [EnvironmentVariables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
-* [Network](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Environment Variables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+
+### Logging
+* [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
+* [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
+
+
 
 
 ### Related Azure blog posts:
