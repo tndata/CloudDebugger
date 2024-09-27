@@ -2,6 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.Caching;
 
+/// <summary>
+/// Caching and CDN tools
+/// 
+/// Provides different endpoints that demonstrate how to control the caching behavior. 
+/// This tool is useful for testing caching services like, like Azure CDN.
+/// 
+/// </summary>
 public class CachingController : Controller
 {
     public CachingController()
