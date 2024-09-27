@@ -40,13 +40,12 @@ public class ErrorsController : Controller
         throw new InvalidOperationException("This is an InvalidOperationException!");
     }
 
-    public IActionResult SlowPage()
+    public async Task<IActionResult> SlowPage()
     {
         _logger.LogInformation("The slow page was called (5 seconds delay)");
-        // Block the thread
-        Thread.Sleep(5000);
+
+        await Task.Delay(5000);
 
         return Content("Page is done!");
     }
-
 }
