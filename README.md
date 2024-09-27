@@ -15,7 +15,6 @@
 * [App Services - File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 * [App Services - File Local Cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 
-
 ### Storage tools
 * [Blob Storage Tools](https://github.com/tndata/CloudDebugger/wiki/BlobStorage)
 * [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
@@ -36,7 +35,8 @@
 * [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
 
-
+### Other tools
+* [Caching](https://github.com/tndata/CloudDebugger/wiki/Caching)
 
 
 ### Related Azure blog posts:
