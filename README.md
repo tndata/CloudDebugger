@@ -35,6 +35,9 @@
 * [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
 
+### Event and messaging
+* [Event Grid](https://github.com/tndata/CloudDebugger/wiki/EventGrid)
+
 ### Other tools
 * [Caching](https://github.com/tndata/CloudDebugger/wiki/Caching)
 

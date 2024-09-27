@@ -13,6 +13,7 @@ namespace CloudDebugger.Features.BlobStorage;
 public class BlobStorageController : Controller
 {
     private readonly ILogger<BlobStorageController> _logger;
+    private const string authenticationApproach = "authenticationApproach";
 
     public BlobStorageController(ILogger<BlobStorageController> logger)
     {
@@ -173,6 +174,7 @@ public class BlobStorageController : Controller
     {
         var storageAccountName = model.StorageAccountName?.ToLower().Trim() ?? "";
         var sasToken = model.SASToken?.Trim() ?? "";
+        ViewData[authenticationApproach] = "";
 
         var storageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
 
@@ -182,36 +184,48 @@ public class BlobStorageController : Controller
 
         if (string.IsNullOrEmpty(sasToken))
         {
-            //Use managed identity
-            ViewData["authenticationApproach"] = "Tried to authenticate using managed identity";
-            var credentials = new MyDefaultAzureCredential();
-            return new BlobServiceClient(storageUri, credentials, blobOptions);
+            //Try using managed identity
+            var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? "";
+
+            var defaultCredentialOptions = new DefaultAzureCredentialOptions();
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                ViewData[authenticationApproach] = "Tried to authenticate using system-assigned managed identity";
+            }
+            else
+            {
+                ViewData[authenticationApproach] = $"Tried to authenticate using-assigned managed identity, ClientID={clientId}";
+                defaultCredentialOptions.ManagedIdentityClientId = clientId;
+            }
+
+            return new BlobServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), blobOptions);
         }
         else
         {
             if (sasToken.StartsWith("BlobEndpoint"))
             {
                 // SAS Connection string
-                ViewData["authenticationApproach"] = "Tried to authenticate using SAS Connection string";
+                ViewData[authenticationApproach] = "Tried to authenticate using SAS Connection string";
                 return new BlobServiceClient(sasToken.ToString(), blobOptions);
             }
             else if (sasToken.StartsWith("http"))
             {
                 // SAS Connection string
-                ViewData["authenticationApproach"] = "Tried to authenticate using SAS Connection string";
+                ViewData[authenticationApproach] = "Tried to authenticate using SAS Connection string";
                 return new BlobServiceClient(new Uri(sasToken), blobOptions);
             }
             else if (sasToken.Contains("sig="))
             {
                 // SAS token
-                ViewData["authenticationApproach"] = "Tried to authenticate using SAS token";
+                ViewData[authenticationApproach] = "Tried to authenticate using SAS token";
                 var url = new Uri($"{storageUri}?{sasToken}");
                 return new BlobServiceClient(url, blobOptions);
             }
             else
             {
                 // Account access key
-                ViewData["authenticationApproach"] = "Tried to authenticate using account access key";
+                ViewData[authenticationApproach] = "Tried to authenticate using account access key";
                 var sharedKeyCredential = new StorageSharedKeyCredential(storageAccountName, sasToken);
                 return new BlobServiceClient(storageUri, sharedKeyCredential, blobOptions);
             }

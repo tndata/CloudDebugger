@@ -4,7 +4,11 @@
 }
 
 <h3>Send Events to Event Grid</h3>
-
+This tool will allow you to send events to an Event Grid topic
+<br />
+<a href="/EventGrid">Back</a>
+<br>
+<br>
 
 <form asp-controller="EventGrid" asp-action="SendEvents" method="post">
 
@@ -12,14 +16,14 @@
         <tr>
             <td class="col-md-2">AccessKey</td>
             <td class="col-md-10">
-                <input asp-for="AccessKey"><br />
+                <input asp-for="AccessKey" style="min-width:100%"><br />
                 (Optional, if missing it will authenticate using DefaultAzureCredential/ServicePrincipal)
             </td>
         </tr>
         <tr>
             <td class="col-md-2">Topic endpoint</td>
             <td class="col-md-6">
-                <input asp-for="TopicEndpoint" style="min-width:75%">
+                <input asp-for="TopicEndpoint" style="min-width:100%">
                 <span asp-validation-for="TopicEndpoint"></span>
             </td>
             <td class="col-md-4"></td>
@@ -45,12 +49,19 @@
 
 
     <br>
-    <input type="submit" name="submit" value="Send Events" /><br />
+    <button type="submit" name="button" value="eventgrid">Send EventGrid Events</button>
+    &nbsp;&nbsp;
+    <button type="submit" name="button" value="cloudevent">Send CloudEvents Events</button>
 
-    @if(!String.IsNullOrWhiteSpace(Model?.Exception))
+    <br />
+    <br />
+    @ViewData["authenticationApproach"]
+    <br />
+
+    @if(!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
     {
         <div class="alert alert-danger" role="alert">
-            <pre>@Model.Exception</pre>
+            <pre>@Model.ErrorMessage</pre>
         </div>
     }
 

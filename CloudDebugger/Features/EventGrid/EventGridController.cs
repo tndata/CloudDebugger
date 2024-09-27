@@ -2,11 +2,18 @@ using Azure;
 using Azure.Messaging;
 using Azure.Messaging.EventGrid;
 using Azure.MyIdentity;
+using CloudDebugger.Features.FileSystem;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.EventGrid;
 
 /// <summary>
+/// Event Grid
+/// ==========
+/// A simple tool to send custom events to Azure Event Grid
+/// 
+/// It will alternate between sending a OrderEvent and ProductEvent
+/// 
 /// Azure Event Grid client library for .NET
 /// https://learn.microsoft.com/en-us/dotnet/api/overview/azure/messaging.eventgrid-readme?view=azure-dotnet
 /// 
@@ -14,7 +21,9 @@ namespace CloudDebugger.Features.EventGrid;
 public class EventGridController : Controller
 {
     private readonly ILogger<EventGridController> _logger;
-    private const string sessionKey = "EventGridAccessKey";
+    private const string accessSessionKey = "EventGridAccessKey";
+    private const string topicSessionKey = "EventGridTopic";
+    private const string authenticationApproach = "authenticationApproach";
 
     public EventGridController(ILogger<EventGridController> logger)
     {
@@ -26,97 +35,105 @@ public class EventGridController : Controller
         return View();
     }
 
-    [HttpGet("/EventGrid/SendEvents")]
-    public IActionResult GetSendEvents(SendEventGridModel model)
+    [HttpGet]
+    public IActionResult SendEvents()
+    {
+        var model = new SendEventGridModel()
+        {
+            AccessKey = HttpContext.Session.GetString(accessSessionKey),
+            TopicEndpoint = HttpContext.Session.GetString(topicSessionKey)
+        };
+
+        return View(model);
+    }
+
+
+    [HttpPost]
+    public IActionResult SendEvents(SendEventGridModel model, string button)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        model ??= new SendEventGridModel();
-        model.AccessKey = HttpContext.Session.GetString(sessionKey);
+        if (model == null)
+            return View(new ReadWriteFilesModel());
 
-        return View("SendEvents", model);
+        model.Message = "";
+        model.ErrorMessage = "";
+        ModelState.Clear();
+        ViewData[authenticationApproach] = "";
+
+        string accessKey = model.AccessKey ?? "";
+        string topicEndpoint = model.TopicEndpoint ?? "";
+
+        //Remember access key and topic
+        HttpContext.Session.SetString(accessSessionKey, accessKey);
+        HttpContext.Session.SetString(topicSessionKey, topicEndpoint);
+
+        try
+        {
+            EventGridPublisherClient? client = CreateEventGridClient(accessKey, topicEndpoint);
+
+            switch (button)
+            {
+                case "eventgrid":
+                    SendEventGridEvents(model, client);
+                    break;
+                case "cloudevent":
+                    SendCloudEvents(model, client);
+                    break;
+            }
+        }
+        catch (Exception exc)
+        {
+            string str = $"Exception:\r\n{exc.Message}";
+            model.ErrorMessage = str;
+        }
+
+        return View(model);
     }
 
-    [HttpPost("/EventGrid/SendEvents")]
-    public IActionResult PostSendEvents(SendEventGridModel model)
+    private void SendCloudEvents(SendEventGridModel model, EventGridPublisherClient client)
     {
-        if (model != null && ModelState.IsValid)
+        int eventId = model.StartNumber;
+
+        for (int i = 0; i < model.NumberOfEvents; i++)
         {
-            string accessKey = model.AccessKey ?? "";
-            //Remember access key
-            HttpContext.Session.SetString(sessionKey, accessKey);
+            CloudEvent? @event = CreateCloudEvent(eventId);
 
-            model.Exception = "";
-            model.Message = "";
-            var userAssignedClientID = Environment.GetEnvironmentVariable("USERASSIGNEDCLIENTID") ?? "";
+            // Send the event
+            client.SendEventAsync(@event).Wait();
 
-            try
-            {
-                EventGridPublisherClient? client = CreateEventGridClient(accessKey, model.TopicEndpoint ?? "", userAssignedClientID);
+            _logger.LogInformation("Sent event to Event Grid {Subject} using the CloudEvent schema", @event.Subject);
 
-                int eventId = model.StartNumber;
-
-                for (int i = 0; i < model.NumberOfEvents; i++)
-                {
-                    CloudEvent? @event = CreateEvent(eventId);
-
-                    // Send the event
-                    client.SendEventAsync(@event).Wait();
-
-                    _logger.LogInformation("Sent event to Event Grid {Subject}:", @event.Subject);
-
-                    eventId++;
-                }
-
-                model.StartNumber = eventId;
-                model.Message = "Events sent!";
-
-                if (!string.IsNullOrWhiteSpace(userAssignedClientID))
-                {
-                    model.Message = model.Message + " Using Entra ID identity " + userAssignedClientID;
-                }
-            }
-            catch (Exception exc)
-            {
-                string msg = "";
-                if (!string.IsNullOrWhiteSpace(userAssignedClientID))
-                {
-                    msg = "Using Entra ID identity " + userAssignedClientID + "\r\n";
-                }
-
-                model.Exception = msg + exc.ToString();
-            }
+            eventId++;
         }
 
-        return View("SendEvents", model);
+        model.StartNumber = eventId;
+        model.Message = $"{model.NumberOfEvents} events sent using the CloudEvent schema!";
     }
 
-    private static EventGridPublisherClient CreateEventGridClient(string accessKey, string topicEndpoint, string userAssignedClientID)
+    private void SendEventGridEvents(SendEventGridModel model, EventGridPublisherClient client)
     {
-        if (string.IsNullOrWhiteSpace(accessKey))
+        int eventId = model.StartNumber;
+
+        for (int i = 0; i < model.NumberOfEvents; i++)
         {
-            var defaultCredentialOptions = new DefaultAzureCredentialOptions();
+            EventGridEvent? @event = CreateEventGridEvent(eventId);
 
-            // See https://github.com/microsoft/azure-container-apps/issues/442
-            // because one or more UserAssignedIdentity can be assigned to an Azure Resource, we have to be explicit about which one to use.
+            // Send the event
+            client.SendEventAsync(@event).Wait();
 
-            if (!string.IsNullOrWhiteSpace(userAssignedClientID))
-            {
-                defaultCredentialOptions.ManagedIdentityClientId = userAssignedClientID;
-            }
+            _logger.LogInformation("Sent event to Event Grid {Subject} using the EventGrid schema", @event.Subject);
 
-            return new EventGridPublisherClient(new Uri(topicEndpoint),
-                                                  new MyDefaultAzureCredential(defaultCredentialOptions));
+            eventId++;
         }
-        else
-        {
-            return new EventGridPublisherClient(new Uri(topicEndpoint),
-                                                new AzureKeyCredential(accessKey));
-        }
+
+        model.StartNumber = eventId;
+        model.Message = $"{model.NumberOfEvents} events sent using the EventGrid schema!";
     }
 
-    private static CloudEvent CreateEvent(int eventId)
+
+    private static CloudEvent CreateCloudEvent(int eventId)
     {
         if (eventId % 2 == 0)
         {
@@ -149,15 +166,82 @@ public class EventGridController : Controller
             return @event;
         }
     }
-}
 
-public class OrderEvent
-{
-    public int OrderId { get; set; }
-    public string? CustomerName { get; set; }
-}
-public class ProductEvent
-{
-    public int ProductId { get; set; }
-    public string? ProductName { get; set; }
+
+    private static EventGridEvent CreateEventGridEvent(int eventId)
+    {
+        if (eventId % 2 == 0)
+        {
+            var order = new OrderEvent()
+            {
+                OrderId = eventId,
+                CustomerName = "Customer " + eventId
+            };
+
+            var @event = new EventGridEvent(
+                subject: "Order" + order.OrderId,
+                eventType: "BusinessEvent.NewOrder",
+                dataVersion: "1.0",
+                data: order)
+            {
+                EventTime = DateTime.UtcNow
+            };
+
+            Console.WriteLine(@event.Subject);
+            return @event;
+        }
+        else
+        {
+            var product = new ProductEvent()
+            {
+                ProductId = eventId,
+                ProductName = "Product " + eventId
+            };
+
+            var @event = new EventGridEvent(
+                subject: "Product" + product.ProductId,
+                eventType: "BusinessEvent.NewProduct",
+                dataVersion: "1.0",
+                data: product)
+            {
+                EventTime = DateTime.UtcNow
+            };
+
+            return @event;
+        }
+    }
+
+
+    private EventGridPublisherClient CreateEventGridClient(string accessKey, string topicEndpoint)
+    {
+
+        if (string.IsNullOrWhiteSpace(accessKey))
+        {
+            // See https://github.com/microsoft/azure-container-apps/issues/442
+            // because one or more UserAssignedIdentity can be assigned to an Azure Resource, we have to be explicit about which one to use.
+
+            var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? "";
+
+            var defaultCredentialOptions = new DefaultAzureCredentialOptions();
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                ViewData[authenticationApproach] = "Tried to authenticate using system-assigned managed identity";
+            }
+            else
+            {
+                ViewData[authenticationApproach] = $"Tried to authenticate using-assigned managed identity, ClientId={clientId}";
+                defaultCredentialOptions.ManagedIdentityClientId = clientId;
+            }
+
+            return new EventGridPublisherClient(new Uri(topicEndpoint),
+                                                  new MyDefaultAzureCredential(defaultCredentialOptions));
+        }
+        else
+        {
+            ViewData[authenticationApproach] = "Tried to authenticate using access key";
+            return new EventGridPublisherClient(new Uri(topicEndpoint),
+                                                new AzureKeyCredential(accessKey));
+        }
+    }
 }
