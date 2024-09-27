@@ -29,6 +29,7 @@
 ### Diagnostics and system information
 * [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Environment Variables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 
 ### Logging
