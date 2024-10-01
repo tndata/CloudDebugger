@@ -13,9 +13,9 @@ namespace CloudDebugger.Features.Api;
 /// /api/echo           Returns back the received request headers as a JSON document.
 /// /api/time           Returns the current time as a string      
 /// </summary>
-[EnableCors("MyCorsPolicy_wildcard")]
 [Route("/api")]
 [ApiController]
+[EnableCors("MyCorsPolicy_wildcard")]
 public class ApiEndpointsController : ControllerBase
 {
     private readonly ILogger<ApiEndpointsController> _logger;

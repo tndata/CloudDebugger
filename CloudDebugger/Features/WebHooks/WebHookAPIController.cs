@@ -1,4 +1,5 @@
 ﻿using CloudDebugger.SharedCode.WebHooks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -13,6 +14,7 @@ namespace CloudDebugger.Features.WebHooks;
 /// /Hook4
 /// 
 /// </summary>
+[EnableCors("MyCorsPolicy_wildcard")]
 [Route("/")]
 [ApiController]
 public class WebHookApiController : ControllerBase
@@ -31,24 +33,28 @@ public class WebHookApiController : ControllerBase
     }
 
     [HttpPost("hook1")]
+    [HttpOptions("hook1")]
     public Task<IActionResult> Hook1()
     {
         return ProcessHook(1);
     }
 
     [HttpPost("hook2")]
+    [HttpOptions("hook2")]
     public Task<IActionResult> Hook2()
     {
         return ProcessHook(2);
     }
 
     [HttpPost("hook3")]
+    [HttpOptions("hook3")]
     public Task<IActionResult> Hook3()
     {
         return ProcessHook(3);
     }
 
     [HttpPost("hook4")]
+    [HttpOptions("hook4")]
     public Task<IActionResult> Hook4()
     {
         return ProcessHook(4);

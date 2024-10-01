@@ -48,10 +48,8 @@ Aeg-Event-Type: SubscriptionValidation
 
 ###
 
-# Eventgrid validation request
-OptIONS {{@hostname}}/hook{{hookId}}
-CLIENT-IP: 51.12.47.155:30343
-DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+### Eventgrid validation request
+OPTIONS {{hostname}}/hook{{hookId}}
 Max-Forwards: 10
 WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
 WebHook-Request-Callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/blobchanges2/validate?id=234AFE6A-A435-4D81-AC37-7E24F10BD31A&t=2024-08-22T14:06:42.7316312Z&apiVersion=2023-12-15-preview&token=iF2Tdqnmojm0l8DkE%2feAKoV8FUjNk1Kb1QyDn0trQnE%3d
@@ -61,10 +59,6 @@ X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corpor
 X-AppService-Proto: https
 X-Client-IP: 51.12.47.155
 X-Client-Port: 30343
-X-Forwarded-TlsVersion: 1.2
-X-Original-For: [::ffff:169.254.129.1]:50421
-X-Original-Proto: http
-X-Original-URL: /WebhookAdvanced/Hook1
 X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
 X-WAWS-Unencoded-URL: /WebhookAdvanced/Hook1
 
@@ -90,4 +84,22 @@ x-ms-containerapp-name: clouddebugger
 x-ms-containerapp-revision-name: clouddebugger--69zn5vw
 x-request-id: 092cfd9a-3ab2-4765-8548-91f86c5ea1df
 
+ 
+### Sample cloud events validation request
 
+OPTIONS {{hostname}}/hook{{hookId}}
+Max-Forwards: 10
+WebHook-Request-Origin: eventgrid.azure.net
+WebHook-Request-Callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/myeventsubscription/validate?id=75EAB6E5-DD6B-49FA-839F-1E6C45698EC0&t=2024-10-01T09:32:09.9335224Z&apiVersion=2023-12-15-preview&token=CnozdXI%2f9iXl00ZT0OIt11L0igEjYQ0CR7mJUo4fN7M%3d
+X-ARR-LOG-ID: f880cdcf-ba93-48f3-a585-433cf36d451b
+CLIENT-IP: 51.12.47.148:50055
+DISGUISED-HOST: as-clouddebugger-windows.azurewebsites.net
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Windows
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-windows.azurewebsites.net
+X-Forwarded-Proto: https
+X-AppService-Proto: https
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 07, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-Forwarded-TlsVersion: 1.2
+X-Forwarded-For: 51.12.47.148:50055
+X-Original-URL: /Hook1
+X-WAWS-Unencoded-URL: /Hook1
