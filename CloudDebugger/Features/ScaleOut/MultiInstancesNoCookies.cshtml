@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "CloudDebugger - Show multiple instances";
+}
+
+<h3>Show multiple instances</h3>
+Continuously load the ShowDetails page in multiple iframes while clearing all cookies to disrupt session
+affinity. This demonstrates load balancing in action.
+
+
+
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 50%;">
+            <iframe width="100%" height="430" border="0" id="frame1" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+        </td>
+        <td style="width: 50%;">
+            <iframe width="100%" height="430" border="0" id="frame2" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+
+        </td>
+
+    </tr>
+    <tr>
+        <td style="width: 50%;">
+            <iframe width="100%" height="430" border="0" id="frame3" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+        </td>
+        <td style="width: 50%;">
+            <iframe width="100%" height="430" border="0" id="frame4" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+        </td>
+    </tr>
+</table>
+
+<script>
+
+    function reloadIFrame(name) {
+
+        document.getElementById(name).src += '';
+    }
+
+    window.setInterval("reloadIFrame('frame1');", 500);
+    window.setInterval("reloadIFrame('frame2');", 500);
+    window.setInterval("reloadIFrame('frame3');", 500);
+    window.setInterval("reloadIFrame('frame4');", 500);
+
+
+
+</script>
