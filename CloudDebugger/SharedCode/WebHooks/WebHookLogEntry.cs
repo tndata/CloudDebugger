@@ -15,7 +15,7 @@ public class WebHookLogEntry
     public string? Url { get; set; }
 
     /// <summary>
-    /// The message subject field if present. 
+    /// The optional event message subject field if present. 
     /// </summary>
     public string? Subject { get; set; }
 
@@ -23,6 +23,11 @@ public class WebHookLogEntry
     /// The raw body of the request.
     /// </summary>
     public string? Body { get; set; }
+
+    /// <summary>
+    /// True if the body of the request is JSON
+    /// </summary>
+    public bool IsJSON { get; set; }
 
     /// <summary>
     /// HTTP method

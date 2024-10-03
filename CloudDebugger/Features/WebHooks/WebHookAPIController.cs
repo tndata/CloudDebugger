@@ -13,6 +13,16 @@ namespace CloudDebugger.Features.WebHooks;
 /// /Hook3
 /// /Hook4
 /// 
+/// These four endpoints will do the following:
+/// * Accept HTTP POST And OPTIONS requests
+/// * Get details about the request and then add it to the log
+/// * Optionally, send a callback request back to the caller for validation purposes
+/// * Supports Cloud events and Event Grid schema validation
+/// 
+/// 
+/// Options:
+/// * WebHookFailureEnable
+/// TODO:!!!
 /// </summary>
 [EnableCors("MyCorsPolicy_wildcard")]
 [Route("/")]
@@ -21,7 +31,7 @@ public class WebHookApiController : ControllerBase
 {
     private readonly ILogger<WebHookApiController> logger;
     private readonly IWebHookLog webHookLog;
-    private readonly IHubContext<WebHookHub> hubContext;
+    private readonly IHubContext<WebHookHub> signalRhubContext;
 
     public WebHookApiController(ILogger<WebHookApiController> logger,
                                 IWebHookLog webHookLog,
@@ -29,35 +39,28 @@ public class WebHookApiController : ControllerBase
     {
         this.logger = logger;
         this.webHookLog = webHookLog;
-        this.hubContext = hubContext;
+        this.signalRhubContext = hubContext;
     }
 
-    [HttpPost("hook1")]
-    [HttpOptions("hook1")]
-    public Task<IActionResult> Hook1()
-    {
-        return ProcessHook(1);
-    }
 
-    [HttpPost("hook2")]
-    [HttpOptions("hook2")]
-    public Task<IActionResult> Hook2()
+    /// <summary>
+    /// Accepts requests to the following endpoints:
+    /// 
+    /// /Hook1
+    /// /Hook2
+    /// /Hook3
+    /// /Hook4
+    /// </summary>
+    /// <returns></returns>
+    [Route("hook{id:int:min(1):max(4)}")]
+    public Task<IActionResult> Hook(int id)
     {
-        return ProcessHook(2);
-    }
+        if (Request.Method != "POST" && Request.Method != "OPTIONS")
+        {
+            return Task.FromResult<IActionResult>(Ok($"Webhook #{id} is responding, but only supports HTTP POST and OPTIONS requests"));
+        }
 
-    [HttpPost("hook3")]
-    [HttpOptions("hook3")]
-    public Task<IActionResult> Hook3()
-    {
-        return ProcessHook(3);
-    }
-
-    [HttpPost("hook4")]
-    [HttpOptions("hook4")]
-    public Task<IActionResult> Hook4()
-    {
-        return ProcessHook(4);
+        return ProcessHook(id);
     }
 
     private async Task<IActionResult> ProcessHook(int hookId)
@@ -65,17 +68,17 @@ public class WebHookApiController : ControllerBase
         IActionResult result;
         try
         {
-            var hookRequest = await WebHookUtility.GetRequestDetails(Request, logger);
+            var hookRequest = await WebHookUtility.GetRequestDetails(hookId, Request, logger);
 
             if (WebHookSettings.WebHookFailureEnabled)
             {
                 // Simulate a webhook failure by returning a HTTP 500 Server Errror back to the caller  
-                AddFailedWebHookEntryToLog(hookId, hookRequest);
+                AddFailedWebHookEntryToLog(hookRequest);
                 result = StatusCode(500);   //Error response
             }
             else
             {
-                AddWebHookEntryToLog(hookId, hookRequest);
+                AddWebHookEntryToLog(hookRequest);
                 await SendToSignalR(hookId, hookRequest);
                 result = Ok("OK");          //OK response
             }
@@ -83,13 +86,13 @@ public class WebHookApiController : ControllerBase
             WebHookValidation.CheckIfEventGridSchemaValdationRequest(e =>
                 {
                     //This lambda is called when a webhook validation request is sent back to the caller
-                    AddCallbackEntryToLog(hookId, e);
+                    AddCallbackEntryToLog(e);
 
                 }, hookRequest, logger);
             WebHookValidation.CheckIfCloudEventValidationRequest(HttpContext, e =>
                 {
                     //This lambda is called when a webhook validation request is sent back to the caller
-                    AddCallbackEntryToLog(hookId, e);
+                    AddCallbackEntryToLog(e);
 
                 }, hookRequest, logger);
 
@@ -126,7 +129,7 @@ public class WebHookApiController : ControllerBase
 
         var content = "[M]";
 
-        await hubContext.Clients.All.SendAsync(signalRMessage, color, content);
+        await signalRhubContext.Clients.All.SendAsync(signalRMessage, color, content);
     }
 
     /// <summary>
@@ -134,9 +137,9 @@ public class WebHookApiController : ControllerBase
     /// </summary>
     /// <param name="hookId"></param>
     /// <param name="entry"></param>
-    private void AddWebHookEntryToLog(int hookId, WebHookLogEntry entry)
+    private void AddWebHookEntryToLog(WebHookLogEntry entry)
     {
-        webHookLog.AddToLog(hookId, entry);
+        webHookLog.AddToLog(entry);
 
 
     }
@@ -146,10 +149,10 @@ public class WebHookApiController : ControllerBase
     /// </summary>
     /// <param name="hookId"></param>
     /// <param name="entry"></param>
-    private void AddFailedWebHookEntryToLog(int hookId, WebHookLogEntry entry)
+    private void AddFailedWebHookEntryToLog(WebHookLogEntry entry)
     {
-        entry.Comment = $"{entry.Comment} (Returned a HTPP 500 Server Error response to the caller for #{hookId})";
-        webHookLog.AddToLog(hookId, entry);
+        entry.Comment = $"{entry.Comment} (Returned a HTPP 500 Server Error response to the caller for #{entry.HookId})";
+        webHookLog.AddToLog(entry);
     }
 
     /// <summary>
@@ -157,9 +160,9 @@ public class WebHookApiController : ControllerBase
     /// </summary>
     /// <param name="hookId"></param>
     /// <param name="entry"></param>
-    private void AddCallbackEntryToLog(int hookId, WebHookLogEntry entry)
+    private void AddCallbackEntryToLog(WebHookLogEntry entry)
     {
-        webHookLog.AddToLog(hookId, entry);
+        webHookLog.AddToLog(entry);
     }
 
     /// <summary>
@@ -172,9 +175,10 @@ public class WebHookApiController : ControllerBase
         var entry = new WebHookLogEntry()
         {
             HookId = hookId,
+            EntryTime = DateTime.UtcNow,
         };
 
         entry.Comment = entry.Comment + $"\r\n" + exc.Message;
-        webHookLog.AddToLog(hookId, entry);
+        webHookLog.AddToLog(entry);
     }
 }

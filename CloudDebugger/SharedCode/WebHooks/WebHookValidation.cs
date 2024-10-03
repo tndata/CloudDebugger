@@ -65,7 +65,7 @@ public static class WebHookValidation
 
             logger.LogInformation("Received CLoudEvent  validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
 
-            SendCallBackRequest(LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
+            SendCallBackRequest(logEntry.HookId, LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
         }
     }
 
@@ -114,7 +114,7 @@ public static class WebHookValidation
 
             if (validationUrl != null)
             {
-                SendCallBackRequest(LogEventHandler, validationUrl, "Event Grid schema webhook confirmation request.");
+                SendCallBackRequest(logEntry.HookId, LogEventHandler, validationUrl, "Event Grid schema webhook confirmation request.");
             }
         }
     }
@@ -122,13 +122,14 @@ public static class WebHookValidation
 
 
 
-    private static void SendCallBackRequest(Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
+    private static void SendCallBackRequest(int hookId, Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
     {
         //Call the callBackUrl to confirm the webhoook
         ThreadPool.QueueUserWorkItem(delegate (object? state)
         {
             var newLogEntry = new WebHookLogEntry()
             {
+                HookId = hookId,
                 EntryTime = DateTime.UtcNow,
                 Url = callbackUrl,
                 HttpMethod = "GET",
