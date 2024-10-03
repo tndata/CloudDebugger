@@ -1,5 +1,8 @@
 ﻿using CloudDebugger.SharedCode.WebHooks;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Text;
+using System.Web;
 
 namespace CloudDebugger.Features.WebHooks;
 
@@ -32,35 +35,64 @@ public static class WebHookUtility
         logEntry.Body = "";
         if (request.ContentLength > 0)
         {
+            // Get the body
             using (var reader = new StreamReader(request.Body))
             {
                 logEntry.Body = await reader.ReadToEndAsync();
             }
 
-            //Optionally, do extra processing if the body is JSON
-            if (!string.IsNullOrEmpty(logEntry.Body) && logEntry.ContentType != null && logEntry.ContentType.Contains("json"))
+            if (!string.IsNullOrEmpty(logEntry.Body) && logEntry.ContentType != null)
             {
-                try
+                if (logEntry.ContentType.Contains("json"))
                 {
-                    //Make the JSON pretty.
-                    var obj = JToken.Parse(logEntry.Body);
-
-                    logEntry.IsJSON = true;
-                    logEntry.Body = obj.ToString();
-
-                    // Get the subject field if present
-                    dynamic dynObj = obj;
-                    if (dynObj != null)
+                    try
                     {
-                        logEntry.Subject = dynObj.subject ?? "";
+                        //Make the JSON pretty.
+                        var obj = JToken.Parse(logEntry.Body);
 
-                        logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
+                        logEntry.IsJSON = true;
+                        logEntry.Body = obj.ToString();
+
+                        // Get the subject field if present
+                        dynamic dynObj = obj;
+                        if (dynObj != null)
+                        {
+                            logEntry.Subject = dynObj.subject ?? "";
+
+                            logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
+                        }
+                    }
+                    catch
+                    {
+                        // If JSON parsing fails, keep the original result, ignore invalid JSON
+                        logEntry.Comment = "Invalid JSON";
                     }
                 }
-                catch
+
+                if (logEntry.ContentType.Contains("x-www-form-urlencoded"))
                 {
-                    // If JSON parsing fails, keep the original result, ignore invalid JSON
-                    logEntry.Comment = "Invalid JSON";
+                    try
+                    {
+                        var sb = new StringBuilder();
+
+                        string decodedString = WebUtility.UrlDecode(logEntry.Body);
+
+                        // Parse the URL-encoded string
+                        var queryParameters = HttpUtility.ParseQueryString(decodedString);
+
+                        foreach (string key in queryParameters.AllKeys)
+                        {
+                            sb.AppendLine($"{key}: {queryParameters[key]}");
+                        }
+
+                        //Append the parameters to the end
+                        logEntry.Body += $"\r\n\r\nDecoded parameters\r\n{sb.ToString()}\r\n";
+                    }
+                    catch
+                    {
+                        // If JSON parsing fails, keep the original result, ignore invalid data
+                        logEntry.Comment = "Invalid x-www-form-urlencoded body";
+                    }
                 }
             }
         }
@@ -74,6 +106,4 @@ public static class WebHookUtility
 
         return logEntry;
     }
-
-
 }

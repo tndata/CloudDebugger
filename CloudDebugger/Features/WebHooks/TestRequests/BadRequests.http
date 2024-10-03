@@ -1,40 +1,9 @@
-#@ hostname=https://as-clouddebugger-linux.azurewebsites.net/ 
 @hostname=https://localhost:5001
 @hookId=1
 
-### Azure Container Registry Webhooks
-### There is no validation done from Azure Contaner Registry side for the webhook URL.
+#Sample bad requests, for testing purposes
 
-# Sample Image push request
-POST {{hostname}}/hook{{hookId}}
-Content-Type: application/json; charset=utf-8
-
-{
-  "id": "9b17169d-bc07-4eb8-b918-31bf6e722089",
-  "timestamp": "2024-10-03T12:48:15.462377991Z",
-  "action": "push",
-  "target": {
-    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "size": 1788,
-    "digest": "sha256:a48fecdacb5e3bdf010874f6023937565b87da0b7c1ec7aaffc7d3860e2d9258",
-    "length": 1788,
-    "repository": "clouddebugger",
-    "tag": "latest"
-  },
-  "request": {
-    "id": "84557676-0f55-4da2-8e2c-af071614abc5",
-    "host": "tncontaineregistry.azurecr.io",
-    "method": "PUT",
-    "useragent": "docker/27.2.0 go/go1.21.13 git-commit/3ab5c7d kernel/5.15.133.1-microsoft-standard-WSL2 os/linux arch/amd64 UpstreamClient(Docker-Client/27.2.0 \\(windows\\))"
-  }
-}
-
-
-
-###
-
-
-# Sample corrupt request (invalid JSON)  (should not fail)
+# Sample corrupt request (invalid/corrupt JSON)  (should not fail)
 POST {{hostname}}/hook{{hookId}}
 Content-Type: application/json; charset=utf-8
 

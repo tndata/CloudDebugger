@@ -1,0 +1,454 @@
+@hostname=https://localhost:5001
+@hookId=1
+
+
+### Sample GitHub webhook events
+# There is no validation done from Azure Contaner Registry side for the webhook URL.
+
+
+POST {{hostname}}/hook{{hookId}}
+Accept: */*
+CLIENT-IP: 140.82.115.101:23520
+Content-Type: application/json
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+User-Agent: GitHub-Hookshot/ddd6d0e
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+X-ARR-LOG-ID: b50a856d-7c24-4237-9cee-2f82053d6156
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 140.82.115.101
+X-Client-Port: 23520
+X-Forwarded-TlsVersion: 1.3
+X-GitHub-Delivery: c6511570-81ae-11ef-84e9-59f61ebde9a3
+X-GitHub-Event: check_run
+X-GitHub-Hook-ID: 505291670
+X-GitHub-Hook-Installation-Target-ID: 840305948
+X-GitHub-Hook-Installation-Target-Type: repository
+X-Original-For: [::ffff:169.254.129.1]:18837
+X-Original-Proto: http
+X-Original-URL: /hook3
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /hook3
+
+{
+  "action": "created",
+  "check_run": {
+    "id": 31041969176,
+    "name": "Build and analyze",
+    "node_id": "CR_kwDOMhYNHM8AAAAHOj7cGA",
+    "head_sha": "74d4c8e1596586f7edf685e373bf27cf0655307e",
+    "external_id": "ca395085-040a-526b-2ce8-bdc85f692774",
+    "url": "https://api.github.com/repos/tndata/CloudDebugger/check-runs/31041969176",
+    "html_url": "https://github.com/tndata/CloudDebugger/actions/runs/11166926261/job/31041969176",
+    "details_url": "https://github.com/tndata/CloudDebugger/actions/runs/11166926261/job/31041969176",
+    "status": "queued",
+    "conclusion": null,
+    "started_at": "2024-10-03T17:41:52Z",
+    "completed_at": null,
+    "output": {
+      "title": null,
+      "summary": null,
+      "text": null,
+      "annotations_count": 0,
+      "annotations_url": "https://api.github.com/repos/tndata/CloudDebugger/check-runs/31041969176/annotations"
+    },
+    "check_suite": {
+      "id": 29180195147,
+      "node_id": "CS_kwDOMhYNHM8AAAAGy0ZxSw",
+      "head_branch": "webhooks",
+      "head_sha": "74d4c8e1596586f7edf685e373bf27cf0655307e",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://api.github.com/repos/tndata/CloudDebugger/check-suites/29180195147",
+      "before": "4de8e66a5c3cef16a0577a1975e902a645760728",
+      "after": "74d4c8e1596586f7edf685e373bf27cf0655307e",
+      "pull_requests": [
+        {
+          "url": "https://api.github.com/repos/tndata/CloudDebugger/pulls/65",
+          "id": 2105635831,
+          "number": 65,
+          "head": {
+            "ref": "webhooks",
+            "sha": "74d4c8e1596586f7edf685e373bf27cf0655307e",
+            "repo": {
+              "id": 840305948,
+              "url": "https://api.github.com/repos/tndata/CloudDebugger",
+              "name": "CloudDebugger"
+            }
+          },
+          "base": {
+            "ref": "main",
+            "sha": "fbb2bc658570d61aabcc94743cf71b62baf3899c",
+            "repo": {
+              "id": 840305948,
+              "url": "https://api.github.com/repos/tndata/CloudDebugger",
+              "name": "CloudDebugger"
+            }
+          }
+        }
+      ],
+      "app": {
+        "id": 15368,
+        "client_id": "Iv1.05c79e9ad1f6bdfa",
+        "slug": "github-actions",
+        "node_id": "MDM6QXBwMTUzNjg=",
+        "owner": {
+          "login": "github",
+          "id": 9919,
+          "node_id": "MDEyOk9yZ2FuaXphdGlvbjk5MTk=",
+          "avatar_url": "https://avatars.githubusercontent.com/u/9919?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/github",
+          "html_url": "https://github.com/github",
+          "followers_url": "https://api.github.com/users/github/followers",
+          "following_url": "https://api.github.com/users/github/following{/other_user}",
+          "gists_url": "https://api.github.com/users/github/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/github/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/github/subscriptions",
+          "organizations_url": "https://api.github.com/users/github/orgs",
+          "repos_url": "https://api.github.com/users/github/repos",
+          "events_url": "https://api.github.com/users/github/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/github/received_events",
+          "type": "Organization",
+          "site_admin": false
+        },
+        "name": "GitHub Actions",
+        "description": "Automate your workflow from idea to production",
+        "external_url": "https://help.github.com/en/actions",
+        "html_url": "https://github.com/apps/github-actions",
+        "created_at": "2018-07-30T09:30:17Z",
+        "updated_at": "2024-04-10T20:33:16Z",
+        "permissions": {
+          "actions": "write",
+          "administration": "read",
+          "attestations": "write",
+          "checks": "write",
+          "contents": "write",
+          "deployments": "write",
+          "discussions": "write",
+          "issues": "write",
+          "merge_queues": "write",
+          "metadata": "read",
+          "packages": "write",
+          "pages": "write",
+          "pull_requests": "write",
+          "repository_hooks": "write",
+          "repository_projects": "write",
+          "security_events": "write",
+          "statuses": "write",
+          "vulnerability_alerts": "read"
+        },
+        "events": [
+          "branch_protection_rule",
+          "check_run",
+          "check_suite",
+          "create",
+          "delete",
+          "deployment",
+          "deployment_status",
+          "discussion",
+          "discussion_comment",
+          "fork",
+          "gollum",
+          "issues",
+          "issue_comment",
+          "label",
+          "merge_group",
+          "milestone",
+          "page_build",
+          "project",
+          "project_card",
+          "project_column",
+          "public",
+          "pull_request",
+          "pull_request_review",
+          "pull_request_review_comment",
+          "push",
+          "registry_package",
+          "release",
+          "repository",
+          "repository_dispatch",
+          "status",
+          "watch",
+          "workflow_dispatch",
+          "workflow_run"
+        ]
+      },
+      "created_at": "2024-10-03T17:41:50Z",
+      "updated_at": "2024-10-03T17:41:50Z"
+    },
+    "app": {
+      "id": 15368,
+      "client_id": "Iv1.05c79e9ad1f6bdfa",
+      "slug": "github-actions",
+      "node_id": "MDM6QXBwMTUzNjg=",
+      "owner": {
+        "login": "github",
+        "id": 9919,
+        "node_id": "MDEyOk9yZ2FuaXphdGlvbjk5MTk=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/9919?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/github",
+        "html_url": "https://github.com/github",
+        "followers_url": "https://api.github.com/users/github/followers",
+        "following_url": "https://api.github.com/users/github/following{/other_user}",
+        "gists_url": "https://api.github.com/users/github/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/github/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/github/subscriptions",
+        "organizations_url": "https://api.github.com/users/github/orgs",
+        "repos_url": "https://api.github.com/users/github/repos",
+        "events_url": "https://api.github.com/users/github/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/github/received_events",
+        "type": "Organization",
+        "site_admin": false
+      },
+      "name": "GitHub Actions",
+      "description": "Automate your workflow from idea to production",
+      "external_url": "https://help.github.com/en/actions",
+      "html_url": "https://github.com/apps/github-actions",
+      "created_at": "2018-07-30T09:30:17Z",
+      "updated_at": "2024-04-10T20:33:16Z",
+      "permissions": {
+        "actions": "write",
+        "administration": "read",
+        "attestations": "write",
+        "checks": "write",
+        "contents": "write",
+        "deployments": "write",
+        "discussions": "write",
+        "issues": "write",
+        "merge_queues": "write",
+        "metadata": "read",
+        "packages": "write",
+        "pages": "write",
+        "pull_requests": "write",
+        "repository_hooks": "write",
+        "repository_projects": "write",
+        "security_events": "write",
+        "statuses": "write",
+        "vulnerability_alerts": "read"
+      },
+      "events": [
+        "branch_protection_rule",
+        "check_run",
+        "check_suite",
+        "create",
+        "delete",
+        "deployment",
+        "deployment_status",
+        "discussion",
+        "discussion_comment",
+        "fork",
+        "gollum",
+        "issues",
+        "issue_comment",
+        "label",
+        "merge_group",
+        "milestone",
+        "page_build",
+        "project",
+        "project_card",
+        "project_column",
+        "public",
+        "pull_request",
+        "pull_request_review",
+        "pull_request_review_comment",
+        "push",
+        "registry_package",
+        "release",
+        "repository",
+        "repository_dispatch",
+        "status",
+        "watch",
+        "workflow_dispatch",
+        "workflow_run"
+      ]
+    },
+    "pull_requests": [
+      {
+        "url": "https://api.github.com/repos/tndata/CloudDebugger/pulls/65",
+        "id": 2105635831,
+        "number": 65,
+        "head": {
+          "ref": "webhooks",
+          "sha": "74d4c8e1596586f7edf685e373bf27cf0655307e",
+          "repo": {
+            "id": 840305948,
+            "url": "https://api.github.com/repos/tndata/CloudDebugger",
+            "name": "CloudDebugger"
+          }
+        },
+        "base": {
+          "ref": "main",
+          "sha": "fbb2bc658570d61aabcc94743cf71b62baf3899c",
+          "repo": {
+            "id": 840305948,
+            "url": "https://api.github.com/repos/tndata/CloudDebugger",
+            "name": "CloudDebugger"
+          }
+        }
+      }
+    ]
+  },
+  "repository": {
+    "id": 840305948,
+    "node_id": "R_kgDOMhYNHA",
+    "name": "CloudDebugger",
+    "full_name": "tndata/CloudDebugger",
+    "private": false,
+    "owner": {
+      "login": "tndata",
+      "id": 1168249,
+      "node_id": "MDQ6VXNlcjExNjgyNDk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1168249?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tndata",
+      "html_url": "https://github.com/tndata",
+      "followers_url": "https://api.github.com/users/tndata/followers",
+      "following_url": "https://api.github.com/users/tndata/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tndata/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tndata/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tndata/subscriptions",
+      "organizations_url": "https://api.github.com/users/tndata/orgs",
+      "repos_url": "https://api.github.com/users/tndata/repos",
+      "events_url": "https://api.github.com/users/tndata/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tndata/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "html_url": "https://github.com/tndata/CloudDebugger",
+    "description": "CloudDebugger - the exploration tool for Azure cloud developers",
+    "fork": false,
+    "url": "https://api.github.com/repos/tndata/CloudDebugger",
+    "forks_url": "https://api.github.com/repos/tndata/CloudDebugger/forks",
+    "keys_url": "https://api.github.com/repos/tndata/CloudDebugger/keys{/key_id}",
+    "collaborators_url": "https://api.github.com/repos/tndata/CloudDebugger/collaborators{/collaborator}",
+    "teams_url": "https://api.github.com/repos/tndata/CloudDebugger/teams",
+    "hooks_url": "https://api.github.com/repos/tndata/CloudDebugger/hooks",
+    "issue_events_url": "https://api.github.com/repos/tndata/CloudDebugger/issues/events{/number}",
+    "events_url": "https://api.github.com/repos/tndata/CloudDebugger/events",
+    "assignees_url": "https://api.github.com/repos/tndata/CloudDebugger/assignees{/user}",
+    "branches_url": "https://api.github.com/repos/tndata/CloudDebugger/branches{/branch}",
+    "tags_url": "https://api.github.com/repos/tndata/CloudDebugger/tags",
+    "blobs_url": "https://api.github.com/repos/tndata/CloudDebugger/git/blobs{/sha}",
+    "git_tags_url": "https://api.github.com/repos/tndata/CloudDebugger/git/tags{/sha}",
+    "git_refs_url": "https://api.github.com/repos/tndata/CloudDebugger/git/refs{/sha}",
+    "trees_url": "https://api.github.com/repos/tndata/CloudDebugger/git/trees{/sha}",
+    "statuses_url": "https://api.github.com/repos/tndata/CloudDebugger/statuses/{sha}",
+    "languages_url": "https://api.github.com/repos/tndata/CloudDebugger/languages",
+    "stargazers_url": "https://api.github.com/repos/tndata/CloudDebugger/stargazers",
+    "contributors_url": "https://api.github.com/repos/tndata/CloudDebugger/contributors",
+    "subscribers_url": "https://api.github.com/repos/tndata/CloudDebugger/subscribers",
+    "subscription_url": "https://api.github.com/repos/tndata/CloudDebugger/subscription",
+    "commits_url": "https://api.github.com/repos/tndata/CloudDebugger/commits{/sha}",
+    "git_commits_url": "https://api.github.com/repos/tndata/CloudDebugger/git/commits{/sha}",
+    "comments_url": "https://api.github.com/repos/tndata/CloudDebugger/comments{/number}",
+    "issue_comment_url": "https://api.github.com/repos/tndata/CloudDebugger/issues/comments{/number}",
+    "contents_url": "https://api.github.com/repos/tndata/CloudDebugger/contents/{+path}",
+    "compare_url": "https://api.github.com/repos/tndata/CloudDebugger/compare/{base}...{head}",
+    "merges_url": "https://api.github.com/repos/tndata/CloudDebugger/merges",
+    "archive_url": "https://api.github.com/repos/tndata/CloudDebugger/{archive_format}{/ref}",
+    "downloads_url": "https://api.github.com/repos/tndata/CloudDebugger/downloads",
+    "issues_url": "https://api.github.com/repos/tndata/CloudDebugger/issues{/number}",
+    "pulls_url": "https://api.github.com/repos/tndata/CloudDebugger/pulls{/number}",
+    "milestones_url": "https://api.github.com/repos/tndata/CloudDebugger/milestones{/number}",
+    "notifications_url": "https://api.github.com/repos/tndata/CloudDebugger/notifications{?since,all,participating}",
+    "labels_url": "https://api.github.com/repos/tndata/CloudDebugger/labels{/name}",
+    "releases_url": "https://api.github.com/repos/tndata/CloudDebugger/releases{/id}",
+    "deployments_url": "https://api.github.com/repos/tndata/CloudDebugger/deployments",
+    "created_at": "2024-08-09T12:11:41Z",
+    "updated_at": "2024-10-03T10:18:25Z",
+    "pushed_at": "2024-10-03T17:41:46Z",
+    "git_url": "git://github.com/tndata/CloudDebugger.git",
+    "ssh_url": "git@github.com:tndata/CloudDebugger.git",
+    "clone_url": "https://github.com/tndata/CloudDebugger.git",
+    "svn_url": "https://github.com/tndata/CloudDebugger",
+    "homepage": "",
+    "size": 1817,
+    "stargazers_count": 0,
+    "watchers_count": 0,
+    "language": "C#",
+    "has_issues": true,
+    "has_projects": true,
+    "has_downloads": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_discussions": false,
+    "forks_count": 0,
+    "mirror_url": null,
+    "archived": false,
+    "disabled": false,
+    "open_issues_count": 21,
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "allow_forking": true,
+    "is_template": false,
+    "web_commit_signoff_required": false,
+    "topics": [
+      "asp-net-core",
+      "azure"
+    ],
+    "visibility": "public",
+    "forks": 0,
+    "open_issues": 21,
+    "watchers": 0,
+    "default_branch": "main"
+  },
+  "sender": {
+    "login": "tndata",
+    "id": 1168249,
+    "node_id": "MDQ6VXNlcjExNjgyNDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1168249?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tndata",
+    "html_url": "https://github.com/tndata",
+    "followers_url": "https://api.github.com/users/tndata/followers",
+    "following_url": "https://api.github.com/users/tndata/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tndata/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tndata/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tndata/subscriptions",
+    "organizations_url": "https://api.github.com/users/tndata/orgs",
+    "repos_url": "https://api.github.com/users/tndata/repos",
+    "events_url": "https://api.github.com/users/tndata/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tndata/received_events",
+    "type": "User",
+    "site_admin": false
+  }
+}
+
+
+###
+
+#Sample GitHub webhook event (x-www-form-urlencoded encoded)
+POST {{hostname}}/hook{{hookId}}
+Accept: */*
+CLIENT-IP: 140.82.115.172:51184
+Content-Type: application/x-www-form-urlencoded
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+User-Agent: GitHub-Hookshot/ddd6d0e
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+X-ARR-LOG-ID: 558c7fd5-f425-4a18-a7c5-846ba19689ab
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 140.82.115.172
+X-Client-Port: 51184
+X-Forwarded-TlsVersion: 1.3
+X-GitHub-Delivery: 55f5ab20-81b2-11ef-9293-7e083e10f96f
+X-GitHub-Event: ping
+X-GitHub-Hook-ID: 505295774
+X-GitHub-Hook-Installation-Target-ID: 840305948
+X-GitHub-Hook-Installation-Target-Type: repository
+X-Original-For: [::ffff:169.254.129.1]:42553
+X-Original-Proto: http
+X-Original-URL: /hook4
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /hook4
+
+payload=%7B%22zen%22%3A%22Encourage+flow.%22%2C%22hook_id%22%3A505295774%2C%22hook%22%3A%7B%22type%22%3A%22Repository%22%2C%22id%22%3A505295774%2C%22name%22%3A%22web%22%2C%22active%22%3Atrue%2C%22events%22%3A%5B%22%2A%22%5D%2C%22config%22%3A%7B%22content_type%22%3A%22form%22%2C%22insecure_ssl%22%3A%220%22%2C%22url%22%3A%22https%3A%2F%2Fas-clouddebugger-linux.azurewebsites.net%2Fhook4%22%7D%2C%22updated_at%22%3A%222024-10-03T18%3A07%3A21Z%22%2C%22created_at%22%3A%222024-10-03T18%3A07%3A21Z%22%2C%22url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fhooks%2F505295774%22%2C%22test_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fhooks%2F505295774%2Ftest%22%2C%22ping_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fhooks%2F505295774%2Fpings%22%2C%22deliveries_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fhooks%2F505295774%2Fdeliveries%22%2C%22last_response%22%3A%7B%22code%22%3Anull%2C%22status%22%3A%22unused%22%2C%22message%22%3Anull%7D%7D%2C%22repository%22%3A%7B%22id%22%3A840305948%2C%22node_id%22%3A%22R_kgDOMhYNHA%22%2C%22name%22%3A%22CloudDebugger%22%2C%22full_name%22%3A%22tndata%2FCloudDebugger%22%2C%22private%22%3Afalse%2C%22owner%22%3A%7B%22login%22%3A%22tndata%22%2C%22id%22%3A1168249%2C%22node_id%22%3A%22MDQ6VXNlcjExNjgyNDk%3D%22%2C%22avatar_url%22%3A%22https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F1168249%3Fv%3D4%22%2C%22gravatar_id%22%3A%22%22%2C%22url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%22%2C%22html_url%22%3A%22https%3A%2F%2Fgithub.com%2Ftndata%22%2C%22followers_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Ffollowers%22%2C%22following_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Ffollowing%7B%2Fother_user%7D%22%2C%22gists_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fgists%7B%2Fgist_id%7D%22%2C%22starred_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fstarred%7B%2Fowner%7D%7B%2Frepo%7D%22%2C%22subscriptions_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fsubscriptions%22%2C%22organizations_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Forgs%22%2C%22repos_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Frepos%22%2C%22events_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fevents%7B%2Fprivacy%7D%22%2C%22received_events_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Freceived_events%22%2C%22type%22%3A%22User%22%2C%22site_admin%22%3Afalse%7D%2C%22html_url%22%3A%22https%3A%2F%2Fgithub.com%2Ftndata%2FCloudDebugger%22%2C%22description%22%3A%22CloudDebugger+-+the+exploration+tool+for+Azure+cloud+developers%22%2C%22fork%22%3Afalse%2C%22url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%22%2C%22forks_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fforks%22%2C%22keys_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fkeys%7B%2Fkey_id%7D%22%2C%22collaborators_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fcollaborators%7B%2Fcollaborator%7D%22%2C%22teams_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fteams%22%2C%22hooks_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fhooks%22%2C%22issue_events_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fissues%2Fevents%7B%2Fnumber%7D%22%2C%22events_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fevents%22%2C%22assignees_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fassignees%7B%2Fuser%7D%22%2C%22branches_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fbranches%7B%2Fbranch%7D%22%2C%22tags_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Ftags%22%2C%22blobs_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fgit%2Fblobs%7B%2Fsha%7D%22%2C%22git_tags_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fgit%2Ftags%7B%2Fsha%7D%22%2C%22git_refs_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fgit%2Frefs%7B%2Fsha%7D%22%2C%22trees_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fgit%2Ftrees%7B%2Fsha%7D%22%2C%22statuses_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fstatuses%2F%7Bsha%7D%22%2C%22languages_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Flanguages%22%2C%22stargazers_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fstargazers%22%2C%22contributors_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fcontributors%22%2C%22subscribers_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fsubscribers%22%2C%22subscription_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fsubscription%22%2C%22commits_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fcommits%7B%2Fsha%7D%22%2C%22git_commits_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fgit%2Fcommits%7B%2Fsha%7D%22%2C%22comments_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fcomments%7B%2Fnumber%7D%22%2C%22issue_comment_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fissues%2Fcomments%7B%2Fnumber%7D%22%2C%22contents_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fcontents%2F%7B%2Bpath%7D%22%2C%22compare_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fcompare%2F%7Bbase%7D...%7Bhead%7D%22%2C%22merges_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fmerges%22%2C%22archive_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2F%7Barchive_format%7D%7B%2Fref%7D%22%2C%22downloads_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fdownloads%22%2C%22issues_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fissues%7B%2Fnumber%7D%22%2C%22pulls_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fpulls%7B%2Fnumber%7D%22%2C%22milestones_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fmilestones%7B%2Fnumber%7D%22%2C%22notifications_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fnotifications%7B%3Fsince%2Call%2Cparticipating%7D%22%2C%22labels_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Flabels%7B%2Fname%7D%22%2C%22releases_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Freleases%7B%2Fid%7D%22%2C%22deployments_url%22%3A%22https%3A%2F%2Fapi.github.com%2Frepos%2Ftndata%2FCloudDebugger%2Fdeployments%22%2C%22created_at%22%3A%222024-08-09T12%3A11%3A41Z%22%2C%22updated_at%22%3A%222024-10-03T10%3A18%3A25Z%22%2C%22pushed_at%22%3A%222024-10-03T17%3A41%3A46Z%22%2C%22git_url%22%3A%22git%3A%2F%2Fgithub.com%2Ftndata%2FCloudDebugger.git%22%2C%22ssh_url%22%3A%22git%40github.com%3Atndata%2FCloudDebugger.git%22%2C%22clone_url%22%3A%22https%3A%2F%2Fgithub.com%2Ftndata%2FCloudDebugger.git%22%2C%22svn_url%22%3A%22https%3A%2F%2Fgithub.com%2Ftndata%2FCloudDebugger%22%2C%22homepage%22%3A%22%22%2C%22size%22%3A1817%2C%22stargazers_count%22%3A0%2C%22watchers_count%22%3A0%2C%22language%22%3A%22C%23%22%2C%22has_issues%22%3Atrue%2C%22has_projects%22%3Atrue%2C%22has_downloads%22%3Atrue%2C%22has_wiki%22%3Atrue%2C%22has_pages%22%3Afalse%2C%22has_discussions%22%3Afalse%2C%22forks_count%22%3A0%2C%22mirror_url%22%3Anull%2C%22archived%22%3Afalse%2C%22disabled%22%3Afalse%2C%22open_issues_count%22%3A21%2C%22license%22%3A%7B%22key%22%3A%22mit%22%2C%22name%22%3A%22MIT+License%22%2C%22spdx_id%22%3A%22MIT%22%2C%22url%22%3A%22https%3A%2F%2Fapi.github.com%2Flicenses%2Fmit%22%2C%22node_id%22%3A%22MDc6TGljZW5zZTEz%22%7D%2C%22allow_forking%22%3Atrue%2C%22is_template%22%3Afalse%2C%22web_commit_signoff_required%22%3Afalse%2C%22topics%22%3A%5B%22asp-net-core%22%2C%22azure%22%5D%2C%22visibility%22%3A%22public%22%2C%22forks%22%3A0%2C%22open_issues%22%3A21%2C%22watchers%22%3A0%2C%22default_branch%22%3A%22main%22%7D%2C%22sender%22%3A%7B%22login%22%3A%22tndata%22%2C%22id%22%3A1168249%2C%22node_id%22%3A%22MDQ6VXNlcjExNjgyNDk%3D%22%2C%22avatar_url%22%3A%22https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F1168249%3Fv%3D4%22%2C%22gravatar_id%22%3A%22%22%2C%22url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%22%2C%22html_url%22%3A%22https%3A%2F%2Fgithub.com%2Ftndata%22%2C%22followers_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Ffollowers%22%2C%22following_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Ffollowing%7B%2Fother_user%7D%22%2C%22gists_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fgists%7B%2Fgist_id%7D%22%2C%22starred_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fstarred%7B%2Fowner%7D%7B%2Frepo%7D%22%2C%22subscriptions_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fsubscriptions%22%2C%22organizations_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Forgs%22%2C%22repos_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Frepos%22%2C%22events_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Fevents%7B%2Fprivacy%7D%22%2C%22received_events_url%22%3A%22https%3A%2F%2Fapi.github.com%2Fusers%2Ftndata%2Freceived_events%22%2C%22type%22%3A%22User%22%2C%22site_admin%22%3Afalse%7D%7D
