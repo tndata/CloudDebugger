@@ -90,7 +90,7 @@ The documentation for this tool can be found in the <a href="https://github.com/
     //Check if this variable is preset in the environment, then Application Insights should be enabled.
     var appInsightsConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
 
-    if (string.IsNullOrEmpty(appInsightsConnectionString) == false)
+    if (!string.IsNullOrEmpty(appInsightsConnectionString))
     {
         <br /><br /><b>Application Insights enabled
         </b>
