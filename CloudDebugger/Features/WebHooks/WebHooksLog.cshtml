@@ -98,7 +98,7 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
                                 <br />
                             }
                             
-                            @if (hideHeaders == false)
+                            @if (!hideHeaders)
                             {
                                 @foreach (var header in entry.RequestHeaders)
                                 {
@@ -106,7 +106,7 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
                                 }
                             }
                        
-                            @if (hideBody == false && entry.Body != null && entry.Body.Length > 0)
+                            @if (!hideBody && entry.Body != null && entry.Body.Length > 0)
                             {
                                 <br />
                                 <pre>@entry.Body</pre>
