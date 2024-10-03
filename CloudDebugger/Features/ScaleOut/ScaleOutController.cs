@@ -30,6 +30,9 @@ public class ScaleOutController : Controller
     [HttpGet]
     public IActionResult ShowDetails(string clearcookies = "")
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         var model = new ScaleOutModel()
         {
             SiteName = Environment.GetEnvironmentVariable("APPSETTING_WEBSITE_SITE_NAME"),
@@ -51,12 +54,9 @@ public class ScaleOutController : Controller
         var hash = strHash % 255 * 255 * 255;
         var hexColor = hash.ToString("X");
 
-        var time = DateTime.UtcNow.ToString("HH:mm:ss");
-        var age = DateTime.UtcNow.Subtract(DebuggerSettings.StartupTime);
-
         model.BackgroundColor = hexColor;
 
-        if (string.IsNullOrEmpty(clearcookies) == false)
+        if (!string.IsNullOrEmpty(clearcookies))
         {
             Response.Headers["Clear-Site-Data"] = "\"cookies\"";
         }

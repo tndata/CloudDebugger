@@ -31,12 +31,12 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
     if (enableHookFailure)
     {
         @:WebHook endpoint returns 500 server error: <a href="/Webhooks/SetWebHookFailureMode/0?hookId=@HookId">(disable)</a>
-        <img src="/content/Info_icon_002.svg.png" width="24" id="icon2" />
+        <img src="/content/Info_icon_002.svg.png" alt="Information" width="24" id="icon2" />
     }
     else
     {
         @:WebHook endpoint: Functional <a href="/Webhooks/SetWebHookFailureMode/1?hookId=@HookId">(make hook endpoint fail)</a>
-        <img src="/content/Info_icon_002.svg.png" width="24" id="icon2" />
+        <img src="/content/Info_icon_002.svg.png" alt="Information" width="24" id="icon2" />
     }
     <br />
     if (hideHeaders)

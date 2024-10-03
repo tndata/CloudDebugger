@@ -17,7 +17,7 @@ public static class ExtensionsMethods
         // Define the regex pattern to allow only spaces, numerical, hyphen/minus and alphabetical characters
         string pattern = @"[^a-zA-Z0-9\s-]";
         // Replace all unwanted characters with an empty string
-        string filteredMessage = Regex.Replace(input, pattern, "");
+        string filteredMessage = Regex.Replace(input, pattern, "", RegexOptions.None, TimeSpan.FromMilliseconds(250));
 
         return filteredMessage;
     }

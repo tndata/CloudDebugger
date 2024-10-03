@@ -1,6 +1,6 @@
 ﻿namespace CloudDebugger.Features.ScaleOut;
 
-public class ScaleOutModel
+public record ScaleOutModel
 {
     public string? SiteName { get; internal set; }
     public string? HostName { get; internal set; }
