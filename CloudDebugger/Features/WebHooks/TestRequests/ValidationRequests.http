@@ -142,7 +142,7 @@ aeg-subscription-name: EVENTGRIDSCHEMASUB
     "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
     "eventTime": "2024-10-03T13:43:42.8765645Z",
     "metadataVersion": "1",
-    "dataVersion": "2"
+    "dataVersion": "2" 
   }
 ]
 
@@ -152,7 +152,6 @@ aeg-subscription-name: EVENTGRIDSCHEMASUB
 OPTIONS  {{hostname}}/hook{{hookId}} 
 CLIENT-IP: 51.12.47.159:65157
 DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
-Host: as-clouddebugger-linux.azurewebsites.net
 Max-Forwards: 10
 WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
 WebHook-Request-Callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/cloudeventsschemasub/validate?id=96DD3B04-10AB-4527-91A0-37457909A33D&t=2024-10-03T13:47:57.9844984Z&apiVersion=2023-12-15-preview&token=RKIAeiDJjKEa9uu%2bfSZKxh0rC142dOmOwohQtEwmtKY%3d
