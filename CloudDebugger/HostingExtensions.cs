@@ -39,7 +39,7 @@ internal static class HostingExtensions
 
 
     /// <summary>
-    /// Add and configure the request pipeline
+    /// Add and configure the request pipeline. Right now we display DeveloperExceptions in the browser. In the future we might want to add app.UseExceptionHandler("/Home/Error"); in production.
     /// </summary>
     /// <param name="app"></param>
     /// <returns></returns>
@@ -53,11 +53,6 @@ internal static class HostingExtensions
 
         app.MapHealthChecks("/healthz");
         app.MapHealthChecks("/health");
-
-        //if (!app.Environment.IsDevelopment())
-        //{
-        //    app.UseExceptionHandler("/Home/Error");
-        //}
 
         app.UseRouting();
 

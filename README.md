@@ -30,6 +30,7 @@
 * [Environment Variables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Scaleout](https://github.com/tndata/CloudDebugger/wiki/Scaleout)
 
 ### Logging
 * [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)

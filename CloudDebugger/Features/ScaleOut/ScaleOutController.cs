@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.ScaleOut;
 
+/// <summary>
+/// This tool is useful for testing the scale out capabilities of your application by calling the application from within four iframes on the same page.
+/// </summary>
 public class ScaleOutController : Controller
 {
-    private readonly ILogger<ScaleOutController> _logger;
-
-    public ScaleOutController(ILogger<ScaleOutController> logger)
+    public ScaleOutController()
     {
-        _logger = logger;
     }
 
     public IActionResult Index()
@@ -27,6 +27,11 @@ public class ScaleOutController : Controller
         return View();
     }
 
+    /// <summary>
+    /// Show the details about the current service instance
+    /// </summary>
+    /// <param name="clearcookies"></param>
+    /// <returns></returns>
     [HttpGet]
     public IActionResult ShowDetails(string clearcookies = "")
     {
@@ -47,25 +52,23 @@ public class ScaleOutController : Controller
             RunningTime = DateTime.UtcNow.Subtract(DebuggerSettings.StartupTime)
         };
 
-
         //Calculate a HTML color based on the hash of the model
         //So we can have a unique color per instance of this application    
         var strHash = model.GetHashCode();
         var hash = strHash % 255 * 255 * 255;
         var hexColor = hash.ToString("X");
-
         model.BackgroundColor = hexColor;
 
+        // If the clearcookies parameter is set, we will send a Clear-Site-Data header to the browser
         if (!string.IsNullOrEmpty(clearcookies))
         {
             Response.Headers["Clear-Site-Data"] = "\"cookies\"";
         }
 
-        // We don't want browser caching
+        // We don't want browser caching on this page.
         Response.Headers.CacheControl = "no-store, no-cache, max-age=0, must-revalidate, proxy-revalidate, private  ";
         Response.Headers.Pragma = "no-cache";
         Response.Headers.Expires = "0";
-
 
         return View(model);
     }
