@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.EventHub;
+﻿namespace CloudDebugger.Features.EventHubProduce.Events;
 
 public class EventHubOrderEvent
 {

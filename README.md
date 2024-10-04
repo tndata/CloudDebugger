@@ -38,6 +38,7 @@
 
 ### Event and messaging
 * [Event Grid](https://github.com/tndata/CloudDebugger/wiki/EventGrid)
+* [Event Hubs](https://github.com/tndata/CloudDebugger/wiki/EventHubs)
 * [WebHooks](https://github.com/tndata/CloudDebugger/wiki/Webhooks)
 
 ### Other tools

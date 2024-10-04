@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.EventHub;
+﻿namespace CloudDebugger.Features.EventHubProduce;
 
 public class EventHubLogEntry
 {
@@ -7,8 +7,6 @@ public class EventHubLogEntry
     public long Offset { get; set; }
 
     public string? PartitionId { get; set; }
-
-    public DateTime EntryTime { get; set; }
 
     public string? Body { get; set; }
 }

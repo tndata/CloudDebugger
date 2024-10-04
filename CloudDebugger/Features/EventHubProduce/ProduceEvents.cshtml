@@ -1,18 +1,22 @@
-﻿@model CloudDebugger.Features.EventHub.SendEventHubModel
+﻿@model CloudDebugger.Features.EventHubProduce.ProduceEventHubModel
 @{
     ViewData["Title"] = "CloudDebugger - Send events to Event Hub";
 }
 
 <h3>Send Events to Event Hub</h3>
+This tool allows you to send events to an Event Hub.
+<br />
+<a href="/EventHub">Back</a>
+<br>
+<br>
 
-
-<form asp-controller="EventHub" asp-action="SendEvents" method="post">
+<form asp-controller="EventHubProduce" asp-action="ProduceEvents" method="post">
 
     <table class="table">
         <tr>
             <td class="col-md-2">Connection String</td>
             <td class="col-md-10">
-                <input asp-for="ConnectionString" style="min-width:75%"><br />
+                <input asp-for="ConnectionString" style="min-width:100%"><br />
             </td>
         </tr>
         <tr>
@@ -31,17 +35,15 @@
             </td>
             <td class="col-md-8"></td>
         </tr>
-
     </table>
 
-
     <br>
-    <input type="submit" name="submit" value="Produce Events" /><br />
+    <input type="submit" name="submit" value="Send Events" /><br />
 
-    @if(!String.IsNullOrWhiteSpace(Model.Exception))
+    @if(!String.IsNullOrWhiteSpace(Model.ErrorMessage))
     {
         <div class="alert alert-danger" role="alert">
-            <pre>@Model.Exception</pre>
+            <pre>@Model.ErrorMessage</pre>
         </div>
     }
 
@@ -51,7 +53,6 @@
     }
 
 </form>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
