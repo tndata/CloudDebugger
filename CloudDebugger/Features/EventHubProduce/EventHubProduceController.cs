@@ -67,7 +67,7 @@ public class EventHubProduceController : Controller
 
             for (int i = 0; i < model.NumberOfEvents; i++)
             {
-                var (eventData, partitionKey) = CreateEvent(i);
+                var (eventData, partitionKey) = CreateEvent(eventId);
 
                 await SendEvent(producerClient, eventData, partitionKey: partitionKey);
 
