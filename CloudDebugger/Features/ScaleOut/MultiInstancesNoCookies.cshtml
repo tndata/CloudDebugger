@@ -14,20 +14,20 @@ affinity. This demonstrates load balancing in action.
 <table style="width: 100%;">
     <tr>
         <td style="width: 50%;">
-            <iframe width="100%" height="430" border="0" id="frame1" title="frame1" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+            <iframe width="100%" height="350" style="border: none;" id="frame1" title="frame1" src="/ScaleOut/ShowDetails?clearcookies=true&frame=1"></iframe>
         </td>
         <td style="width: 50%;">
-            <iframe width="100%" height="430" border="0" id="frame2" title="frame2" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+            <iframe width="100%" height="350" style="border: none;" id="frame2" title="frame2" src="/ScaleOut/ShowDetails?clearcookies=true&frame=2"></iframe>
 
         </td>
 
     </tr>
     <tr>
         <td style="width: 50%;">
-            <iframe width="100%" height="430" border="0" id="frame3" title="frame3" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+            <iframe width="100%" height="350" style="border: none;" id="frame3" title="frame3" src="/ScaleOut/ShowDetails?clearcookies=true&frame=3"></iframe>
         </td>
         <td style="width: 50%;">
-            <iframe width="100%" height="430" border="0" id="frame4" title="frame4" src="/ScaleOut/ShowDetails?clearcookies=true"></iframe>
+            <iframe width="100%" height="350" style="border: none;" id="frame4" title="frame4" src="/ScaleOut/ShowDetails?clearcookies=true&frame=4"></iframe>
         </td>
     </tr>
 </table>
@@ -39,8 +39,8 @@ affinity. This demonstrates load balancing in action.
         document.getElementById(name).src += '';
     }
 
-    window.setInterval("reloadIFrame('frame1');", 500);
-    window.setInterval("reloadIFrame('frame2');", 500);
-    window.setInterval("reloadIFrame('frame3');", 500);
-    window.setInterval("reloadIFrame('frame4');", 500);
+    window.setInterval(() => reloadIFrame('frame1'), 600);
+    window.setInterval(() => reloadIFrame('frame2'), 625);
+    window.setInterval(() => reloadIFrame('frame3'), 650);
+    window.setInterval(() => reloadIFrame('frame4'), 675);
 </script>

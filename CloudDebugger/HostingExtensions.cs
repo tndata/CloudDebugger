@@ -45,8 +45,8 @@ internal static class HostingExtensions
     /// <returns></returns>
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
-        // Custom middleware to capture the request body, used by the request logger tool
-        app.UseRequsetBodyCapture();
+        // Custom middleware to capture the request body, used by the UseMyHttpLogging module   
+        app.UseRequestBodyCapture();
         app.UseMyHttpLogging();
 
         app.UseStaticFiles();

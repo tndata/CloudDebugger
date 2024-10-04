@@ -8,7 +8,7 @@ public static class CustomMiddlewares
     /// This middleware is used to capture the request body. It is used by the Request Logger tool.
     /// </summary>
     /// <param name="app"></param>
-    public static void UseRequsetBodyCapture(this WebApplication app)
+    public static void UseRequestBodyCapture(this WebApplication app)
     {
         app.Use(async (context, next) =>
         {

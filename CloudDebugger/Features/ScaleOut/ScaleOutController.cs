@@ -1,5 +1,6 @@
 using CloudDebugger.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CloudDebugger.Features.ScaleOut;
 
@@ -40,11 +41,10 @@ public class ScaleOutController : Controller
 
         var model = new ScaleOutModel()
         {
-            SiteName = Environment.GetEnvironmentVariable("APPSETTING_WEBSITE_SITE_NAME"),
-            HostName = Environment.GetEnvironmentVariable("HOSTNAME"),
-
+            SiteName = TryGetSiteName(),
+            HostName = TryGetHostName(),
             PodIP = Environment.GetEnvironmentVariable("MY_POD_IP"),
-            IPAddress = Environment.GetEnvironmentVariable("WEBSITE_INFRASTRUCTURE_IP"),
+            IPAddress = TryGetLocalIPAddress(),
             InstanceId = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID"),
             ComputerName = Environment.GetEnvironmentVariable("COMPUTERNAME"),
 
@@ -52,12 +52,7 @@ public class ScaleOutController : Controller
             RunningTime = DateTime.UtcNow.Subtract(DebuggerSettings.StartupTime)
         };
 
-        //Calculate a HTML color based on the hash of the model
-        //So we can have a unique color per instance of this application    
-        var strHash = model.GetHashCode();
-        var hash = strHash % 255 * 255 * 255;
-        var hexColor = hash.ToString("X");
-        model.BackgroundColor = hexColor;
+        model.BackgroundColor = CalculateInstanceColor(model);
 
         // If the clearcookies parameter is set, we will send a Clear-Site-Data header to the browser
         if (!string.IsNullOrEmpty(clearcookies))
@@ -71,5 +66,55 @@ public class ScaleOutController : Controller
         Response.Headers.Expires = "0";
 
         return View(model);
+    }
+
+    private static string CalculateInstanceColor(ScaleOutModel model)
+    {
+        //Calculate a HTML color based on the hash of the model
+        //So we can have a unique color per instance of this application    
+        var strHash = model.GetHashCode();
+        var hash = strHash % 0xFFFFFF;
+        var hexColor = hash.ToString("X6"); // Format as a 6-digit hex value
+        return hexColor;
+    }
+
+    private static string? TryGetLocalIPAddress()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        var ipAddress = host.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                                                              !IPAddress.IsLoopback(ip));
+
+        if (ipAddress != null)
+        {
+            return ipAddress.ToString();
+        }
+        else
+        {
+            //Try this one as a backup
+            return Environment.GetEnvironmentVariable("WEBSITE_INFRASTRUCTURE_IP");
+        }
+    }
+
+    private static string? TryGetHostName()
+    {
+        var hostName = Environment.GetEnvironmentVariable("HOSTNAME");
+        if (string.IsNullOrEmpty(hostName))
+        {
+            //Container Apps specific instance indentifer
+            hostName = Environment.GetEnvironmentVariable("CONTAINER_APP_REPLICA_NAME");
+        }
+        return hostName;
+    }
+
+    private static string? TryGetSiteName()
+    {
+        var siteName = Environment.GetEnvironmentVariable("APPSETTING_WEBSITE_SITE_NAME");
+
+        if (string.IsNullOrEmpty(siteName))
+        {
+            //Container Apps specific instance name
+            siteName = Environment.GetEnvironmentVariable("CONTAINER_APP_NAME");
+        }
+        return siteName;
     }
 }
