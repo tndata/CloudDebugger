@@ -1,0 +1,138 @@
+@hostname=https://localhost:5001
+@hookId=1
+
+# Sample Event Grid Schema validation requests
+
+
+#Sample Event Grid validation request (array)
+POST {{hostname}}/hook{{hookId}}
+Content-Type: application/json; charset=utf-8
+Aeg-Event-Type: SubscriptionValidation
+
+[
+  {
+    "id": "01a07c63-4614-4839-ab71-d85778996402",
+    "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-dev/providers/microsoft.storage/storageaccounts/mytndatastorageaccount",
+    "subject": "",
+    "data": {
+      "validationCode": "2C59C8CA-B453-4FB0-9094-4C0DEAA4761A",
+      "validationUrl": "https://www.tn-data.se"
+    },
+    "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+    "eventTime": "2024-07-03T12:03:43.1634844Z",
+    "metadataVersion": "1",
+    "dataVersion": "2"
+  }
+]
+
+###
+
+
+#Sample Event Grid validation request (single object)
+POST {{hostname}}/hook{{hookId}}
+Content-Type: application/json; charset=utf-8
+Aeg-Event-Type: SubscriptionValidation
+
+{
+  "id": "01a07c63-4614-4839-ab71-d85778996402",
+  "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-dev/providers/microsoft.storage/storageaccounts/mytndatastorageaccount",
+  "subject": "",
+  "data": {
+    "validationCode": "2C59C8CA-B453-4FB0-9094-4C0DEAA4761A",
+    "validationUrl": "https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/blobsadded/validate?id=2C59C8CA-B453-4FB0-9094-4C0DEAA4761A&t=2024-07-03T12:03:43.1634232Z&apiVersion=2023-12-15-preview&token=gEYLdkoR1LChv9wp0DOXIefcvDS23IOkpkT5TBu0xgk%3d"
+  },
+  "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+  "eventTime": "2024-07-03T12:03:43.1634844Z",
+  "metadataVersion": "1",
+  "dataVersion": "2"
+}
+
+
+
+
+###
+
+# Sample event grid schema validation request (Should send a validation request to event grid)
+POST {{hostname}}/hook{{hookId}}
+CLIENT-IP: 51.12.47.159:34816
+Content-Type: application/json; charset=utf-8
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+X-ARR-LOG-ID: 74054a67-c35f-4af2-953d-947a5d1713f2
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 51.12.47.159
+X-Client-Port: 34816
+X-Forwarded-TlsVersion: 1.2
+X-Original-For: [::ffff:169.254.129.1]:53207
+X-Original-Proto: http
+X-Original-URL: /hook1
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /hook1
+aeg-data-version: 1
+aeg-delivery-count: 0
+aeg-event-type: SubscriptionValidation
+aeg-metadata-version: 0
+aeg-subscription-name: EVENTGRIDSCHEMASUB
+
+[
+  {
+    "id": "4ba32c73-7763-4c7c-8baf-6196c25c416c",
+    "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-CloudDebugger/providers/Microsoft.Storage/storageAccounts/clouddebuggerstorage",
+    "subject": "",
+    "data": {
+      "validationCode": "FC84B66C-7B58-405E-BE24-A87C494A1CC0",
+      "validationUrl": "https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/eventgridschemasub/validate?id=FC84B66C-7B58-405E-BE24-A87C494A1CC0&t=2024-10-03T13:43:42.8765034Z&apiVersion=2023-12-15-preview&token=icmN05ebGFuqLPGe5KaOVXAp7C9ls%2bD9amXLGOhuQgs%3d"
+    },
+    "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+    "eventTime": "2024-10-03T13:43:42.8765645Z",
+    "metadataVersion": "1",
+    "dataVersion": "2" 
+  }
+]
+
+###
+
+
+# Sample event grid schema validation request (Should send a validation request to event grid)
+POST {{hostname}}/hook{{hookId}}
+CLIENT-IP: 51.12.47.159:34823
+Content-Length: 764
+Content-Type: application/json; charset=utf-8
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Host: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+X-ARR-LOG-ID: fd828b2a-38bf-4e3c-a38a-55ee62dfe0b1
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 51.12.47.159
+X-Client-Port: 34823
+X-Forwarded-TlsVersion: 1.2
+X-Original-For: [::ffff:169.254.129.1]:33855
+X-Original-Proto: http
+X-Original-URL: /hook1
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /hook1
+aeg-data-version: 1
+aeg-delivery-count: 0
+aeg-event-type: SubscriptionValidation
+aeg-metadata-version: 0
+aeg-subscription-name: EVENTGRIDSUBSCRIPTION
+
+[
+  {
+    "id": "0588c8e0-193c-4c19-99ab-40f905173d12",
+    "topic": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-CloudDebugger/providers/Microsoft.Storage/storageAccounts/clouddebuggerstorage",
+    "subject": "",
+    "data": {
+      "validationCode": "194A76BD-17E0-41E4-BAEE-7FD21E27CE85",
+      "validationUrl": "https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/eventgridsubscription/validate?id=194A76BD-17E0-41E4-BAEE-7FD21E27CE85&t=2024-10-04T09:28:29.2050157Z&apiVersion=2023-12-15-preview&token=egZvMTdTIazJ5%2fKgBI1%2bh4xzaaGnciOXt3OYr9qJTmE%3d"
+    },
+    "eventType": "Microsoft.EventGrid.SubscriptionValidationEvent",
+    "eventTime": "2024-10-04T09:28:29.2050821Z",
+    "metadataVersion": "1",
+    "dataVersion": "2"
+  }
+]

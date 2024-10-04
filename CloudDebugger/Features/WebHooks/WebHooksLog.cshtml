@@ -63,7 +63,7 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
 
 <hr />
 <h4>Request log</h4>
-<a href="/Webhook/ClearWebHookLog?hookId=@HookId">Clear the log</a>
+<a href="/Webhooks/ClearWebHookLog?hookId=@HookId">Clear the log</a>
 
 
 
@@ -90,8 +90,13 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
                             @entry.EntryTime.ToString("hh:mm:ss")
                         </td>
                         <td colspan="11">
-                            <b>@entry.HttpMethod @entry.Url</b> &nbsp;@entry.Subject
-                            <br />
+                            <b>@entry.HttpMethod @entry.Url</b><br />
+                            @if(!string.IsNullOrEmpty(entry.Subject))
+                            {
+                                <b>Subject:</b>@entry.Subject
+                                <br />
+                            }
+
                             @if (!String.IsNullOrWhiteSpace(entry.Comment))
                             {
                                 <b>@entry.Comment</b>
@@ -124,8 +129,6 @@ Webhook #@HookId endpoint: <b>@hookEndpoint</b>
         }
     </tbody>
 </table>
-
-
 
 @section scripts {
     <script>

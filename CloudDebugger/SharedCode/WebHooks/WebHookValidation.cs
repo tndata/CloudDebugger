@@ -55,7 +55,7 @@ public static class WebHookValidation
     {
 
         logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackUrl);
-        logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackorigin);
+        logEntry.RequestHeaders.TryGetValue("WebHook-Request-Origin", out string? callbackorigin);
 
         if (!string.IsNullOrEmpty(callbackUrl))
         {
@@ -65,7 +65,7 @@ public static class WebHookValidation
 
             logger.LogInformation("Received CLoudEvent  validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
 
-            SendCallBackRequest(LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
+            SendCallBackRequest(logEntry.HookId, LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
         }
     }
 
@@ -114,7 +114,7 @@ public static class WebHookValidation
 
             if (validationUrl != null)
             {
-                SendCallBackRequest(LogEventHandler, validationUrl, "Event Grid schema webhook confirmation request.");
+                SendCallBackRequest(logEntry.HookId, LogEventHandler, validationUrl, "Event Grid schema webhook confirmation request.");
             }
         }
     }
@@ -122,13 +122,14 @@ public static class WebHookValidation
 
 
 
-    private static void SendCallBackRequest(Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
+    private static void SendCallBackRequest(int hookId, Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
     {
         //Call the callBackUrl to confirm the webhoook
         ThreadPool.QueueUserWorkItem(delegate (object? state)
         {
             var newLogEntry = new WebHookLogEntry()
             {
+                HookId = hookId,
                 EntryTime = DateTime.UtcNow,
                 Url = callbackUrl,
                 HttpMethod = "GET",
@@ -172,9 +173,12 @@ public static class WebHookValidation
                 {
                     StringBuilder logEntry = new();
 
-                    logEntry.AppendLine($"Called the webhook validation URL");
+                    logEntry.AppendLine($"Called the webhook validation URL:");
+                    logEntry.AppendLine($"{callbackUrl}");
                     logEntry.AppendLine();
-                    logEntry.AppendLine("Response headers from callback request");
+                    logEntry.AppendLine($"Response status code: {(int)response.StatusCode} ({response.StatusCode})");
+                    logEntry.AppendLine();
+                    logEntry.AppendLine("Response headers:");
 
                     //Add the response headers to the log
                     foreach (var header in response.Headers)
@@ -187,10 +191,8 @@ public static class WebHookValidation
                         result = result.Substring(0, 2000) + "...";
                     }
 
-                    logEntry.AppendLine("\r\n{callbackUrl}\r\n\r\nResponse body:\r\n\r\n'{result}'");
-                    logEntry.AppendLine($"Status code: " + response.StatusCode);
-                    logEntry.AppendLine();
-
+                    logEntry.AppendLine("\r\nResponse body:");
+                    logEntry.AppendLine($"\r\n{result}\r\n");
 
                     newLogEntry.Body = logEntry.ToString();
                 }

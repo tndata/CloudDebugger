@@ -23,13 +23,12 @@ public class WebHookLog : IWebHookLog
         }
     }
 
-    public void AddToLog(int hookId, WebHookLogEntry logEntry)
+    public void AddToLog(WebHookLogEntry logEntry)
     {
         ArgumentNullException.ThrowIfNull(logEntry);
 
         lock (lockObj)
         {
-            logEntry.HookId = hookId;
             Log.Add(logEntry);
 
             //Limit the # of entries

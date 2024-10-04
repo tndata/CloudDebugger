@@ -4,7 +4,7 @@ namespace CloudDebugger.Features.WebHooks;
 
 public interface IWebHookLog
 {
-    void AddToLog(int hookId, WebHookLogEntry logEntry);
+    void AddToLog(WebHookLogEntry logEntry);
 
     void ClearLog();
 
