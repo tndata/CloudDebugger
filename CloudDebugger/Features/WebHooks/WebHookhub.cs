@@ -2,6 +2,9 @@
 
 namespace CloudDebugger.Features.WebHooks;
 
+/// <summary>
+/// This is the SignalR webhook hub that will send messages to the browser.
+/// </summary>
 public class WebHookHub : Hub
 {
     /// <summary>

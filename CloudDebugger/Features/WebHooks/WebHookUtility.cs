@@ -32,79 +32,18 @@ public static class WebHookUtility
         }
 
         //Get request body 
-        logEntry.Body = "";
-        if (request.ContentLength > 0)
+        logEntry.Body = await GetRquestBody(request);
+
+        if (!string.IsNullOrEmpty(logEntry.Body) && !string.IsNullOrEmpty(logEntry.ContentType))
         {
-            // Get the body
-            using (var reader = new StreamReader(request.Body))
+            if (logEntry.ContentType.Contains("json"))
             {
-                logEntry.Body = await reader.ReadToEndAsync();
+                ParseJSONBody(logger, logEntry);
             }
 
-            if (!string.IsNullOrEmpty(logEntry.Body) && logEntry.ContentType != null)
+            if (logEntry.ContentType.Contains("x-www-form-urlencoded"))
             {
-                if (logEntry.ContentType.Contains("json"))
-                {
-                    try
-                    {
-                        // Make the JSON pretty.
-                        var obj = JToken.Parse(logEntry.Body);
-
-                        logEntry.IsJSON = true;
-                        logEntry.Body = obj.ToString();
-
-                        // Extract the subject field
-                        JToken? subjectToken = null;
-
-                        if (obj.Type == JTokenType.Array)
-                        {
-                            var firstItem = obj.First;
-                            subjectToken = firstItem?.SelectToken("subject");
-                        }
-                        else if (obj.Type == JTokenType.Object)
-                        {
-                            subjectToken = obj.SelectToken("subject");
-                        }
-
-                        if (subjectToken != null)
-                        {
-                            logEntry.Subject = subjectToken.ToString();
-                            logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // If JSON parsing fails, keep the original result, ignore invalid JSON
-                        logEntry.Comment = "Invalid JSON " + ex.Message;
-                    }
-                }
-
-                if (logEntry.ContentType.Contains("x-www-form-urlencoded"))
-                {
-                    try
-                    {
-                        var sb = new StringBuilder();
-
-                        string decodedString = WebUtility.UrlDecode(logEntry.Body);
-
-                        // Parse the URL-encoded string
-                        var queryParameters = HttpUtility.ParseQueryString(decodedString);
-
-                        foreach (string? key in queryParameters.AllKeys)
-                        {
-                            if (key != null)
-                                sb.AppendLine($"{key}: {queryParameters[key]}");
-                        }
-
-                        //Append the parameters to the end
-                        logEntry.Body += $"\r\n\r\nDecoded parameters\r\n{sb}\r\n";
-                    }
-                    catch
-                    {
-                        // If JSON parsing fails, keep the original result, ignore invalid data
-                        logEntry.Comment = "Invalid x-www-form-urlencoded body";
-                    }
-                }
+                ParseWwwFormUrlEncoded(logEntry);
             }
         }
 
@@ -116,5 +55,90 @@ public static class WebHookUtility
         }
 
         return logEntry;
+    }
+
+    private static async Task<string?> GetRquestBody(HttpRequest request)
+    {
+        if (request.ContentLength > 0)
+        {
+            // Get the body
+            using (var reader = new StreamReader(request.Body))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private static void ParseJSONBody(ILogger logger, WebHookLogEntry logEntry)
+    {
+        if (logEntry == null)
+            return;
+
+        try
+        {
+            // Make the JSON pretty.
+            var obj = JToken.Parse(logEntry.Body ?? "");
+
+            logEntry.IsJSON = true;
+            logEntry.Body = obj.ToString();
+
+            // Extract the subject field
+            JToken? subjectToken = null;
+
+            if (obj.Type == JTokenType.Array)
+            {
+                var firstItem = obj.First;
+                subjectToken = firstItem?.SelectToken("subject");
+            }
+            else if (obj.Type == JTokenType.Object)
+            {
+                subjectToken = obj.SelectToken("subject");
+            }
+
+            if (subjectToken != null)
+            {
+                logEntry.Subject = subjectToken.ToString();
+                logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
+            }
+        }
+        catch (Exception ex)
+        {
+            // If JSON parsing fails, keep the original result, ignore invalid JSON
+            logEntry.Comment = "Invalid JSON " + ex.Message;
+        }
+    }
+
+    private static void ParseWwwFormUrlEncoded(WebHookLogEntry logEntry)
+    {
+        if (logEntry == null)
+            return;
+
+        try
+        {
+            var sb = new StringBuilder();
+
+            string decodedString = WebUtility.UrlDecode(logEntry.Body ?? "");
+
+            // Parse the URL-encoded string
+            var queryParameters = HttpUtility.ParseQueryString(decodedString);
+
+            foreach (string? key in queryParameters.AllKeys)
+            {
+                if (key != null)
+                    sb.AppendLine($"{key}: {queryParameters[key]}");
+            }
+
+            //Append the parameters to the end
+            logEntry.Body += $"\r\n\r\nDecoded parameters\r\n{sb}\r\n";
+        }
+        catch
+        {
+            // If JSON parsing fails, keep the original result, ignore invalid data
+            logEntry.Comment = "Invalid x-www-form-urlencoded body";
+        }
     }
 }

@@ -1,10 +1,8 @@
 @hostname=https://localhost:5001
-@hookId=3
+@hookId=2
 
 # Sample requests to test the webhook overview page
 
-
-#Sample cloud event
 POST {{hostname}}/hook{{hookId}}
 Content-Type: application/cloudevents+json; charset=utf-8
 aeg-delivery-count: 0
@@ -36,7 +34,7 @@ x-request-id: 59ad7b35-9ba9-4769-b926-ad3c16b38993
   },
   "time": "2024-07-06T09:31:58.6139464+00:00",
   "specversion": "1.0",
-  "subject": "Product1",
+  "subject": "Product{{$randomInt 1 100}}",
   "traceparent": "00-f4671311242f1d91aec83873553bc799-0674a399b6808262-00"
 }
 
