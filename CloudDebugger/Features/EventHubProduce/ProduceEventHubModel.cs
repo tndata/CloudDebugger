@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CloudDebugger.Features.EventHub;
+namespace CloudDebugger.Features.EventHubProduce;
 
-public class SendEventHubModel
+public class ProduceEventHubModel
 {
     [Required]
     public string? ConnectionString { get; set; } = "";
@@ -11,7 +11,6 @@ public class SendEventHubModel
     [Required]
     public int NumberOfEvents { get; set; } = 10;
 
-    public string? Exception { get; set; }
-
+    public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
 }

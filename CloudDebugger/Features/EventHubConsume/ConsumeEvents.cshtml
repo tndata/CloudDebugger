@@ -1,12 +1,16 @@
-﻿@model CloudDebugger.Features.EventHub.ConsumeEventHubModel
+﻿@model CloudDebugger.Features.EventHubConsume.ConsumeEventHubModel
 @{
-    ViewData["Title"] = "CloudDebugger - Send events to Event Hub";
+    ViewData["Title"] = "CloudDebugger - Consume Events From Event Hub";
 }
 
 <h3>Consume Event Hub events</h3>
+This tool allows you to consume events from an Event Hub. This tool assumes you have two different partitions.
+<br />
+<a href="/EventHub">Back</a>
+<br>
+<br>
 
-
-<form asp-controller="EventHub" asp-action="ConsumeEvents" method="post">
+<form asp-controller="EventHubConsume" asp-action="ConsumeEvents" method="post">
 
     <table class="table">
         <tr>
@@ -23,25 +27,16 @@
             </td>
             <td class="col-md-8"></td>
         </tr>
-        @*        <tr>
-        <td class="col-md-2">Number of events to send</td>
-        <td class="col-md-2">
-        <input asp-for="NumberOfEvents">
-        <span asp-validation-for="NumberOfEvents"></span>
-        </td>
-        <td class="col-md-8"></td>
-        </tr> *@
-
     </table>
 
 
     <br>
     <input type="submit" name="submit" value="Consume Events" /><br />
 
-    @if (!String.IsNullOrWhiteSpace(Model.Exception))
+    @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
     {
         <div class="alert alert-danger" role="alert">
-            <pre>@Model.Exception</pre>
+            <pre>@Model.ErrorMessage</pre>
         </div>
     }
 
@@ -70,7 +65,6 @@
                             {
                             <tr>
                                 <td>
-                                    EntryTime: @evnt.EntryTime<br>
                                     Offset: @evnt.Offset<br>
                                     PartitionId: @evnt.PartitionId<br>
                                     <br />
@@ -103,7 +97,6 @@
                         {
                             <tr>
                                 <td>
-                                    EntryTime: @evnt.EntryTime<br>
                                     Offset: @evnt.Offset<br>
                                     PartitionId: @evnt.PartitionId<br>
                                     <br />
@@ -138,19 +131,7 @@
     {
         <b>No events found</b>
     }
-
-
-
-
 }
-
-
-
-
-
-
-
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

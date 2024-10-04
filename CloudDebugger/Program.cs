@@ -27,7 +27,6 @@ var eventListener = new AzureEventSourceListener((e, message) =>
     // Only log messages from "Azure-Core" event source
     //Azure-Messaging-ServiceBus
     //Azure-Messaging-EventHubs
-    //Azure-Messaging-ServiceBus
 
     if (e.EventSource.Name == "Azure-Core" || e.EventSource.Name == "Azure-Identity")
     {
