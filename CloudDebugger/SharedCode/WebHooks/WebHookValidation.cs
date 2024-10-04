@@ -55,7 +55,7 @@ public static class WebHookValidation
     {
 
         logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackUrl);
-        logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackorigin);
+        logEntry.RequestHeaders.TryGetValue("WebHook-Request-Origin", out string? callbackorigin);
 
         if (!string.IsNullOrEmpty(callbackUrl))
         {
@@ -173,9 +173,12 @@ public static class WebHookValidation
                 {
                     StringBuilder logEntry = new();
 
-                    logEntry.AppendLine($"Called the webhook validation URL");
+                    logEntry.AppendLine($"Called the webhook validation URL:");
+                    logEntry.AppendLine($"{callbackUrl}");
                     logEntry.AppendLine();
-                    logEntry.AppendLine("Response headers from callback request");
+                    logEntry.AppendLine($"Response status code: {(int)response.StatusCode} ({response.StatusCode})");
+                    logEntry.AppendLine();
+                    logEntry.AppendLine("Response headers:");
 
                     //Add the response headers to the log
                     foreach (var header in response.Headers)
@@ -188,10 +191,8 @@ public static class WebHookValidation
                         result = result.Substring(0, 2000) + "...";
                     }
 
-                    logEntry.AppendLine("\r\n{callbackUrl}\r\n\r\nResponse body:\r\n\r\n'{result}'");
-                    logEntry.AppendLine($"Status code: " + response.StatusCode);
-                    logEntry.AppendLine();
-
+                    logEntry.AppendLine("\r\nResponse body:");
+                    logEntry.AppendLine($"\r\n{result}\r\n");
 
                     newLogEntry.Body = logEntry.ToString();
                 }

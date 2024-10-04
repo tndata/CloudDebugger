@@ -47,25 +47,35 @@ public static class WebHookUtility
                 {
                     try
                     {
-                        //Make the JSON pretty.
+                        // Make the JSON pretty.
                         var obj = JToken.Parse(logEntry.Body);
 
                         logEntry.IsJSON = true;
                         logEntry.Body = obj.ToString();
 
-                        // Get the subject field if present
-                        dynamic dynObj = obj;
-                        if (dynObj != null)
-                        {
-                            logEntry.Subject = dynObj.subject ?? "";
+                        // Extract the subject field
+                        JToken? subjectToken = null;
 
+                        if (obj.Type == JTokenType.Array)
+                        {
+                            var firstItem = obj.First;
+                            subjectToken = firstItem?.SelectToken("subject");
+                        }
+                        else if (obj.Type == JTokenType.Object)
+                        {
+                            subjectToken = obj.SelectToken("subject");
+                        }
+
+                        if (subjectToken != null)
+                        {
+                            logEntry.Subject = subjectToken.ToString();
                             logger.LogInformation("Received cloud event with subject='{Subject}':", logEntry.Subject);
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         // If JSON parsing fails, keep the original result, ignore invalid JSON
-                        logEntry.Comment = "Invalid JSON";
+                        logEntry.Comment = "Invalid JSON " + ex.Message;
                     }
                 }
 
@@ -80,13 +90,14 @@ public static class WebHookUtility
                         // Parse the URL-encoded string
                         var queryParameters = HttpUtility.ParseQueryString(decodedString);
 
-                        foreach (string key in queryParameters.AllKeys)
+                        foreach (string? key in queryParameters.AllKeys)
                         {
-                            sb.AppendLine($"{key}: {queryParameters[key]}");
+                            if (key != null)
+                                sb.AppendLine($"{key}: {queryParameters[key]}");
                         }
 
                         //Append the parameters to the end
-                        logEntry.Body += $"\r\n\r\nDecoded parameters\r\n{sb.ToString()}\r\n";
+                        logEntry.Body += $"\r\n\r\nDecoded parameters\r\n{sb}\r\n";
                     }
                     catch
                     {

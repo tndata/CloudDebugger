@@ -1,6 +1,5 @@
-@hostname=https://as-clouddebugger-linux.azurewebsites.net/ 
+@hostname=https://localhost:5001
 @hookId=1
-
 
 
 #Sample cloud event
@@ -10,7 +9,7 @@ aeg-delivery-count: 0
 aeg-event-type: Notification
 aeg-metadata-version: 1
 aeg-subscription-name: ALLBUSINESSEVENTS
-webhook-request-origin: eventgrid.azure.net
+WebHook-Request-Origin: eventgrid.azure.net
 x-arr-ssl: true
 x-envoy-expected-rq-timeout-ms: 1800000
 x-envoy-external-address: 51.12.47.168
@@ -48,7 +47,7 @@ aeg-delivery-count: 0
 aeg-event-type: Notification
 aeg-metadata-version: 1
 aeg-subscription-name: ALLBUSINESSEVENTS
-webhook-request-origin: eventgrid.azure.net
+WebHook-Request-Origin: eventgrid.azure.net
 x-arr-ssl: true
 x-envoy-expected-rq-timeout-ms: 1800000
 x-envoy-external-address: 51.12.47.168
@@ -75,4 +74,54 @@ x-request-id: 59ad7b35-9ba9-4769-b926-ad3c16b38993
   "specversion": "1.0",
   "subject": "Product1",
   "traceparent": "00-f4671311242f1d91aec83873553bc799-0674a399b6808262-00"
+}
+
+
+###
+
+#Sample cloud event
+POST {{hostname}}/hook{{hookId}}
+CLIENT-IP: 51.12.47.165:64386
+Content-Type: application/cloudevents+json; charset=utf-8
+DISGUISED-HOST: as-clouddebugger-linux.azurewebsites.net
+Max-Forwards: 10
+WAS-DEFAULT-HOSTNAME: as-clouddebugger-linux.azurewebsites.net
+WebHook-Request-Origin: eventgrid.azure.net
+X-ARR-LOG-ID: e98020c3-b835-4023-98bb-b575518c83e1
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 04, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-AppService-Proto: https
+X-Client-IP: 51.12.47.165
+X-Client-Port: 64386
+X-Forwarded-TlsVersion: 1.2
+X-Original-For: [::ffff:169.254.129.1]:25393
+X-Original-Proto: http
+X-Original-URL: /hook2
+X-SITE-DEPLOYMENT-ID: as-CloudDebugger-Linux
+X-WAWS-Unencoded-URL: /hook2
+aeg-delivery-count: 0
+aeg-event-type: Notification
+aeg-metadata-version: 1
+aeg-subscription-name: CLOUDEVENTSSUBSCRIPTION
+
+{
+  "id": "c7ac6469-501e-005e-7d4c-1651ee0678f2",
+  "source": "/subscriptions/b78d216b-d714-4664-b39a-26ef8dbcfdf1/resourceGroups/rg-CloudDebugger/providers/Microsoft.Storage/storageAccounts/clouddebuggerstorage",
+  "specversion": "1.0",
+  "type": "Microsoft.Storage.BlobCreated",
+  "subject": "/blobServices/default/containers/clouddebugger/blobs/MyBlob.txt",
+  "time": "2024-10-04T10:58:52.426327Z",
+  "data": {
+    "api": "PutBlob",
+    "clientRequestId": "55848b13-7a06-49cb-abd7-14b84a953697",
+    "requestId": "c7ac6469-501e-005e-7d4c-1651ee000000",
+    "eTag": "0x8DCE4638896E45B",
+    "contentType": "application/octet-stream",
+    "contentLength": 9,
+    "blobType": "BlockBlob",
+    "url": "https://clouddebuggerstorage.blob.core.windows.net/clouddebugger/MyBlob.txt",
+    "sequencer": "0000000000000000000000000000854500000000005041cc",
+    "storageDiagnostics": {
+      "batchId": "9c549f00-d006-006f-004c-16b0fd000000"
+    }
+  }
 }
