@@ -42,6 +42,11 @@ public class WebHookApiController : ControllerBase
         this.signalRhubContext = hubContext;
     }
 
+    [HttpGet("hook{id:int:min(1):max(4)}")]
+    public Task<IActionResult> HookGet(int id)
+    {
+        return Task.FromResult<IActionResult>(Ok($"Webhook #{id} is responding, but only supports HTTP POST and OPTIONS requests"));
+    }
 
     /// <summary>
     /// Accepts requests to the following endpoints:
@@ -52,16 +57,14 @@ public class WebHookApiController : ControllerBase
     /// /Hook4
     /// </summary>
     /// <returns></returns>
-    [Route("hook{id:int:min(1):max(4)}")]
+    [HttpPost("hook{id:int:min(1):max(4)}")]
+    [HttpOptions("hook{id:int:min(1):max(4)}")]
     public Task<IActionResult> Hook(int id)
     {
-        if (Request.Method != "POST" && Request.Method != "OPTIONS")
-        {
-            return Task.FromResult<IActionResult>(Ok($"Webhook #{id} is responding, but only supports HTTP POST and OPTIONS requests"));
-        }
-
         return ProcessHook(id);
     }
+
+
 
     private async Task<IActionResult> ProcessHook(int hookId)
     {
@@ -106,15 +109,41 @@ public class WebHookApiController : ControllerBase
         return result;
     }
 
+
+    /// <summary>
+    /// Send the webhook entry to the SignalR hubContext
+    /// </summary>
+    /// <param name="hookId"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
     private async Task SendToSignalR(int hookId, WebHookLogEntry entry)
     {
-        string signalRMessage = $"ReceiveMessage{hookId}";
-        string color = "";
+        if (entry == null)
+            return;
 
-        switch (entry?.Body?.GetHashCode() % 4)
+        //This is the destination message for the SignalR hub
+        string signalRMessage = $"ReceiveMessage{hookId}";
+
+        string color = "black";
+        int hashcode = 0;
+
+        //Base the color of the message on the hashcode of the subject or body
+        if (!string.IsNullOrEmpty(entry.Subject))
+        {
+            hashcode = entry.Subject.GetHashCode() % 4;
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(entry.Body))
+            {
+                hashcode = entry.Body.GetHashCode() % 4;
+            }
+        }
+
+        switch (hashcode)
         {
             case 0:
-                color = "red";
+                color = "black";
                 break;
             case 1:
                 color = "blue";
@@ -123,7 +152,7 @@ public class WebHookApiController : ControllerBase
                 color = "green";
                 break;
             case 3:
-                color = "black";
+                color = "red";
                 break;
         }
 

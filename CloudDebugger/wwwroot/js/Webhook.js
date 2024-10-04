@@ -2,7 +2,7 @@
 
 //SignalR connection script, used by the Webhook tool.
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/WebHookHub").build();
+let connection = new signalR.HubConnectionBuilder().withUrl("/WebHookHub").build();
 
 connection.on("ReceiveMessage1", function (color, content) {
     let li1 = document.createElement("span");
