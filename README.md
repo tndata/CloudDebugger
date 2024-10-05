@@ -7,6 +7,7 @@ CloudDebugger is an open-source tool built with ASP.NET Core, providing a compre
 Designed to be deployed to Azure App Services, it enables developers, architects, and DevOps engineers to seamlessly explore and troubleshoot Azure services and APIs. 
 CloudDebugger is a web-based tool that can be accessed from any browser, making it easy to gain insights into your cloud environment and streamline your debugging processes.
 
+![image](https://github.com/user-attachments/assets/be9e5501-ce86-401d-8dc7-9b5a171a82d5)
 
 ### Features
 
