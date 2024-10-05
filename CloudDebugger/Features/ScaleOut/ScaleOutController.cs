@@ -81,8 +81,8 @@ public class ScaleOutController : Controller
     private static string? TryGetLocalIPAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
-        var ipAddress = host.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
-                                                              !IPAddress.IsLoopback(ip));
+        var ipAddress = Array.Find(host.AddressList, ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                                                           !IPAddress.IsLoopback(ip));
 
         if (ipAddress != null)
         {
