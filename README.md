@@ -8,7 +8,7 @@ CloudDebugger is a web-based tool that can be accessed from any browser, making 
 ![image](https://github.com/user-attachments/assets/be9e5501-ce86-401d-8dc7-9b5a171a82d5)
 
 ### Build status
-![Build status](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+![Build status](https://github.com/tndata/CloudDebugger/actions/workflows/main.yml/badge.svg)
 
 
 ### To get started
