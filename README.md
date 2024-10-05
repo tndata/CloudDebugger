@@ -1,7 +1,5 @@
 ## CloudDebugger - the exploration tool and debugger for Azure cloud developers
 
-
-
 ### About CloudDebugger
 CloudDebugger is an open-source tool built with ASP.NET Core, providing a comprehensive set of utilities for exploring, teaching, and debugging Azure services. 
 Designed to be deployed to Azure App Services, it enables developers, architects, and DevOps engineers to seamlessly explore and troubleshoot Azure services and APIs. 
@@ -9,7 +7,9 @@ CloudDebugger is a web-based tool that can be accessed from any browser, making 
 
 ![image](https://github.com/user-attachments/assets/be9e5501-ce86-401d-8dc7-9b5a171a82d5)
 
-### Features
+### Build status
+![Build status](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+
 
 ### To get started
 See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployment) for instructions on how to deploy this service to Azure.
@@ -31,7 +31,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Blob Storage Tools](https://github.com/tndata/CloudDebugger/wiki/BlobStorage)
 * [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 
-##### Identity tools
+#### Identity tools
 * [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
 * [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
 * [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
