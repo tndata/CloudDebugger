@@ -54,9 +54,9 @@ public class LogWorkspaceController : Controller
 
                 await LogSender.SendLogStatements(logStatements, model.LogType!, model.WorkspaceId!, model.WorkspaceKey!);
 
-                model.Message = $"Log statements sent to table {model.LogType} in your Log Analytics Workspace! It will take a few minutes before the data shows up in your Workspace.";
+                model.Message = $"{NumberOfLogStatementsToSend} Log statements sent to table {model.LogType} in your Log Analytics Workspace! It will take a few minutes before the data shows up in your Workspace.";
 
-                _logger.LogInformation("Send log statements to Log Analytics Workspace.");
+                _logger.LogInformation("Sent {NumberOfLogStatementsToSend} log statements to Log Analytics Workspace.", NumberOfLogStatementsToSend);
             }
             catch (Exception exc)
             {

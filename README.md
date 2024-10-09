@@ -1,4 +1,4 @@
-# CloudDebugger - the exploration for for Azure cloud developers
+# CloudDebugger - the exploration tool for Azure cloud developers
 
 ## About CloudDebugger
 CloudDebugger is an open-source tool built with ASP.NET Core, providing a comprehensive set of utilities for exploring, teaching, and debugging Azure services. 
@@ -22,12 +22,13 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Current Request Viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
 * [Calling External APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
 
-### Compute tools
-* [App Services - File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
-* [App Services - File Local Cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
+### App Services
+* [File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
+* [Local Cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 
 ### Storage tools
 * [Blob Storage Tools](https://github.com/tndata/CloudDebugger/wiki/BlobStorage)
+* [File System](https://github.com/tndata/CloudDebugger/wiki/FileSystem)
 * [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 
 ### Identity tools
@@ -41,7 +42,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Environment Variables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
-* [Scaleout](https://github.com/tndata/CloudDebugger/wiki/Scaleout)
+* [Scale-out and load-balancing](https://github.com/tndata/CloudDebugger/wiki/Scaleout)
 
 ### Logging
 * [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)

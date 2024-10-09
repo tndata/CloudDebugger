@@ -32,6 +32,7 @@ public class WebHookApiController : ControllerBase
     private readonly ILogger<WebHookApiController> logger;
     private readonly IWebHookLog webHookLog;
     private readonly IHubContext<WebHookHub> signalRhubContext;
+    private static int WebHookCounter;
 
     public WebHookApiController(ILogger<WebHookApiController> logger,
                                 IWebHookLog webHookLog,
@@ -157,6 +158,13 @@ public class WebHookApiController : ControllerBase
         }
 
         var content = "[M]";
+
+        if (WebHookCounter++ % 15 == 0)
+        {
+            //Add a new line to ensure it wraps every 15 items
+            content = "\r\n" + content;
+        }
+
 
         await signalRhubContext.Clients.All.SendAsync(signalRMessage, color, content);
     }

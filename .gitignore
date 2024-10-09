@@ -6,6 +6,9 @@
 # Ignore .URL files
 *.url
 
+# Ignore markdown monster backup files
+* .saved.bak
+
 # User-specific files
 *.rsuser
 *.suo
