@@ -21,7 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Core" Version="1.44.0" />
+		<PackageReference Include="Azure.Core" Version="1.44.1" />
 		<PackageReference Include="System.Memory" Version="4.5.5" />
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
