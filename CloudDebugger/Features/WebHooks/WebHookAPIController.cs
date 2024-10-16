@@ -117,7 +117,7 @@ public class WebHookApiController : ControllerBase
     /// <param name="hookId"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    private async Task SendToSignalR(int hookId, WebHookLogEntry entry)
+    private static async Task SendToSignalR(int hookId, WebHookLogEntry entry)
     {
         if (entry == null)
             return;

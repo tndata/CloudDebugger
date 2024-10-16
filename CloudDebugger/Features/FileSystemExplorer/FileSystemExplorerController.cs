@@ -151,7 +151,7 @@ public class FileSystemExplorerController : Controller
         }
         catch (Exception exc)
         {
-            _logger.LogInformation(exc, "Failure when calling GetDirectoryContent for path {Path}", path);
+            _logger.LogInformation(exc, "Failure when calling GetDirectoryContent for path {Path}", path.SanitizeInput());
             result.Add(("### Error getting the directory content", ""));
         }
 
