@@ -2,15 +2,15 @@
 
 public record ScaleOutModel
 {
-    public string? SiteName { get; internal set; }
-    public string? HostName { get; internal set; }
-    public string? PodIP { get; internal set; }
-    public string? IPAddress { get; internal set; }
-    public string? InstanceId { get; internal set; }
-    public string? ComputerName { get; internal set; }
-    public string? BackgroundColor { get; internal set; }
-    public string? CurrentTime { get; internal set; }
-    public TimeSpan RunningTime { get; internal set; }
+    public string? SiteName { get; set; }
+    public string? HostName { get; set; }
+    public string? PodIP { get; set; }
+    public string? IPAddress { get; set; }
+    public string? InstanceId { get; set; }
+    public string? ComputerName { get; set; }
+    public string? BackgroundColor { get; set; }
+    public string? CurrentTime { get; set; }
+    public TimeSpan RunningTime { get; set; }
 
     public override int GetHashCode()
     {
