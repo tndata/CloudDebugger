@@ -26,7 +26,6 @@ public class HealthController : Controller
         return View(model);
     }
 
-
     /// <summary>
     /// The ServiceHealth controls the health of this application service.This is the overall health as exposed by the /healthz and /health endpoints.
     /// </summary>

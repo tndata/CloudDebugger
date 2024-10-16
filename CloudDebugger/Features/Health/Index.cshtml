@@ -39,41 +39,71 @@
 }
 
 <h4>Health checks</h4>
+This tool exposes two types of health endpoints that you can control from within this tool.
+<br />
+<br />
+
+
+
 <h4>Healthcheck control</h4>
 Controls the status of the <a href="/health">/health</a> and <a href="/healthz">/healthz</a> endpoints.<br />
 <br />
 
-CurrentStatus: <b>@currentHealthState</b>
-<br /><br />
+<table class="table">
+    <tr>
+        <td class="col-md-3">Status</td>
+        <td class="col-md-9"><b>@currentHealthState</b></td>
+    </tr> 
+    <tr>
+        <td class="col-md-3">Set health status</td>
+        <td class="col-md-9">
 
-Set new service health status:<br><br />
-@using (Html.BeginForm("SetServiceHealthMode", "Health", FormMethod.Post))
-{
-    <button name="mode" value="Healthy">Healthy</button> 
-    <button name="mode" value="Degraded">Degraded</button> 
-    <button name="mode" value="Unhealthy">Unhealthy</button>
-    <br />
-}
+            @using (Html.BeginForm("SetServiceHealthMode", "Health", FormMethod.Post))
+            {
+                <button name="mode" value="Healthy">Healthy</button>
+                <button name="mode" value="Degraded">Degraded</button>
+                <button name="mode" value="Unhealthy">Unhealthy</button>
+                <br />
+            }
+
+        </td>
+    </tr>
+</table>
+
 <br />
 <br />
-
-
 <h4>Custom health endpoint</h4>
 Controls the health of the following custom endpoint <a href="/Health/CustomEndpoint">/Health/CustomEndpoint</a>.
 <br />
 
-CurrentStatus: <b>@currentCustomHealthState</b>
-<br />
-<br />
+<table class="table">
+    <tr>
+        <td class="col-md-3">Status</td>
+        <td class="col-md-9"><b>@currentCustomHealthState</b></td>
+    </tr> 
+    <tr>
+        <td class="col-md-3">Set health status</td>
+        <td class="col-md-9">
 
-Set new  health status:
+            @using (Html.BeginForm("SetCustomHealthMode", "Health", FormMethod.Post))
+            {
+                <button name="mode" value="healthy">Healthy</button>
+                <button name="mode" value="delayed10s">Delayed 10s</button>
+                <button name="mode" value="delayed60s">Delayed 60s</button>
+                <button name="mode" value="error">Error (500)</button>
+                <br />
+            }
+
+        </td>
+    </tr>
+</table>
+
+
+
+
 <br>
-@using (Html.BeginForm("SetCustomHealthMode", "Health", FormMethod.Post))
-{
-    <button name="mode" value="healthy">Healthy</button>
-    <button name="mode" value="delayed10s">Delayed 10s</button>
-    <button name="mode" value="delayed60s">Delayed 60s</button>
-    <button name="mode" value="error">Error (500)</button>
-    <br />
-}
-<br />
+<br>
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/Health">Documentation</a></li>
+</ul>

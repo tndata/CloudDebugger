@@ -51,6 +51,7 @@ internal static class HostingExtensions
 
         app.UseStaticFiles();
 
+        // Used by the Health Tool
         app.MapHealthChecks("/healthz");
         app.MapHealthChecks("/health");
 

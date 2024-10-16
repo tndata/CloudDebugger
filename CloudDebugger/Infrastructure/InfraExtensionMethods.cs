@@ -88,7 +88,8 @@ public static class InfraExtensionMethods
     }
 
     /// <summary>
-    /// Configure the public health endpoint system and the customf health check
+    /// Configure the public health endpoint system and the customf health check. 
+    /// The health endpoints /health and /healthz are defined in the HostingExtension class.
     /// </summary>
     /// <param name="builder"></param>
     public static void AddAndConfigureHealth(this WebApplicationBuilder builder)
