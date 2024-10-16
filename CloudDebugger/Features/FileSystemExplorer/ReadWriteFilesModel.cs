@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.FileSystem;
+﻿namespace CloudDebugger.Features.FileSystemExplorer;
 
 public class ReadWriteFilesModel
 {

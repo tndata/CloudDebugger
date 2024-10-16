@@ -1,14 +1,15 @@
+using CloudDebugger.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace CloudDebugger.Features.FileSystem;
+namespace CloudDebugger.Features.FileSystemExplorer;
 
-public class FileSystemController : Controller
+public class FileSystemExplorerController : Controller
 {
-    private readonly ILogger<FileSystemController> _logger;
+    private readonly ILogger<FileSystemExplorerController> _logger;
 
-    public FileSystemController(ILogger<FileSystemController> logger)
+    public FileSystemExplorerController(ILogger<FileSystemExplorerController> logger)
     {
         _logger = logger;
     }
@@ -21,17 +22,10 @@ public class FileSystemController : Controller
     public IActionResult ReadWriteFiles()
     {
         var model = GetDefaultModel();
-        try
-        {
-            model.DirectoryContent = GetDirectoryContent(model.Path);
 
-        }
-        catch (Exception exc)
-        {
-            _logger.LogInformation(exc, "Failure when calling ReadWriteFiles");
-            string str = $"Exception:\r\n{exc.Message}";
-            model.ErrorMessage = str;
-        }
+
+        model.DirectoryContent = GetDirectoryContent(model.Path);
+
 
         return View(model);
     }
@@ -50,9 +44,14 @@ public class FileSystemController : Controller
             model.ErrorMessage = "";
             ModelState.Clear();
 
+            //Remove unwanted characters
+            model.Path = model.Path?.SanitizeInput() ?? "";
+            model.FileName = model.FileName?.SanitizeInput() ?? "";
+
             switch (button)
             {
                 case "changepath":
+                    // Just reload the page with the new path in place.
                     model.FileContent = "";
                     break;
                 case "createfolder":
@@ -84,7 +83,6 @@ public class FileSystemController : Controller
     {
         if (model.Path != null && model.FileName != null)
         {
-
             string filePath = Path.Combine(model.Path, model.FileName);
 
             System.IO.File.WriteAllText(filePath, model.FileContent);
@@ -123,9 +121,13 @@ public class FileSystemController : Controller
 
     private static void CreateDirectory(ReadWriteFilesModel model)
     {
-        if (!string.IsNullOrWhiteSpace(model.Path))
+        ArgumentNullException.ThrowIfNull(model);
+
+        string path = model.Path ?? "";
+
+        if (!string.IsNullOrWhiteSpace(path))
         {
-            Directory.CreateDirectory(model.Path);
+            Directory.CreateDirectory(path);
             model.Message = "Folder created";
         }
         else
@@ -135,14 +137,22 @@ public class FileSystemController : Controller
     }
 
 
-    private static List<(string name, string size)> GetDirectoryContent(string? path)
+    private List<(string name, string size)> GetDirectoryContent(string? path)
     {
         var result = new List<(string name, string size)>();
 
-        if (path != null)
+        try
         {
-            result.AddRange(GetFolders(path));
-            result.AddRange(GetFiles(path));
+            if (path != null)
+            {
+                result.AddRange(GetFolders(path));
+                result.AddRange(GetFiles(path));
+            }
+        }
+        catch (Exception exc)
+        {
+            _logger.LogInformation(exc, "Failure when calling GetDirectoryContent for path {Path}", path);
+            result.Add(("### Error getting the directory content", ""));
         }
 
         return result;
@@ -193,6 +203,11 @@ public class FileSystemController : Controller
         return result;
     }
 
+
+    /// <summary>
+    /// Try to set some sensible default start path and get the App and Home PAth if available. 
+    /// </summary>
+    /// <returns></returns>
     private static ReadWriteFilesModel GetDefaultModel()
     {
         var model = new ReadWriteFilesModel()

@@ -2,7 +2,6 @@ using Azure;
 using Azure.Messaging;
 using Azure.Messaging.EventGrid;
 using Azure.MyIdentity;
-using CloudDebugger.Features.FileSystem;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.EventGrid;
@@ -55,7 +54,7 @@ public class EventGridController : Controller
             return BadRequest(ModelState);
 
         if (model == null)
-            return View(new ReadWriteFilesModel());
+            return View(new SendEventGridModel());
 
         model.Message = "";
         model.ErrorMessage = "";

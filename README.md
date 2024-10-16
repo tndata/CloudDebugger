@@ -23,12 +23,12 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Calling External APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
 
 ### App Services
-* [File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
+* [App Service File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 * [Local Cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
 
 ### Storage tools
 * [Blob Storage Tools](https://github.com/tndata/CloudDebugger/wiki/BlobStorage)
-* [File System](https://github.com/tndata/CloudDebugger/wiki/FileSystem)
+* [File System Explorer](https://github.com/tndata/CloudDebugger/wiki/FileSystem)
 * [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 
 ### Identity tools

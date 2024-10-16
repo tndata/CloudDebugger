@@ -2,7 +2,6 @@ using Azure.MyIdentity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using CloudDebugger.Features.FileSystem;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.BlobStorage;
@@ -57,7 +56,7 @@ public class BlobStorageController : Controller
             return BadRequest(ModelState);
 
         if (model == null)
-            return View(new ReadWriteFilesModel());
+            return View(new BlobStorageModel());
 
         model.Message = "";
         model.ErrorMessage = "";

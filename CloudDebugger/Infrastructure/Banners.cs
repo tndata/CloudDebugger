@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace CloudDebugger.Infrastructure;
 
-#pragma warning disable S6664  // The code block contains too many logging calls
 /// <summary>
 /// Startup banners
 /// 

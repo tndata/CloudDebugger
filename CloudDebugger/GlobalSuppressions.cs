@@ -13,3 +13,5 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "We don't care about this in this application")]
 [assembly: SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "We don't care about this in this application")]
 [assembly: SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "We don't care about this in this application")]
+[assembly: SuppressMessage("Design", "CA3003: Review code for file path injection vulnerabilities", Justification = "We don't care about this in the File Explorer Tool", Scope = "type", Target = "~T:CloudDebugger.Features.FileSystemExplorer.FileSystemExplorerController")]
+[assembly: SuppressMessage("Design", "S6664: The code block contains too many logging calls", Justification = "We don't care about this in the Banners class", Scope = "type", Target = "~T:CloudDebugger.Infrastructure.Banners")]
