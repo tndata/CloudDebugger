@@ -44,6 +44,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Scale-out and load-balancing](https://github.com/tndata/CloudDebugger/wiki/Scaleout)
 
+ 
 ### Logging
 * [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
@@ -55,7 +56,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 
 ### Other tools
 * [Caching](https://github.com/tndata/CloudDebugger/wiki/Caching)
-
+* [Health Endpoint](https://github.com/tndata/CloudDebugger/wiki/Health)
 
 
 
