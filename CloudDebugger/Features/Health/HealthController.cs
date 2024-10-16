@@ -7,7 +7,6 @@ public class HealthController : Controller
 {
     private readonly ILogger<HealthController> _logger;
 
-    //TODO: Remove static, use session
     private static CustomHealthStatusEnum CustomHealthEndpointStatus { get; set; } = CustomHealthStatusEnum.Healthy;
 
     public HealthController(ILogger<HealthController> logger)
@@ -64,7 +63,6 @@ public class HealthController : Controller
 
         return View("index", model);
     }
-
 
 
     /// <summary>
