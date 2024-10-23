@@ -68,7 +68,7 @@ his tool was developed by [Tore Nestenius](https://nestenius.se/), a seasoned .N
 * [Blog](https://nestenius.se/)
 * [Company](https://tn-data.se/)
 
-## Videos by the author
+## Videos
 * [Introducing the Cloud Debugger and DefaultAzureCredentials deep dive](https://www.youtube.com/watch?v=XgtcmfZwDn4&t=40s) 
 
 ## Related Azure blog posts by the author:
