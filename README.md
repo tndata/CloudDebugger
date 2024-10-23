@@ -68,6 +68,9 @@ his tool was developed by [Tore Nestenius](https://nestenius.se/), a seasoned .N
 * [Blog](https://nestenius.se/)
 * [Company](https://tn-data.se/)
 
+## Videos by the author
+* [Introducing the Cloud Debugger and DefaultAzureCredentials deep dive](https://www.youtube.com/watch?v=XgtcmfZwDn4&t=40s) 
+
 ## Related Azure blog posts by the author:
 * [Deploy a container to Azure App Services using Azure CLI and user-assigned managed identity](https://nestenius.se/2024/08/27/deploy-a-container-to-azure-app-services-using-azure-cli-and-user-assigned-managed-identity/)
 * [Deploy Container to Azure App Services with System-Assigned Identity](https://nestenius.se/2024/09/02/deploy-a-container-to-azure-app-services-using-a-system-assigned-identity/)
