@@ -15,6 +15,8 @@ public static class WebHookValidation
     /// Test if this is a EventGrid Event Subscription validation request
     /// Inspiration taken from https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/eventgrid/Microsoft.Azure.WebJobs.Extensions.EventGrid/src/TriggerBinding/HttpRequestProcessor.cs
     /// More details about the request https://learn.microsoft.com/en-us/azure/event-grid/receive-events
+    /// https://learn.microsoft.com/en-us/azure/event-grid/end-point-validation-event-grid-events-schema
+    /// https://github.com/Azure-Samples/event-grid-dotnet-publish-consume-events/blob/master/EventGridConsumer/EventGridConsumer/Function1.cs
     /// </summary>
     /// <param name="webHookLog"></param>
     /// <param name="logEntry"></param>
@@ -127,6 +129,10 @@ public static class WebHookValidation
         //Call the callBackUrl to confirm the webhoook
         ThreadPool.QueueUserWorkItem(delegate (object? state)
         {
+            // We send the callback on a separate thread, slightly delayed, so that the callback will be accepted.
+            // It is important to send this request after the current request is completed, otherwise it will not be accepted. 
+            Thread.Sleep(5000);
+
             var newLogEntry = new WebHookLogEntry()
             {
                 HookId = hookId,

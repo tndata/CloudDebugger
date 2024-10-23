@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 
 namespace CloudDebugger.Features.WebHooks;
 
@@ -69,7 +70,6 @@ public class WebHookApiController : ControllerBase
 
     private async Task<IActionResult> ProcessHook(int hookId)
     {
-        IActionResult result;
         try
         {
             var hookRequest = await WebHookUtility.GetRequestDetails(hookId, Request, logger);
@@ -78,13 +78,14 @@ public class WebHookApiController : ControllerBase
             {
                 // Simulate a webhook failure by returning a HTTP 500 Server Errror back to the caller  
                 AddFailedWebHookEntryToLog(hookRequest);
-                result = StatusCode(500);   //Error response
+                return StatusCode(500);   //Error response
             }
             else
             {
                 AddWebHookEntryToLog(hookRequest);
+
+                // Send a separate notification to the SignalR based webhooks page.
                 await SendToSignalR(hookId, hookRequest);
-                result = Ok("OK");          //OK response
             }
 
             WebHookValidation.CheckIfEventGridSchemaValdationRequest(e =>
@@ -93,6 +94,7 @@ public class WebHookApiController : ControllerBase
                     AddCallbackEntryToLog(e);
 
                 }, hookRequest, logger);
+
             WebHookValidation.CheckIfCloudEventValidationRequest(HttpContext, e =>
                 {
                     //This lambda is called when a webhook validation request is sent back to the caller
@@ -100,14 +102,13 @@ public class WebHookApiController : ControllerBase
 
                 }, hookRequest, logger);
 
+            return Ok("OK");          //OK response
         }
         catch (Exception exc)
         {
-            result = StatusCode(500);
             AddExceptionEntryToLog(hookId, exc);
+            return StatusCode(500);
         }
-
-        return result;
     }
 
 
@@ -218,4 +219,11 @@ public class WebHookApiController : ControllerBase
         entry.Comment = entry.Comment + $"\r\n" + exc.Message;
         webHookLog.AddToLog(entry);
     }
+}
+
+// Source https://github.com/pm7y/AzureEventGridSimulator/blob/master/src/AzureEventGridSimulator/Domain/Services/SubscriptionValidationResponse.cs
+public class SubscriptionValidationResponse
+{
+    [JsonProperty(PropertyName = "validationResponse", Required = Required.Always)]
+    public Guid ValidationResponse { get; set; }
 }
