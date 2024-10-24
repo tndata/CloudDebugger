@@ -69,7 +69,11 @@ his tool was developed by [Tore Nestenius](https://nestenius.se/), a seasoned .N
 * [Company](https://tn-data.se/)
 
 ## Videos
-* [Introducing the Cloud Debugger and DefaultAzureCredentials deep dive](https://www.youtube.com/watch?v=XgtcmfZwDn4&t=40s) 
+* [Introducing the Cloud Debugger and DefaultAzureCredentials deep dive](https://www.youtube.com/watch?v=XgtcmfZwDn4&t=40s). In this video I present the Cloud Debugger tool. 
+
+## Presentations
+* [Slides from my Cloud Debugger presentations](https://github.com/tndata/CloudDebugger/blob/main/Presentations/CloudDebugger%20-%20Presentation.pdf). This slide deck contains example slides for most of the tools.
+
 
 ## Related Azure blog posts by the author:
 * [Deploy a container to Azure App Services using Azure CLI and user-assigned managed identity](https://nestenius.se/2024/08/27/deploy-a-container-to-azure-app-services-using-azure-cli-and-user-assigned-managed-identity/)
