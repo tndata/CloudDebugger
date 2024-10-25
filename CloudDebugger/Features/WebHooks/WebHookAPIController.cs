@@ -15,15 +15,13 @@ namespace CloudDebugger.Features.WebHooks;
 /// /Hook4
 /// 
 /// These four endpoints will do the following:
-/// * Accept HTTP POST And OPTIONS requests
+/// * Accept HTTP GET,PUT, POST, DELETE And OPTIONS requests
 /// * Get details about the request and then add it to the log
 /// * Optionally, send a callback request back to the caller for validation purposes
 /// * Supports Cloud events and Event Grid schema validation
 /// 
-/// 
 /// Options:
 /// * WebHookFailureEnable
-/// TODO:!!!
 /// </summary>
 [EnableCors("MyCorsPolicy_wildcard")]
 [Route("/")]
@@ -44,12 +42,6 @@ public class WebHookApiController : ControllerBase
         this.signalRhubContext = hubContext;
     }
 
-    [HttpGet("hook{id:int:min(1):max(4)}")]
-    public Task<IActionResult> HookGet(int id)
-    {
-        return Task.FromResult<IActionResult>(Ok($"Webhook #{id} is responding, but only supports HTTP POST and OPTIONS requests"));
-    }
-
     /// <summary>
     /// Accepts requests to the following endpoints:
     /// 
@@ -59,13 +51,15 @@ public class WebHookApiController : ControllerBase
     /// /Hook4
     /// </summary>
     /// <returns></returns>
+    [HttpGet("hook{id:int:min(1):max(4)}")]
+    [HttpPut("hook{id:int:min(1):max(4)}")]
     [HttpPost("hook{id:int:min(1):max(4)}")]
+    [HttpDelete("hook{id:int:min(1):max(4)}")]
     [HttpOptions("hook{id:int:min(1):max(4)}")]
     public Task<IActionResult> Hook(int id)
     {
         return ProcessHook(id);
     }
-
 
 
     private async Task<IActionResult> ProcessHook(int hookId)
@@ -78,7 +72,7 @@ public class WebHookApiController : ControllerBase
             {
                 // Simulate a webhook failure by returning a HTTP 500 Server Errror back to the caller  
                 AddFailedWebHookEntryToLog(hookRequest);
-                return StatusCode(500);   //Error response
+                return StatusCode(500, $"Webhook #{hookId} is in a error state");   //Error response
             }
             else
             {
@@ -102,7 +96,7 @@ public class WebHookApiController : ControllerBase
 
                 }, hookRequest, logger);
 
-            return Ok("OK");          //OK response
+            return Ok($"Webhook #{hookId} is responding");          //OK response
         }
         catch (Exception exc)
         {
