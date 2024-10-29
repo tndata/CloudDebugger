@@ -52,6 +52,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 ### Event and messaging
 * [Event Grid](https://github.com/tndata/CloudDebugger/wiki/EventGrid)
 * [Event Hubs](https://github.com/tndata/CloudDebugger/wiki/EventHubs)
+* [Queue Storage](https://github.com/tndata/CloudDebugger/wiki/QueueStorage)
 * [WebHooks](https://github.com/tndata/CloudDebugger/wiki/Webhooks)
 
 ### Other tools

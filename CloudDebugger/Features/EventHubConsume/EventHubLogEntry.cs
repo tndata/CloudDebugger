@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.EventHubProduce;
+﻿namespace CloudDebugger.Features.EventHubConsume;
 
 public class EventHubLogEntry
 {

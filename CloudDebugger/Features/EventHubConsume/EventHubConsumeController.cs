@@ -1,5 +1,4 @@
 using Azure.Messaging.EventHubs.Consumer;
-using CloudDebugger.Features.EventHubProduce;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.EventHubConsume;
