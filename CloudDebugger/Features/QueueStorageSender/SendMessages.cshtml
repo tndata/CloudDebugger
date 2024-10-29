@@ -1,0 +1,89 @@
+﻿@model CloudDebugger.Features.QueueStorageSender.SendMessagesModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Send events to Azure Queue Storage";
+}
+
+<h3>Send Events to Azure Queue Storage</h3>
+This tool allows you to send messages to an Azure Queue Storage.
+<br />
+<a href="/QueueStorage">Back</a>
+<br>
+<br>
+
+<form asp-controller="QueueStorageSender" asp-action="SendMessages" method="post">
+
+
+    <h5>Queue and Connection details</h5>
+    <table class="table">
+        <tr>
+            <td class="col-md-2">SAS token</td>
+            <td class="col-md-10">
+                <input asp-for="SasToken" style="min-width:100%"><br />
+                Leave empty to use managed identity.
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Queue URL</td>
+            <td class="col-md-10">
+                <input asp-for="QueueUrl" style="min-width:100%"><br />
+            </td>
+        </tr>
+    </table>
+
+    <br />
+    <br />
+
+    <h5>Message details</h5>
+    <table class="table">
+        <tr>
+            <td class="col-md-2">Message start number</td>
+            <td class="col-md-2">
+                <input asp-for="StartNumber">
+                <span asp-validation-for="StartNumber"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Number of messages to send</td>
+            <td class="col-md-2">
+                <input asp-for="NumberOfMessages">
+                <span asp-validation-for="NumberOfMessages"></span>
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Message Body</td>
+            <td class="col-md-10">
+                <textarea asp-for="MessageToSend" rows="20" cols="70"></textarea>
+                <br />##ID## will be replaced by the message number.<br />
+
+                <span asp-validation-for="MessageToSend"></span>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+    <input type="submit" name="submit" value="Send Events" /><br />
+
+    @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.ErrorMessage</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+    <br />
+    @ViewData["authenticationApproach"]
+    <br />
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

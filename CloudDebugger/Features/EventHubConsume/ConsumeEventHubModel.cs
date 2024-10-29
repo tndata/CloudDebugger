@@ -1,5 +1,4 @@
-﻿using CloudDebugger.Features.EventHubProduce;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CloudDebugger.Features.EventHubConsume;
 
