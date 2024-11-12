@@ -1,0 +1,81 @@
+﻿@model CloudDebugger.Features.QueueStorageReceiver.ReceiveMessagesModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Receive events from Azure Queue Storage";
+}
+
+<h3>Receive messages from Azure Queue Storage</h3>
+This tool allows you to receive messages from an Azure Queue Storage. It will receive up to 10 messages.
+<br />
+<a href="/QueueStorage">Back</a>
+<br>
+<br>
+
+<form asp-controller="QueueStorageReceiver" asp-action="ReceiveMessages" method="post">
+
+
+    <h5>Queue and Connection details</h5>
+    <table class="table">
+        <tr>
+            <td class="col-md-2">SAS token</td>
+            <td class="col-md-10">
+                <input asp-for="SasToken" style="min-width:100%"><br />
+                Leave empty to use managed identity.
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Queue URL</td>
+            <td class="col-md-10">
+                <input asp-for="QueueUrl" style="min-width:100%"><br />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2"></td>
+            <td>
+
+                <input asp-for="DeleteMessagesAfterRead" type="checkbox" /> Don't delete messages from the queue<br />
+            </td>
+        </tr>
+    </table>
+
+    <br />
+    <br />
+
+    <br>
+    <input type="submit" name="submit" value="Receive Events" /><br />
+
+    @if(Model.ReceivedMessages != null)
+    {
+        <table class="table table-bordered">
+           @foreach(var message in Model.ReceivedMessages)
+            {
+                <tr>
+                    <td><pre>@message</pre></td>
+                </tr>
+            }
+            </table>
+    }
+
+
+
+    @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.ErrorMessage</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+    <br />
+    @ViewData["authenticationApproach"]
+    <br />
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
