@@ -98,7 +98,7 @@ public class EventHubProduceController : Controller
     /// <summary>
     /// We send one event per batch, so we can provide different partition keys for each event.
     /// </summary>
-    private async static Task SendEvent(EventHubProducerClient producerClient, EventData eventData, string partitionKey)
+    private static async Task SendEvent(EventHubProducerClient producerClient, EventData eventData, string partitionKey)
     {
         var batchOptions = new CreateBatchOptions()
         {

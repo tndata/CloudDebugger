@@ -14,7 +14,7 @@ public static class WebHookUtility
     /// <param name="request"></param>
     /// <param name="logger"></param>
     /// <returns></returns>
-    public async static Task<WebHookLogEntry> GetRequestDetails(int hookId, HttpRequest request, ILogger logger)
+    public static async Task<WebHookLogEntry> GetRequestDetails(int hookId, HttpRequest request, ILogger logger)
     {
         var logEntry = new WebHookLogEntry()
         {

@@ -63,7 +63,7 @@ public class TokenCredentailsExplorerController : Controller
         }
 
         totalTimeSw.Stop();
-        result.Add($"\r\nTotal time {((int)totalTimeSw.Elapsed.TotalMilliseconds)} ms");
+        result.Add($"\r\nTotal time {(int)totalTimeSw.Elapsed.TotalMilliseconds} ms");
 
         model.Log = result;
 

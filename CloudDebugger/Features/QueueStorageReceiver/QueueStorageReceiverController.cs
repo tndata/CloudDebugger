@@ -84,7 +84,7 @@ public class QueueStorageReceiverController : Controller
             {
                 QueueMessage[] messages = await client.ReceiveMessagesAsync(maxMessages: 10, cancellationToken: CTS.Token);
 
-                model.ReceivedMessages = new List<string>();
+                model.ReceivedMessages = [];
 
                 foreach (QueueMessage receivedMessage in messages)
                 {

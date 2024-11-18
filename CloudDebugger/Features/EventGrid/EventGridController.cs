@@ -80,6 +80,8 @@ public class EventGridController : Controller
                 case "cloudevent":
                     SendCloudEvents(model, client);
                     break;
+                default:
+                    break;
             }
         }
         catch (Exception exc)

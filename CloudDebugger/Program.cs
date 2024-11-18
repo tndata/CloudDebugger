@@ -28,7 +28,7 @@ var eventListener = new AzureEventSourceListener((e, message) =>
     //Azure-Messaging-ServiceBus
     //Azure-Messaging-EventHubs
 
-    if (e.EventSource.Name == "Azure-Core" || e.EventSource.Name == "Azure-Identity")
+    if (e.EventSource.Name is "Azure-Core" or "Azure-Identity")
     {
         MyAzureIdentityLog.AddToLog(e.EventSource.Name.ToString(), message);
     }

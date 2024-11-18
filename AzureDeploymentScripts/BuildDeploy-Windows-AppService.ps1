@@ -13,7 +13,7 @@ $zipFolder = '../publish'
 if (-not (Test-Path $zipFolder)) {
     New-Item -ItemType Directory -Path $zipFolder
 }
-Compress-Archive -Path ..\CloudDebugger\bin\Release\net8.0\win-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-windows.zip"
+Compress-Archive -Path ..\CloudDebugger\bin\Release\net9.0\win-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-windows.zip"
 Write-Host "Zip file created at ${zipFolder}/publish-windows.zip"
 
 # Step 3: Create the resource group
@@ -50,7 +50,7 @@ Write-Host "`nCreating the Windows App Service '${AppServiceName_win}'."
 $AppService = az webapp create --name $AppServiceName_win `
                                --plan $AppServicePlan_win `
                                -g $rgname `
-                               --runtime 'dotnet:8' `
+                               --runtime 'dotnet:9' `
                                --assign-identity $identityId `
                                | ConvertFrom-Json
 $appServiceID = $AppService.id

@@ -90,7 +90,7 @@ public class RedisController : Controller
     /// <param name="pattern"></param>
     /// <param name="connectionString"></param>
     /// <returns></returns>
-    private async static Task<List<RedisKeyInfo>> ScanKeys(string pattern, string connectionString)
+    private static async Task<List<RedisKeyInfo>> ScanKeys(string pattern, string connectionString)
     {
         ConnectionMultiplexer connection = await GetRedisConnection(connectionString);
         var server = connection.GetServer(connection.GetEndPoints()[0]);
@@ -147,7 +147,7 @@ public class RedisController : Controller
     /// <param name="expire"></param>
     /// <param name="connectionString"></param>
     /// <returns></returns>
-    private async static Task<string> WriteKeyToRedis(string key, string value, int expire, string connectionString)
+    private static async Task<string> WriteKeyToRedis(string key, string value, int expire, string connectionString)
     {
         ConnectionMultiplexer connection = await GetRedisConnection(connectionString);
         IDatabase db = connection.GetDatabase();
@@ -178,7 +178,7 @@ public class RedisController : Controller
     /// </summary>
     /// <param name="connectionString"></param>
     /// <returns></returns>
-    private async static Task<ConnectionMultiplexer> GetRedisConnection(string connectionString)
+    private static async Task<ConnectionMultiplexer> GetRedisConnection(string connectionString)
     {
         if (connectionString.Contains("password="))
         {

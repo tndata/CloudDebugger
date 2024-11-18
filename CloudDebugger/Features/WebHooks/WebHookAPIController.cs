@@ -120,7 +120,6 @@ public class WebHookApiController : ControllerBase
         //This is the destination message for the SignalR hub
         string signalRMessage = $"ReceiveMessage{hookId}";
 
-        string color = "black";
         int hashcode = 0;
 
         //Base the color of the message on the hashcode of the subject or body
@@ -136,21 +135,14 @@ public class WebHookApiController : ControllerBase
             }
         }
 
-        switch (hashcode)
+        string color = hashcode switch
         {
-            case 0:
-                color = "black";
-                break;
-            case 1:
-                color = "blue";
-                break;
-            case 2:
-                color = "green";
-                break;
-            case 3:
-                color = "red";
-                break;
-        }
+            0 => "black",
+            1 => "blue",
+            2 => "green",
+            3 => "red",
+            _ => "yellow",
+        };
 
         var content = "[M]";
 

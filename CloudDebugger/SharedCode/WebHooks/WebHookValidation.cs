@@ -88,8 +88,8 @@ public static class WebHookValidation
                 return;
             }
 
-            string? validationCode;
-            string? validationUrl;
+            string? validationCode = null;
+            string? validationUrl = null;
             switch (receivedEvents.Type)
             {
                 case JTokenType.Array:
@@ -108,6 +108,24 @@ public static class WebHookValidation
                         logger.LogInformation("Received EventGrid subscription validation request with validation code '{ValidationCode}' and validation URL '{ValidationUrl}'", validationCode, validationUrl);
                         break;
                     }
+                case JTokenType.Boolean:
+                case JTokenType.Bytes:
+                case JTokenType.Comment:
+                case JTokenType.Constructor:
+                case JTokenType.Date:
+                case JTokenType.Float:
+                case JTokenType.Guid:
+                case JTokenType.Integer:
+                case JTokenType.None:
+                case JTokenType.Null:
+                case JTokenType.Property:
+                case JTokenType.Raw:
+                case JTokenType.String:
+                case JTokenType.TimeSpan:
+                case JTokenType.Undefined:
+                case JTokenType.Uri:
+                    // Do nothing for these cases
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(
                         $"The request content should be parseable into a JSON object or array, but was {receivedEvents.Type}.");

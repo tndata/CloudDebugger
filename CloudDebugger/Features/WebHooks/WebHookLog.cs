@@ -9,7 +9,7 @@ public class WebHookLog : IWebHookLog
 {
     private const int MaxLogEntries = 100;
     private readonly List<WebHookLogEntry> Log = [];
-    private readonly object lockObj = new();
+    private readonly Lock lockObj = new();
 
     public WebHookLog()
     {

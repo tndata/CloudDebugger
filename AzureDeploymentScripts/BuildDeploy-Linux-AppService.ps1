@@ -13,7 +13,7 @@ $zipFolder = '../publish'
 if (-not (Test-Path $zipFolder)) {
     New-Item -ItemType Directory -Path $zipFolder
 }
-Compress-Archive -Path ..\CloudDebugger\bin\Release\net8.0\linux-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-linux.zip"
+Compress-Archive -Path ..\CloudDebugger\bin\Release\net9.0\linux-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-linux.zip"
 Write-Host "Zip file created at ${zipFolder}/publish-linux.zip"
 
 # Step 3: Create the resource group
@@ -50,7 +50,7 @@ Write-Host "`nCreating the Linux App Service '${AppServiceName_linux}'."
 $AppService = az webapp create --name $AppServiceName_linux `
                                           --plan $AppServicePlan_linux `
                                           --resource-group $rgname `
-                                          --runtime 'DOTNETCORE:8.0' `
+                                          --runtime 'DOTNETCORE:9.0' `
                                           --assign-identity $identityId `
                                           --output json | ConvertFrom-Json
 
@@ -72,11 +72,11 @@ $tmp = az webapp config appsettings set --name $AppServiceName_linux `
              # -Location $location `
              # -AppServicePlan $AppServicePlan_linux
              
-# Write-Host "Set the stack to .NET Core 8.0" 
+# Write-Host "Set the stack to .NET Core 9.0" 
 # $tmp1 = az webapp config set --resource-group $rgname `
                      # --name $AppServiceName_linux `
                      # --use-32bit-worker-process false `
-                     # --linux-fx-version 'DOTNETCORE"|"8.0'
+                     # --linux-fx-version 'DOTNETCORE"|"9.0'
                      
 Write-Host "Get App Service details"                    
 $AppService = Get-AzWebApp -ResourceGroupName $rgname -Name $AppServiceName_linux 

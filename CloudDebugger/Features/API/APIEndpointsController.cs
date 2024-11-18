@@ -19,7 +19,7 @@ namespace CloudDebugger.Features.Api;
 public class ApiEndpointsController : ControllerBase
 {
     private readonly ILogger<ApiEndpointsController> _logger;
-    private readonly static CustomerDatabase m_db = new();
+    private static readonly CustomerDatabase m_db = new();
 
     public ApiEndpointsController(ILogger<ApiEndpointsController> logger)
     {
