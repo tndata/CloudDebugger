@@ -7,6 +7,13 @@
 Write-Host "`n`nBuilding and publishing the project for Windows."
 dotnet publish ../CloudDebugger.sln -r win-x64
 
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Publish succeeded."
+} else {
+    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 9 SDK not installed?" -ForegroundColor Red
+    exit 1
+}
+
 # Step 2: Compress the published files
 Write-Host "`nCompressing the published files."
 $zipFolder = '../publish'
@@ -42,7 +49,7 @@ $servicePlan = az appservice plan create --name $AppServicePlan_win `
                                            --sku $AppServicePlanSKU_Windows `
                                            --output json | ConvertFrom-Json
 $planId = $servicePlan.id
-Write-Host "App Service Plan created with id: ${planId}"
+Write-Host "Windows App Service Plan created with id: ${planId}"
                   
 # Step 6: Create the App Service
 Write-Host "`nCreating the Windows App Service '${AppServiceName_win}'."

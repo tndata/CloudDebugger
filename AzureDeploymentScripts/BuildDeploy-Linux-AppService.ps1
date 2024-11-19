@@ -7,6 +7,13 @@
 Write-Host "`n`nBuilding and publishing the project for Linux."
 dotnet publish ../CloudDebugger.sln -r linux-x64
 
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Publish succeeded."
+} else {
+    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 9 SDK not installed?" -ForegroundColor Red
+    exit 1
+}
+
 # Step 2: Compress the published files
 Write-Host "`nCompressing the published files."
 $zipFolder = '../publish'
@@ -43,7 +50,7 @@ $servicePlan = az appservice plan create --name $AppServicePlan_linux `
                                          --sku $AppServicePlanSKU_Linux `
                                          --output json | ConvertFrom-Json
 $planId = $servicePlan.id
-Write-Host "App Service Plan created with id: ${planId}"
+Write-Host "Linux App Service Plan created with id: ${planId}"
 
 #Step 6: Create the App Service
 Write-Host "`nCreating the Linux App Service '${AppServiceName_linux}'."
@@ -54,6 +61,9 @@ $AppService = az webapp create --name $AppServiceName_linux `
                                           --assign-identity $identityId `
                                           --output json | ConvertFrom-Json
 
+                                          $appServiceID = $AppService.id
+$hostName = $AppService.defaultHostName
+
 # Step 7: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
 Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."
 $tmp = az webapp config appsettings set --name $AppServiceName_linux `
@@ -61,30 +71,8 @@ $tmp = az webapp config appsettings set --name $AppServiceName_linux `
 	--settings AZURE_CLIENT_ID=$clientId `
 	--output json | ConvertFrom-Json
 
-# $appServiceID = $AppService.id
-# $hostName = $AppService.defaultHostName
-# Write-Host "App Service created, id: ${appServiceID}"
 
-# # We use the New-AzWebApp cmdlet to create the App Service instead of 'az webapp create'.
-# # We do this to avoid odd timeouts during the .ZIP deployment that we have experienced with 'az webapp create'.
-# $AppService = New-AzWebApp -ResourceGroupName $rgName `
-             # -Name $AppServiceName_linux `
-             # -Location $location `
-             # -AppServicePlan $AppServicePlan_linux
-             
-# Write-Host "Set the stack to .NET Core 9.0" 
-# $tmp1 = az webapp config set --resource-group $rgname `
-                     # --name $AppServiceName_linux `
-                     # --use-32bit-worker-process false `
-                     # --linux-fx-version 'DOTNETCORE"|"9.0'
-                     
-Write-Host "Get App Service details"                    
-$AppService = Get-AzWebApp -ResourceGroupName $rgname -Name $AppServiceName_linux 
-$appServiceID = $AppService.id
-$hostName = $AppService.DefaultHostName
-Write-Host "App Service created, id: ${appServiceID}"
-
-# Step 7: Enable Application Logging (Filesystem)
+# Step 8: Enable Application Logging (Filesystem)
 Write-Host "`nEnabling application logging for the App Service."
 $res1 = az webapp log config --name $AppServiceName_linux `
                              --resource-group $rgname `
@@ -93,7 +81,7 @@ $res1 = az webapp log config --name $AppServiceName_linux `
                              --output json | ConvertFrom-Json
 
 
-# Step 8: Deploy the ZIP file to the App Service
+# Step 9: Deploy the ZIP file to the App Service
 Write-Host "`nUpload and deploy CloudDebugger App Service (Zip deployment)"
 $deployResult = az webapp deploy --resource-group $rgname `
                                  --name $AppServiceName_linux `
@@ -103,7 +91,7 @@ $deployResult = az webapp deploy --resource-group $rgname `
 
 Write-Host "Application uploaded, waiting for deployment to complete, status=${deploymentStatus}"
 
-# Step 9: Assign the User-Assigned Identity to the Web App
+# Step 10: Assign the User-Assigned Identity to the Web App
 Write-Host "`nAssigning the User-Assigned Identity to the Web App."
 $tmp1 = az webapp identity assign --name $AppServiceName_linux --resource-group $rgname --identities $identityId
 

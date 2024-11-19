@@ -6,6 +6,10 @@
 # Ignore .URL files
 *.url
 
+# Ignore .ZIP files
+*.zip
+
+
 # Ignore markdown monster backup files
 * .saved.bak
 
