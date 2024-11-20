@@ -17,6 +17,48 @@ public class LoggingController : Controller
 
     public IActionResult Index()
     {
+        return View();
+    }
+
+
+    public IActionResult WriteToStdOutErr()
+    {
+        var model = new StdOutStdErrModel()
+        {
+            StdOutMessage = "### This is my standard output message! ###",
+            StdErrMessage = "### This is my standard error message! ###"
+        };
+
+        return View(model);
+    }
+
+
+    [HttpPost]
+    public IActionResult WriteToStdOutErr(StdOutStdErrModel model)
+    {
+        try
+        {
+            model.Message = "";
+            model.Exception = "";
+
+            if (model.StdOutMessage != null)
+                Console.WriteLine(model.StdOutMessage);
+
+            if (model.StdErrMessage != null)
+                Console.Error.WriteLine(model.StdErrMessage);
+
+            model.Message = "Log message written to standard out and/or error";
+        }
+        catch (Exception exc)
+        {
+            model.Exception = exc.ToString();
+        }
+
+        return View(model);
+    }
+
+    public IActionResult WriteToLog()
+    {
         var model = new LoggingModel()
         {
             LogMessage = "This is my log message!",
@@ -26,8 +68,10 @@ public class LoggingController : Controller
         return View(model);
     }
 
+
+
     [HttpPost]
-    public IActionResult Index(LoggingModel model)
+    public IActionResult WriteToLog(LoggingModel model)
     {
         try
         {
