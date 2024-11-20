@@ -18,7 +18,7 @@ public static class QueueStorageClientBuilder
     /// <returns></returns>
     public static (QueueClient client, string message) CreateQueueClient(Uri queueUrl, string sasToken)
     {
-        string message = "";
+        string message;
         if (string.IsNullOrWhiteSpace(sasToken))
         {
             // See https://github.com/microsoft/azure-container-apps/issues/442
