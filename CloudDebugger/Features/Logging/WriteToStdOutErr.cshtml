@@ -17,22 +17,20 @@ This tool will write a message to the standard output and standard error output 
             <td class="col-md-2">
                 Standard Output message
             </td>
-            <td class="col-md-2">
-                <input asp-for="StdOutMessage" style="min-width:50%" />
+            <td class="col-md-10">
+                <input asp-for="StdOutMessage" style="min-width:75%" />
                 <span asp-validation-for="StdOutMessage"></span><br />(Leave empty to not write to standard output)
             </td>
-            <td class="col-md-8"></td>
         </tr>
         <tr>
             <td class="col-md-2">
                 Standard error message
             </td>
-            <td class="col-md-2">
-                <textarea asp-for="StdErrMessage" rows="7" cols="70"></textarea>
+            <td class="col-md-10">
+                <input asp-for="StdErrMessage" style="min-width:75%" />
                 <span asp-validation-for="StdErrMessage"></span>
                 <br />(Leave empty to not write to standard output)
             </td>
-            <td class="col-md-8">
             </td>
         </tr>
         <tr>

@@ -66,7 +66,7 @@ public class LoggingController : Controller
     {
         var model = new LoggingModel()
         {
-            LogMessage = "This is my log message!",
+            LogMessage = "### This is my log message! ###",
             LogCategory = typeof(LoggingController).FullName
         };
 

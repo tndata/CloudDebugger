@@ -17,23 +17,21 @@ This tool will write a message to each of the 6 different log levels (Trace, Deb
             <td class="col-md-2">
                 Log Category
             </td>
-            <td class="col-md-2">
+            <td class="col-md-10">
                 <input asp-for="LogCategory" style="min-width:50%" />
                 <span asp-validation-for="LogCategory"></span>
                 <br>(Specify any category/namespace for the log message.<br />
                 By default, it is the fully qualified name of the class that wrote the message.)
             </td>
-            <td class="col-md-8"></td>
         </tr>
         <tr>
             <td class="col-md-2">
                 Log Message
             </td>
-            <td class="col-md-2">
+            <td class="col-md-10">
                 <textarea asp-for="LogMessage" rows="7" cols="70"></textarea>
                 <span asp-validation-for="LogMessage"></span>
             </td>
-            <td class="col-md-8">
             </td>
         </tr>
         <tr>
