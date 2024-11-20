@@ -1,0 +1,82 @@
+﻿@model CloudDebugger.Features.Logging.LoggingModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Write a message to the ILogger<T> log";
+}
+
+<h4>Write a message to the log</h4>
+This tool will write a message to each of the 6 different log levels (Trace, Debug, Information, Warning, Error, Critical).
+
+<br>
+<br>
+
+<form asp-controller="Logging" asp-action="WriteToLog" method="post">
+
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Log Category
+            </td>
+            <td class="col-md-2">
+                <input asp-for="LogCategory" style="min-width:50%" />
+                <span asp-validation-for="LogCategory"></span>
+                <br>(Specify any category/namespace for the log message.<br />
+                By default, it is the fully qualified name of the class that wrote the message.)
+            </td>
+            <td class="col-md-8"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">
+                Log Message
+            </td>
+            <td class="col-md-2">
+                <textarea asp-for="LogMessage" rows="7" cols="70"></textarea>
+                <span asp-validation-for="LogMessage"></span>
+            </td>
+            <td class="col-md-8">
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">
+            </td>
+            <td class="col-md-10">
+                <input type="submit" name="submit" value="Write message to the log" /><br />
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+    <br>
+
+
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Exception))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+<br>
+<br>
+<br>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/Logging">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging">Logging in .NET Core and ASP.NET Core</a></li>
+</ul>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
