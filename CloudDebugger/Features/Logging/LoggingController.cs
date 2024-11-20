@@ -4,7 +4,11 @@ using System.Text.RegularExpressions;
 namespace CloudDebugger.Features.Logging;
 
 /// <summary>
-/// This tool will write a message to each of the 6 different log levels
+/// This tool does the following:
+
+/// * Writes a message to standard output and standard error
+/// * Writes a message to each of the 6 different log levels (Trace, Debug, Information, Warning, Error, Critical).
+/// 
 /// </summary>
 public class LoggingController : Controller
 {
@@ -20,7 +24,6 @@ public class LoggingController : Controller
         return View();
     }
 
-
     public IActionResult WriteToStdOutErr()
     {
         var model = new StdOutStdErrModel()
@@ -32,7 +35,6 @@ public class LoggingController : Controller
         return View(model);
     }
 
-
     [HttpPost]
     public IActionResult WriteToStdOutErr(StdOutStdErrModel model)
     {
@@ -41,13 +43,16 @@ public class LoggingController : Controller
             model.Message = "";
             model.Exception = "";
 
-            if (model.StdOutMessage != null)
-                Console.WriteLine(model.StdOutMessage);
+            if (ModelState.IsValid)
+            {
+                if (model.StdOutMessage != null)
+                    Console.WriteLine(model.StdOutMessage);
 
-            if (model.StdErrMessage != null)
-                Console.Error.WriteLine(model.StdErrMessage);
+                if (model.StdErrMessage != null)
+                    Console.Error.WriteLine(model.StdErrMessage);
 
-            model.Message = "Log message written to standard out and/or error";
+                model.Message = "Log message written to standard out and/or error";
+            }
         }
         catch (Exception exc)
         {
@@ -67,8 +72,6 @@ public class LoggingController : Controller
 
         return View(model);
     }
-
-
 
     [HttpPost]
     public IActionResult WriteToLog(LoggingModel model)
