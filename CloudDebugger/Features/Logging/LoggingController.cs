@@ -5,7 +5,7 @@ namespace CloudDebugger.Features.Logging;
 
 /// <summary>
 /// This tool does the following:
-
+/// 
 /// * Writes a message to standard output and standard error
 /// * Writes a message to each of the 6 different log levels (Trace, Debug, Information, Warning, Error, Critical).
 /// 
@@ -28,8 +28,8 @@ public class LoggingController : Controller
     {
         var model = new StdOutStdErrModel()
         {
-            StdOutMessage = "### This is my standard output message! ###",
-            StdErrMessage = "### This is my standard error message! ###"
+            StdOutMessage = "XXX - This is my standard output message! XXX",
+            StdErrMessage = "XXX - This is my standard error message! XXX"
         };
 
         return View(model);
@@ -66,7 +66,7 @@ public class LoggingController : Controller
     {
         var model = new LoggingModel()
         {
-            LogMessage = "### This is my log message! ###",
+            LogMessage = "XXX This is my log message! XXX",
             LogCategory = typeof(LoggingController).FullName
         };
 

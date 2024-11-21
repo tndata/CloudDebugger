@@ -1,0 +1,110 @@
+﻿@model CloudDebugger.Features.Configuration.AppConfigurationModel
+
+@{
+    ViewData["Title"] = "Cloud Debugger - List ASP.NET Core Configuration";
+}
+
+<h3>Configuration</h3>
+This tool lists all configuration data detected by ASP.NET Core.
+
+<a href="/">Back</a>
+<br />
+<br />
+<br />
+
+<h4>Current Configuration Values</h4>
+This table displays the final combined list of all configuration values gathered from all providers.
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Key
+            </th>
+            <th>
+                Value
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Config)
+        {
+            <tr>
+                <td>
+                    @item.Key
+                </td>
+                <td>
+                    @item.Value
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+<br />
+<br />
+
+<h4>Current Configuration Providers</h4>
+This tool lists all the configuration providers used by your application and the keys found for each provider.
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Child Keys</th>
+            <th>Values</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ConfigProviders)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>
+                    <ul>
+                        @foreach (var key in item.ChildKeys)
+                        {
+                            <li>@key</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        @foreach (var kvp in item.Values)
+                        {
+                            <li>@kvp.Key: @kvp.Value</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+<br />
+<br />
+
+@if(Model.DebugView != null)
+{
+    <h4>DebugView</h4>
+    <p>This view provides a detailed representation of the configuration data, including the sources and values.</p>
+    <table class="table">
+        <tr>
+            <td>
+                <pre>@Model.DebugView</pre>
+            </td>
+        </tr>
+    </table>
+}
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/Configuration">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/app-service/configure-common">Configure an App Service app</a></li>
+</ul>
+
+

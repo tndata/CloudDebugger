@@ -19,12 +19,6 @@ public class DiagnosticsController : Controller
     {
     }
 
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-
     /// <summary>
     /// Show all the environment variables
     /// </summary>

@@ -1,0 +1,45 @@
+﻿@model CloudDebugger.Features.ConnectionStrings.ConnectionStringsModel
+
+@{
+    ViewData["Title"] = "Cloud Debugger - List Connection Strings";
+}
+
+<h3>Connection Strings</h3>
+This tool lists all connection strings detected by ASP.NET Core.
+These may come from configuration files or environment variables.
+
+<a href="/diagnostics">Back</a>
+<br />
+
+
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th class="col-md-1">Name</th>
+            <th class="col-md-11">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var entry in Model.ConnectionStrings)
+            {
+                <tr>
+                    <td class="col-md-2">@entry.Key</td>
+                    <td class="col-md-10">@entry.Value</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/ConnectionStrings">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/app-service/configure-common">Configure an App Service app</a></li>
+</ul>
+
+

@@ -18,9 +18,9 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 ## Features and tools
 
 ### HTTP Request tools
-* [Request Logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 * [Current Request Viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
 * [Calling External APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
+* [Request Logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 
 ### App Services
 * [App Service File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
@@ -32,22 +32,23 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
 
 ### Identity tools
-* [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
 * [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
+* [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
 * [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
 * [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 ### Diagnostics and system information
-* [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Connection Strings](https://github.com/tndata/CloudDebugger/wiki/ConnectionStrings)
 * [Environment Variables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
-* [Scale-out and load-balancing](https://github.com/tndata/CloudDebugger/wiki/Scaleout)
+* [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 
  
 ### Logging
-* [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
+* [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
+* [Write to standard output and error](https://github.com/tndata/CloudDebugger/wiki/WriteToStdOutErr)
 
 ### Event and messaging
 * [Event Grid](https://github.com/tndata/CloudDebugger/wiki/EventGrid)
@@ -58,6 +59,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 ### Other tools
 * [Caching](https://github.com/tndata/CloudDebugger/wiki/Caching)
 * [Health Endpoint](https://github.com/tndata/CloudDebugger/wiki/Health)
+* [Scale-out and load-balancing](https://github.com/tndata/CloudDebugger/wiki/Scaleout)
 
 
 
