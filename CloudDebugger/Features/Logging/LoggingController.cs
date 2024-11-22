@@ -4,11 +4,10 @@ using System.Text.RegularExpressions;
 namespace CloudDebugger.Features.Logging;
 
 /// <summary>
-/// This tool does the following:
+/// This tool performs the following actions:
 /// 
-/// * Writes a message to standard output and standard error
-/// * Writes a message to each of the 6 different log levels (Trace, Debug, Information, Warning, Error, Critical).
-/// 
+/// * Writes a message to standard output and standard error.
+/// * Writes a message to the logging system at each of the 6 log levels: Trace, Debug, Information, Warning, Error, and Critical.
 /// </summary>
 public class LoggingController : Controller
 {
@@ -35,6 +34,11 @@ public class LoggingController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Write a message to the Standard output and Error output stream
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult WriteToStdOutErr(StdOutStdErrModel model)
     {
