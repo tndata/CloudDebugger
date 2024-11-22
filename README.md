@@ -38,6 +38,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 ### Diagnostics and system information
+* [App Configuration](https://github.com/tndata/CloudDebugger/wiki/Configuration)
 * [Connection Strings](https://github.com/tndata/CloudDebugger/wiki/ConnectionStrings)
 * [Environment Variables](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)

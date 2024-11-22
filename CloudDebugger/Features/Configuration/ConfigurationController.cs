@@ -7,6 +7,8 @@ namespace CloudDebugger.Features.Configuration;
 /// 
 /// * Lists all the ASP.NET Configuration data
 /// 
+/// * Documentation
+///   https://github.com/tndata/CloudDebugger/wiki/Configuration
 /// </summary>
 public class ConfigurationController : Controller
 {
@@ -36,7 +38,7 @@ public class ConfigurationController : Controller
 
                      Prefix = (provider as IConfigurationSource)?.ToString(), // Example of getting prefix, adjust as needed
 
-                     ChildKeys = provider.GetChildKeys(Enumerable.Empty<string>(), null).ToList()
+                     ChildKeys = provider.GetChildKeys([], null).ToList()
                  };
 
                  // Get values for each key
