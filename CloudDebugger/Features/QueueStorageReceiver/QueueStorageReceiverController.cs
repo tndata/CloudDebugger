@@ -9,9 +9,14 @@ namespace CloudDebugger.Features.QueueStorageReceiver;
 /// <summary>
 /// Azure Queue Storage receiver tool
 /// 
-/// This tool will send a number of messages to an Azure Queue Storage. It supposed authentication using SAS Token or Managed Identity.
+/// This tool will send a number of messages to an Azure Queue Storage. 
+/// It supports authentication using SAS Token or Managed Identity.
+/// 
+/// See the Wiki documentation on how to create a Storage Queue
 /// 
 /// Resources: 
+/// * Documentation wiki
+///   https://github.com/tndata/CloudDebugger/wiki/QueueStorage       
 /// * Getting Started with Azure Queue Service in .NET
 ///   https://github.com/Azure-Samples/storage-queue-dotnet-getting-started
 /// * Azure Storage client libraries for .NET
@@ -19,13 +24,13 @@ namespace CloudDebugger.Features.QueueStorageReceiver;
 /// </summary>
 public class QueueStorageReceiverController : Controller
 {
-
     // Keys for the Session Storage
     private const string QueueUrlSessionKey = "QueueStorageUrlString";
     private const string queueSasTokenSessionKey = "QueueStorageSasTokenString";
 
     private const string authenticationApproach = "authenticationApproach";
     private const int WaitForMessagesTimeout = 10000;       //ms
+    private const int MaxNumberOfMessagesToRetrieve = 10;
 
     public QueueStorageReceiverController()
     {
@@ -82,7 +87,7 @@ public class QueueStorageReceiverController : Controller
 
             using (var CTS = new CancellationTokenSource(WaitForMessagesTimeout))
             {
-                QueueMessage[] messages = await client.ReceiveMessagesAsync(maxMessages: 10, cancellationToken: CTS.Token);
+                QueueMessage[] messages = await client.ReceiveMessagesAsync(maxMessages: MaxNumberOfMessagesToRetrieve, cancellationToken: CTS.Token);
 
                 model.ReceivedMessages = [];
 
@@ -111,6 +116,8 @@ public class QueueStorageReceiverController : Controller
                     {
                         // Let the service know we're finished with
                         // the message and it can be safely deleted.
+
+                        //If the message is not deleted, the message will be invisible for default 30 seconds. (visibility timeout)
                         await client.DeleteMessageAsync(receivedMessage.MessageId, receivedMessage.PopReceipt);
                     }
                 }

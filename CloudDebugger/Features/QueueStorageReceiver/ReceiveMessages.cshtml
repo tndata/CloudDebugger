@@ -1,6 +1,6 @@
 ﻿@model CloudDebugger.Features.QueueStorageReceiver.ReceiveMessagesModel
 @{
-    ViewData["Title"] = "Cloud Debugger - Receive events from Azure Queue Storage";
+    ViewData["Title"] = "Cloud Debugger - Receive messages from Azure Queue Storage";
 }
 
 <h3>Receive messages from Azure Queue Storage</h3>
@@ -32,7 +32,7 @@ This tool allows you to receive messages from an Azure Queue Storage. It will re
             <td class="col-md-2"></td>
             <td>
 
-                <input asp-for="DeleteMessagesAfterRead" type="checkbox" /> Don't delete messages from the queue<br />
+                <input asp-for="DeleteMessagesAfterRead" type="checkbox" /> Delete messages from the queue<br />
             </td>
         </tr>
     </table>
@@ -41,7 +41,7 @@ This tool allows you to receive messages from an Azure Queue Storage. It will re
     <br />
 
     <br>
-    <input type="submit" name="submit" value="Receive Events" /><br />
+    <input type="submit" name="submit" value="Receive Messages" /><br />
 
     @if(Model.ReceivedMessages != null)
     {

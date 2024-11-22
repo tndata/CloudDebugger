@@ -7,9 +7,12 @@ namespace CloudDebugger.Features.QueueStorageSender;
 /// <summary>
 /// Azure Queue Storage Sender tool
 /// 
-/// This tool will send a number of messages to an Azure Queue Storage. It supposed authentication using SAS Token or Managed Identity.
+/// This tool will send a number of messages to an Azure Queue Storage. 
+/// It supports authentication using SAS Token or Managed Identity.
 /// 
 /// Resources: 
+/// * Documentation for this tool
+///   https://github.com/tndata/CloudDebugger/wiki/QueueStorage 
 /// * Getting Started with Azure Queue Service in .NET
 ///   https://github.com/Azure-Samples/storage-queue-dotnet-getting-started
 /// * Azure Storage client libraries for .NET
@@ -117,7 +120,7 @@ public class QueueStorageSenderController : Controller
     {
         int eventId = model.StartNumber;
 
-        for (int i = 0; i < model.NumberOfMessages; i++)
+        for (int i = 0; i < model.NumberOfMessagesToSend; i++)
         {
             var message = model.MessageToSend ?? "";
             message = message.Replace("##ID##", eventId.ToString());
@@ -128,6 +131,6 @@ public class QueueStorageSenderController : Controller
         }
 
         model.StartNumber = eventId;
-        model.Message = $"{model.NumberOfMessages} messages sent!";
+        model.Message = $"{model.NumberOfMessagesToSend} messages sent!";
     }
 }

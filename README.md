@@ -43,7 +43,6 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
-
  
 ### Logging
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
