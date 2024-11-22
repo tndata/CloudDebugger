@@ -3,7 +3,7 @@
 public class ConnectionStringsModel
 {
     /// <summary>
-    /// Message to write to the log
+    /// List of the connection string found
     /// </summary>
     public SortedDictionary<string, string> ConnectionStrings { get; set; } = [];
 }

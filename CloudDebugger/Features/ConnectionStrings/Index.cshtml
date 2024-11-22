@@ -11,6 +11,7 @@ These may come from configuration files or environment variables.
 <a href="/diagnostics">Back</a>
 <br />
 <br />
+<br />
 
 
 <table class="table table-hover table-bordered">
@@ -33,6 +34,24 @@ These may come from configuration files or environment variables.
         }
     </tbody>
 </table>
+
+
+<br>
+<br>
+<br>
+
+<div class="border p-3">
+    <h5>Important</h5>
+    Only MySQL, SQL Azure, SQL Server, and Custom connection strings defined in Azure App Services are displayed here.
+    For more information, refer to the following resources:
+    <ul>
+        <li><a href="https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.Configuration.EnvironmentVariables/src/EnvironmentVariablesConfigurationProvider.cs">EnvironmentVariablesConfigurationProvider.cs</a> (where the connection string mapping is performed)</li>
+        <li><a href="https://github.com/dotnet/runtime/issues/36123">GitHub Issue - EnvironmentVariablesConfigurationProvider should support all types of connection strings</a></li>
+        <li><a href="https://github.com/MicrosoftDocs/azure-docs/pull/122464">Enhance clarity for workaround with unsupported Connection String Types</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#configure-connection-strings">Configure connection strings</a></li>
+    </ul>
+</div>
+
 
 
 <br />

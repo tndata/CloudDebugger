@@ -7,6 +7,8 @@ namespace CloudDebugger.Features.ConnectionStrings;
 /// 
 /// * Lists all the connection strings found by ASP.NET Core
 /// 
+/// * Documentatioin
+///   https://github.com/tndata/CloudDebugger/wiki/ConnectionStrings 
 /// </summary>
 public class ConnectionStringsController : Controller
 {
@@ -26,7 +28,12 @@ public class ConnectionStringsController : Controller
         {
             if (!string.IsNullOrEmpty(connectionString.Value))
             {
-                model.ConnectionStrings.Add(connectionString.Key, connectionString.Value);
+                var value = connectionString.Value;
+
+                if (string.IsNullOrEmpty(value))
+                    value = "[Empty]";
+
+                model.ConnectionStrings.Add(connectionString.Key, value);
             }
         }
 
