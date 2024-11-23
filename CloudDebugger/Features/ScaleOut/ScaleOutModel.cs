@@ -12,6 +12,11 @@ public record ScaleOutModel
     public string? CurrentTime { get; set; }
     public TimeSpan RunningTime { get; set; }
 
+    // These are taken from the environment variables. Used for example when experimenting with App Settings And Deployment Slots
+    public string? Version { get; set; }
+    public string? ConStr { get; set; }
+    public string? Env { get; set; }
+
     public override int GetHashCode()
     {
         return HashCode.Combine(SiteName, HostName, PodIP, IPAddress, InstanceId, ComputerName);

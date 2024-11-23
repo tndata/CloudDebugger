@@ -89,7 +89,9 @@ $deployResult = az webapp deploy --resource-group $rgname `
                                  --src-path "${zipFolder}/publish-linux.zip" `
                                  --output json | ConvertFrom-Json
 
-Write-Host "Application uploaded, waiting for deployment to complete, status=${deploymentStatus}"
+$deploymentId = $deployResult.id
+$deploymentProvisioningState = $deployResult.provisioningState
+Write-Host "App Service deployment completed with id: ${deploymentId}, provisioningState: ${deploymentProvisioningState}"
 
 # Step 10: Assign the User-Assigned Identity to the Web App
 Write-Host "`nAssigning the User-Assigned Identity to the Web App."

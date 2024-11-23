@@ -1,22 +1,28 @@
 ﻿@{
     ViewData["Title"] = "Cloud Debugger";
 
-    var company = Environment.GetEnvironmentVariable("Company");
-    var country = Environment.GetEnvironmentVariable("Country");
+    var version = Environment.GetEnvironmentVariable("Version");
+    var conStr = Environment.GetEnvironmentVariable("ConStr");
+    var env = Environment.GetEnvironmentVariable("Env");
 
 }
 
 <h2>Cloud Debugger</h2>
     
-@* Display these two environment variables if set, useful when exploring App Service deployments slots *@
- @if(!string.IsNullOrEmpty(company))
+@* Display these environment variables if set, useful when exploring App Service deployments slots *@
+@if (!string.IsNullOrEmpty(version))
 {
-    @:Company: @company
+    @:Version: @version
     <br />
 }
-@if (!string.IsNullOrEmpty(country))
+@if (!string.IsNullOrEmpty(conStr))
 {
-    @:Country: @country
+    @:ConStr: @conStr
+    <br />
+}
+@if (!string.IsNullOrEmpty(env))
+{
+    @:Env: @env
     <br />
 }
 

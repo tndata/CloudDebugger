@@ -59,6 +59,27 @@
                 <td>@Model.ComputerName</td>
             </tr>
         }
+        @if (Model.Version != null)
+        {
+            <tr>
+                <td>Version</td>
+                <td>@Model.Version</td>
+            </tr>
+        }
+        @if (Model.ConStr != null)
+        {
+            <tr>
+                <td>ConStr</td>
+                <td>@Model.ConStr</td>
+            </tr>
+        }
+        @if (Model.Env != null)
+        {
+            <tr>
+                <td>ConStr</td>
+                <td>@Model.Env</td>
+            </tr>
+        }
         <tr>
             <td>Time</td>
             <td>@Model.CurrentTime (Instance age: @((int)(Model.RunningTime.TotalMinutes)) minutes)</td>

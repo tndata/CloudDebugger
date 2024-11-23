@@ -49,7 +49,11 @@ public class ScaleOutController : Controller
             ComputerName = Environment.GetEnvironmentVariable("COMPUTERNAME"),
 
             CurrentTime = DateTime.UtcNow.ToString("HH:mm:ss"),
-            RunningTime = DateTime.UtcNow.Subtract(DebuggerSettings.StartupTime)
+            RunningTime = DateTime.UtcNow.Subtract(DebuggerSettings.StartupTime),
+
+            Version = Environment.GetEnvironmentVariable("Version"),
+            ConStr = Environment.GetEnvironmentVariable("ConStr"),
+            Env = Environment.GetEnvironmentVariable("Env")
         };
 
         model.BackgroundColor = CalculateInstanceColor(model);
