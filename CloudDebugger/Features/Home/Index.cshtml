@@ -1,8 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Cloud Debugger";
+
+    var company = Environment.GetEnvironmentVariable("Company");
+    var country = Environment.GetEnvironmentVariable("Country");
+
 }
 
 <h2>Cloud Debugger</h2>
+    
+@* Display these two environment variables if set, useful when exploring App Service deployments slots *@
+ @if(!string.IsNullOrEmpty(company))
+{
+    @:Company: @company
+    <br />
+}
+@if (!string.IsNullOrEmpty(country))
+{
+    @:Country: @country
+    <br />
+}
+
 <br />
 <br />
 
