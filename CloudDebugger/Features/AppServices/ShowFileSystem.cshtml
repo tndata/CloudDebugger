@@ -1,9 +1,9 @@
 ﻿@model CloudDebugger.Features.AppServices.ShowFilesModel
 @{
-    ViewData["Title"] = "ShowFileSystem";
+    ViewData["Title"] = "App Services File System Viewer";
 }
 
-<h3>App Services - ShowFileSystem</h3>
+<h3>App Services - App Services File System Viewer</h3>
 This tool will show the content of the most essential directories in an App Service. See also the more generic <a href="/FileSystem/index">File explorer tool</a>.
 <a href="/AppServices">Back</a>
 <br />
@@ -29,60 +29,8 @@ This tool will show the content of the most essential directories in an App Serv
     </tr>
 </table>
 
-<br>
-<br>
-@* 
-<h4>Folders and files in the application directory</h4>
-<table class="table">
-    @foreach (var dir in Model.AppDirFolders)
-    {
-        <tr>
-            <td class="col-md-12">
-                <b>\@dir</b>
-            </td>
-        </tr>
-    }
-
-    @foreach (var file in Model.AppDirFiles)
-    {
-        <tr>
-            <td class="col-md-12">@file</td>
-        </tr>
-    }
-
-</table>
-
 <br />
 <br />
-
-
-
-<h4>Folders and files in the home directory</h4>
-<table class="table">
-    @foreach (var dir in Model.HomeDirFolders)
-    {
-        <tr>
-            <td class="col-md-12">
-                <b>\@dir</b>
-            </td>
-        </tr>
-    }
-
-    @foreach (var file in Model.HomeDirFiles)
-    {
-        <tr>
-            <td class="col-md-12">@file</td>
-        </tr>
-    }
-
-</table>
- *@
-
-<br>
-<br />
-
-
-
 
 <table class="table table-bordered">
     <thead>
@@ -162,10 +110,6 @@ This tool will show the content of the most essential directories in an App Serv
             </td>
         </tr>
     </tbody>
-
-
-
-
 </table>
 
 

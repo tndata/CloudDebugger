@@ -53,24 +53,14 @@ public class AppServicesController : Controller
 
         var model = new ShowFilesModel()
         {
-            HomeDirectory = Environment.GetEnvironmentVariable("HOME")
+            AppDirectory = AppContext.BaseDirectory,
+            OperatingSystem = RuntimeInformation.OSDescription,
+            HomeDirectory = GetHomeDirectory(),
+            TempDirectory = GetTempDirectory()
         };
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            model.TempDirectory = Environment.GetEnvironmentVariable("TEMP"); //Windows path
-        }
-        else
-        {
-            model.TempDirectory = "/tmp";  //Linux Path. The variable is not set for Linux services.
-        }
-
-        model.AppDirectory = AppContext.BaseDirectory;
-        model.OperatingSystem = RuntimeInformation.OSDescription;
 
         if (model.HomeDirectory != null && Directory.Exists(model.HomeDirectory))
         {
-            model.HomeDirectory = "d:\\";
             model.HomeDirFolders = GetFolders(model.HomeDirectory);
             model.HomeDirFiles = GetFiles(model.HomeDirectory);
         }
@@ -100,6 +90,37 @@ public class AppServicesController : Controller
         }
 
         return View(model);
+    }
+
+    private static string? GetTempDirectory()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return Environment.GetEnvironmentVariable("TEMP"); //Windows path
+        }
+        else
+        {
+            return "/tmp";  //Linux Path. The env variable is not set for Linux services.
+        }
+    }
+
+    private static string GetHomeDirectory()
+    {
+        var homeDirectory = Environment.GetEnvironmentVariable("HOME");
+
+        if (string.IsNullOrEmpty(homeDirectory))
+        {
+            //Set the default home directory, if missing or empty
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                homeDirectory = "c:\\home";
+            }
+            else
+            {
+                homeDirectory = "/home";
+            }
+        }
+        return homeDirectory;
     }
 
     private static List<string> GetFiles(string path)
