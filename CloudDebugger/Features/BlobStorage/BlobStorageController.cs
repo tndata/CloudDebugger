@@ -30,9 +30,10 @@ public class BlobStorageController : Controller
     {
         var model = new BlobStorageModel()
         {
-            StorageAccountName = "clouddebuggerstorage",
-            ContainerName = "clouddebugger",
-            BlobName = "MyBlob.txt"
+            StorageAccountName = "",
+            ContainerName = "",
+            BlobName = "MyBlob.txt",
+            AnonymousAccess = false
         };
 
         try
@@ -66,6 +67,9 @@ public class BlobStorageController : Controller
         {
             switch (button)
             {
+                case "listblobs":
+                    //Do nothing, we always lists the files when we click on a button
+                    break;
                 case "loadblob":
                     _logger.LogInformation("BlobStorage.LoadBlob");
                     model.FileContent = "";
@@ -78,15 +82,11 @@ public class BlobStorageController : Controller
                 default:
                     break;
             }
-
-
         }
         catch (Exception exc)
         {
             string str = $"Exception:\r\n{exc.Message}";
             model.ErrorMessage = str;
-
-
         }
 
         try
@@ -111,20 +111,27 @@ public class BlobStorageController : Controller
     /// <returns>Returns an empty list if it can't access the content</returns>
     private List<(string name, string size)> TryGetContainerContent(BlobStorageModel model)
     {
-        var containerName = model.ContainerName?.Trim() ?? "";
-
-        var client = GetBlobServiceClient(model);
-
-        var container = client.GetBlobContainerClient(containerName);
-
-        var blobs = container.GetBlobs().ToList();
-
         var result = new List<(string name, string size)>();
 
-        foreach (var blob in blobs)
+        var containerName = model.ContainerName?.Trim() ?? "";
+
+        if (!String.IsNullOrEmpty(containerName))
         {
-            var blobSize = blob.Properties.ContentLength ?? 0;
-            result.Add((blob.Name, blobSize.ToString()));
+            (var client, var message) = GetBlobServiceClient(model);
+            ViewData[authenticationApproach] = message;
+
+            if (client != null)
+            {
+                var container = client.GetBlobContainerClient(containerName);
+
+                var blobs = container.GetBlobs().ToList();
+
+                foreach (var blob in blobs)
+                {
+                    var blobSize = blob.Properties.ContentLength ?? 0;
+                    result.Add((blob.Name, blobSize.ToString()));
+                }
+            }
         }
 
         return result;
@@ -133,24 +140,36 @@ public class BlobStorageController : Controller
 
     private string? LoadBlob(BlobStorageModel model)
     {
-        var client = GetBlobServiceClient(model);
+        (var client, var message) = GetBlobServiceClient(model);
+        ViewData[authenticationApproach] = message;
 
-        var container = client.GetBlobContainerClient(model.ContainerName);
-        BlobClient blobClient = container.GetBlobClient(model.BlobName);
+        if (client != null)
+        {
+            var container = client.GetBlobContainerClient(model.ContainerName);
+            BlobClient blobClient = container.GetBlobClient(model.BlobName);
 
-        BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
-        return downloadResult.Content.ToString();
+            BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+            return downloadResult.Content.ToString();
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
     private void WriteBlob(BlobStorageModel model)
     {
-        var client = GetBlobServiceClient(model);
+        (var client, var message) = GetBlobServiceClient(model);
+        ViewData[authenticationApproach] = message;
 
-        var container = client.GetBlobContainerClient(model.ContainerName);
-        BlobClient blobClient = container.GetBlobClient(model.BlobName);
+        if (client != null)
+        {
+            var container = client.GetBlobContainerClient(model.ContainerName);
+            BlobClient blobClient = container.GetBlobClient(model.BlobName);
 
-        blobClient.UploadAsync(BinaryData.FromString(model.FileContent ?? "Empty"), overwrite: true).Wait();
+            blobClient.UploadAsync(BinaryData.FromString(model.FileContent ?? "Empty"), overwrite: true).Wait();
+        }
     }
 
 
@@ -169,17 +188,26 @@ public class BlobStorageController : Controller
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    private BlobServiceClient GetBlobServiceClient(BlobStorageModel model)
+    private static (BlobServiceClient? client, string message) GetBlobServiceClient(BlobStorageModel model)
     {
         var storageAccountName = model.StorageAccountName?.ToLower().Trim() ?? "";
         var sasToken = model.SASToken?.Trim() ?? "";
-        ViewData[authenticationApproach] = "";
+
+        if (string.IsNullOrWhiteSpace(storageAccountName))
+            return (null, "storageAccountName missing");
 
         var storageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
 
         var blobOptions = new BlobClientOptions()
         {
         };
+
+        if (model.AnonymousAccess)
+        {
+            var message = "Using anonymous access";
+            var client = new BlobServiceClient(storageUri, blobOptions);
+            return (client, message);
+        }
 
         if (string.IsNullOrEmpty(sasToken))
         {
@@ -190,43 +218,50 @@ public class BlobStorageController : Controller
 
             if (string.IsNullOrEmpty(clientId))
             {
-                ViewData[authenticationApproach] = "Tried to authenticate using system-assigned managed identity";
+                var message = "Tried to authenticate using system-assigned managed identity";
+                var client = new BlobServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), blobOptions);
+                return (client, message);
             }
             else
             {
-                ViewData[authenticationApproach] = $"Tried to authenticate using-assigned managed identity, ClientID={clientId}";
+                var message = $"Tried to authenticate using-assigned managed identity, ClientID={clientId}";
                 defaultCredentialOptions.ManagedIdentityClientId = clientId;
+                var client = new BlobServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), blobOptions);
+                return (client, message);
             }
-
-            return new BlobServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), blobOptions);
         }
         else
         {
             if (sasToken.StartsWith("BlobEndpoint"))
             {
                 // SAS Connection string
-                ViewData[authenticationApproach] = "Tried to authenticate using SAS Connection string";
-                return new BlobServiceClient(sasToken.ToString(), blobOptions);
+                var message = "Tried to authenticate using SAS Connection string";
+                var client = new BlobServiceClient(sasToken.ToString(), blobOptions);
+                return (client, message);
             }
             else if (sasToken.StartsWith("http"))
             {
                 // SAS Connection string
-                ViewData[authenticationApproach] = "Tried to authenticate using SAS Connection string";
-                return new BlobServiceClient(new Uri(sasToken), blobOptions);
+                var message = "Tried to authenticate using SAS Connection string";
+                var client = new BlobServiceClient(new Uri(sasToken), blobOptions);
+                return (client, message);
             }
             else if (sasToken.Contains("sig="))
             {
                 // SAS token
-                ViewData[authenticationApproach] = "Tried to authenticate using SAS token";
+                var message = "Tried to authenticate using SAS token";
                 var url = new Uri($"{storageUri}?{sasToken}");
-                return new BlobServiceClient(url, blobOptions);
+                var client = new BlobServiceClient(url, blobOptions);
+
+                return (client, message);
             }
             else
             {
                 // Account access key
-                ViewData[authenticationApproach] = "Tried to authenticate using account access key";
+                var message = "Tried to authenticate using account access key";
                 var sharedKeyCredential = new StorageSharedKeyCredential(storageAccountName, sasToken);
-                return new BlobServiceClient(storageUri, sharedKeyCredential, blobOptions);
+                var client = new BlobServiceClient(storageUri, sharedKeyCredential, blobOptions);
+                return (client, message);
             }
         }
     }

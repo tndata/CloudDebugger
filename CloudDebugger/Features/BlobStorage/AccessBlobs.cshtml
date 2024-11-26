@@ -4,7 +4,7 @@
 }
 
 <h4>Access Blob Storage</h4>
-This tool allows you to access blobs in Blob storage. 
+This tool allows you to access blobs in Blob storage.
 <br />
 <a href="/BlobStorage">Back</a>
 <br>
@@ -36,18 +36,31 @@ This tool allows you to access blobs in Blob storage.
             </td>
         </tr>
 
+        <tr>
+            <td class="col-md-2">Anonymous Access</td>
+            <td class="col-md-10">
+                <input asp-for="AnonymousAccess" type="checkbox" /> Access the blob storage anonymously.
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <button type="submit" name="button" value="listblobs">List blobs</button>
+            </td>
+        </tr>
+
     </table>
 
-
-
+    <br />
 
     <table class="table table-bordered">
         <tr>
             <td class="col-md-6">
-
                 <!-- First Column start -->
                 <h5>Blobs in this container</h5>
                 @ViewData["authenticationApproach"]
+
                 <table class="table table-bordered">
 
                     @if (Model.ContainerContent.Count > 0)

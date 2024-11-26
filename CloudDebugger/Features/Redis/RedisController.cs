@@ -140,7 +140,7 @@ public class RedisController : Controller
     }
 
     /// <summary>
-    /// Write a key to Redis
+    /// Write a key to Redis™
     /// </summary>
     /// <param name="key"></param>
     /// <param name="value"></param>

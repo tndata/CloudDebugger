@@ -10,6 +10,11 @@ public class BlobStorageModel
     public string? SASToken { get; set; }
 
     /// <summary>
+    /// True if we want to access the blob storage anonymously
+    /// </summary>
+    public bool AnonymousAccess { get; set; }
+
+    /// <summary>
     /// Storage account name (must be lowercase)
     /// </summary>
     [Required]
