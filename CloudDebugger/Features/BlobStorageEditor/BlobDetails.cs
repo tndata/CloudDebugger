@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.BlobStorage;
+﻿namespace CloudDebugger.Features.BlobStorageEditor;
 
 /// <summary>
 /// Details about blob

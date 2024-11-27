@@ -1,0 +1,105 @@
+﻿@model CloudDebugger.Features.BlobStorageAccessCheck.BlobStorageAccessCheckModel
+@{
+    ViewData["Title"] = "Cloud Debugger - BlobStorage Access Checker";
+}
+
+
+<h4>BlobStorage Access Checker</h4>
+Checks what access do you have to blob storage.
+<br />
+<a href="/BlobStorage">Back</a>
+<br />
+<br />
+
+
+<form asp-controller="BlobStorageAccessCheck" asp-action="Index" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Storage account name
+            </td>
+            <td class="col-md-10">
+                <input asp-for="StorageAccountName" style="min-width:30%">
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Container name</td>
+            <td class="col-md-6">
+                <input asp-for="ContainerName" style="min-width:30%">
+                <span asp-validation-for="ContainerName"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SAS Access key or<br /> SAS Token/URL</td>
+            <td class="col-md-10">
+                <input asp-for="SASToken" style="min-width:100%"><br />
+                (If missing it will authenticate using Managed Identity using DefaultAzureCredential)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2">Blob to Read/Update</td>
+            <td class="col-md-10">
+                <input asp-for="BlobToReadUpdate" type="checkbox" /> Access the blob storage anonymously.
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2">Blob To Delete Name</td>
+            <td class="col-md-10">
+                <input asp-for="BlobToDeleteName" type="checkbox" /> (Full blob name)
+            </td>
+        </tr>
+                <tr>
+            <td class="col-md-2">Anonymous Access</td>
+            <td class="col-md-10">
+                <input asp-for="AnonymousAccess" type="checkbox" />  (Full blob name)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <button type="submit" name="button" value="listblobs">Check access</button>
+            </td>
+        </tr>
+
+    </table>
+
+    <br />
+
+    <h4>Access Check Result</h4>
+    @ViewData["authenticationApproach"]<br>
+    <br />
+    <table class="table table-bordered">
+        <tr>
+            <td class="col-md-12">
+
+            </td>
+        </tr>
+    </table>
+
+
+    <br>
+
+    @if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.ErrorMessage</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-AccessBlobs">TODO</a></li>
+</ul>

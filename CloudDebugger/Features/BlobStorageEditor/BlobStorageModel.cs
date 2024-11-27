@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CloudDebugger.Features.BlobStorage;
+namespace CloudDebugger.Features.BlobStorageEditor;
 
 public class BlobStorageModel
 {
