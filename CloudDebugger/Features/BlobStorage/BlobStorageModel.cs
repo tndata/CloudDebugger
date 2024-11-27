@@ -10,11 +10,6 @@ public class BlobStorageModel
     public string? SASToken { get; set; }
 
     /// <summary>
-    /// True if we want to access the blob storage anonymously
-    /// </summary>
-    public bool AnonymousAccess { get; set; }
-
-    /// <summary>
     /// Storage account name (must be lowercase)
     /// </summary>
     [Required]
@@ -27,20 +22,35 @@ public class BlobStorageModel
     public string? ContainerName { get; set; }
 
     /// <summary>
+    /// True if we want to access the blob storage anonymously
+    /// </summary>
+    public bool AnonymousAccess { get; set; }
+
+    /// <summary>
     /// Blob Name
     /// </summary>
-    [Required]
     public string? BlobName { get; set; }
 
+    /// <summary>
+    /// Blob content
+    /// </summary>
+    public string? BlobContent { get; set; }
+
+
+    /// <summary>
+    /// List of the blobs in the container
+    /// </summary>
     public List<(string name, string size)> ContainerContent { get; set; } = [];
 
-    public string? FileContent { get; set; }
+    /// <summary>
+    /// Details about the loaded blob
+    /// </summary>
+    public BlobDetails? Blob { get; set; } = new();
 
     /// <summary>
     /// How did we try to authenticate?
     /// </summary>
     public string? AuthenticationApproach { get; set; }
-
 
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }

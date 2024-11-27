@@ -82,13 +82,13 @@ This tool allows you to access blobs in Blob storage.
                                     {
                                         @if (entry.name.StartsWith('\\'))
                                         {
-                                            <b>@entry.name</b>
+                                            <b class="blob-filename">@entry.name</b>
 
                                             <br />
                                         }
                                         else
                                         {
-                                            @entry.name
+                                            <span class="blob-filename">@entry.name</span>
 
                                             <br />
 
@@ -124,7 +124,7 @@ This tool allows you to access blobs in Blob storage.
                 <table>
                     <tr>
                         <td>
-                            <input asp-for="BlobName" />
+                            <input asp-for="BlobName" id="blobName" />
                             <button type="submit" name="button" value="loadblob">Load</button>
                             &nbsp;&nbsp;<button type="submit" name="button" value="writeblob">Save</button>
                             <br />
@@ -133,13 +133,63 @@ This tool allows you to access blobs in Blob storage.
 
                     <tr>
                         <td>
-                            @if (!string.IsNullOrEmpty(Model.FileContent))
-                            {
-                                <h5>File content</h5>
-                                <textarea asp-for="FileContent" rows="20" cols="50"></textarea>
-                            }
+                            <h5>Blob Content</h5>
+                            <textarea asp-for="BlobContent" rows="10" cols="50"></textarea>
                         </td>
                     </tr>
+
+
+
+                    @if (Model?.Blob != null)
+                    {
+                        <tr>
+                            <td>
+                                <h5>Properties</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td>blob Type</td>
+                                        <td>@Model.Blob.BlobType</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ContentType</td>
+                                        <td>@Model.Blob.ContentType</td>
+                                    </tr>
+                                    <tr>
+                                        <td>CreatedOn</td>
+                                        <td>@Model.Blob.CreatedOn</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LastAccessed</td>
+                                        <td>@Model.Blob.LastAccessed</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LastModified</td>
+                                        <td>@Model.Blob.LastModified</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        @if (Model.Blob.MetaData.Count > 0)
+                        {
+                            <tr>
+                                <td>
+                                    <h5>
+                                        Metadata tag
+                                    </h5>
+                                    <table class="table table-bordered">
+                                        @foreach (var entry in Model.Blob.MetaData)
+                                        {
+                                            <tr>
+                                                <td>@entry.Key</td>
+                                                <td>@entry.Value</td>
+                                            </tr>
+                                        }
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                    }
                 </table>
 
                 <!-- Second column end -->
@@ -171,3 +221,14 @@ This tool allows you to access blobs in Blob storage.
 <ul>
     <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-AccessBlobs">Documentation</a></li>
 </ul>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.blob-filename').click(function() {
+                var filename = $(this).text().trim();
+                $('#blobName').val(filename);
+            });
+        });
+    </script>
+}
