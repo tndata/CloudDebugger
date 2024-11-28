@@ -126,7 +126,7 @@ public class BlobStorageEditorController : Controller
 
         if (!String.IsNullOrEmpty(containerName))
         {
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
+            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess ?? false);
             ViewData[authenticationApproach] = message;
 
             if (client != null)
@@ -174,7 +174,7 @@ public class BlobStorageEditorController : Controller
             if (string.IsNullOrWhiteSpace(model.BlobName))
                 throw new ArgumentNullException(nameof(model), "model.BlobName is null or empty.");
 
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
+            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess ?? false);
             ViewData[authenticationApproach] = message;
 
             if (client != null)
@@ -221,7 +221,7 @@ public class BlobStorageEditorController : Controller
             if (string.IsNullOrWhiteSpace(model.BlobName))
                 throw new ArgumentNullException(nameof(model), "model is null or empty.");
 
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
+            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess ?? false);
             ViewData[authenticationApproach] = message;
 
             if (client != null && model.Blob != null)
