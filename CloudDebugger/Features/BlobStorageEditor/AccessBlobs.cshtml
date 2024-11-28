@@ -1,4 +1,4 @@
-﻿@model CloudDebugger.Features.BlobStorage.BlobStorageModel
+﻿@model CloudDebugger.Features.BlobStorageEditor.BlobStorageModel
 @{
     ViewData["Title"] = "Access Blob Storage";
 }
@@ -9,7 +9,7 @@ This tool allows you to access blobs in Blob storage.
 <a href="/BlobStorage">Back</a>
 <br>
 
-<form asp-controller="BlobStorage" asp-action="AccessBlobs" method="post">
+<form asp-controller="BlobStorageEditor" asp-action="AccessBlobs" method="post">
 
     <table class="table">
         <tr>
@@ -43,13 +43,6 @@ This tool allows you to access blobs in Blob storage.
             </td>
         </tr>
 
-        <tr>
-            <td class="col-md-2"></td>
-            <td class="col-md-10">
-                <button type="submit" name="button" value="listblobs">List blobs</button>
-            </td>
-        </tr>
-
     </table>
 
     <br />
@@ -59,6 +52,9 @@ This tool allows you to access blobs in Blob storage.
             <td class="col-md-6">
                 <!-- First Column start -->
                 <h5>Blobs in this container</h5>
+
+                Path:   <input asp-for="Path" style="min-width:30%" id="blobPath">&nbsp;<button type="submit" name="button" value="listblobs">List blobs</button><br />
+
                 @ViewData["authenticationApproach"]
 
                 <table class="table table-bordered">
@@ -78,11 +74,11 @@ This tool allows you to access blobs in Blob storage.
                             <tr>
                                 <td class="col-md-3">
 
-                                    @foreach (var entry in Model.ContainerContent)
+                                    @foreach (var entry in Model.ContainerContent.OrderBy(f => f.name))
                                     {
-                                        @if (entry.name.StartsWith('\\'))
+                                        @if (entry.name.StartsWith('/'))
                                         {
-                                            <b class="blob-filename">@entry.name</b>
+                                            <b class="blob-folder">@entry.name</b>
 
                                             <br />
                                         }
@@ -97,7 +93,7 @@ This tool allows you to access blobs in Blob storage.
                                 </td>
                                 <td class="col-md-3">
 
-                                    @foreach (var entry in Model.ContainerContent)
+                                    @foreach (var entry in Model.ContainerContent.OrderBy(f => f.name))
                                     {
                                         @entry.size
 
@@ -124,17 +120,18 @@ This tool allows you to access blobs in Blob storage.
                 <table>
                     <tr>
                         <td>
+                            <h5>Blob Content</h5>
                             <input asp-for="BlobName" id="blobName" />
                             <button type="submit" name="button" value="loadblob">Load</button>
-                            &nbsp;&nbsp;<button type="submit" name="button" value="writeblob">Save</button>
+                            &nbsp;&nbsp;<button type="submit" name="button" value="writeblob">Save</button><br />
                             <br />
                         </td>
                     </tr>
 
                     <tr>
                         <td>
-                            <h5>Blob Content</h5>
-                            <textarea asp-for="BlobContent" rows="10" cols="50"></textarea>
+                            
+                            <textarea asp-for="BlobContent" rows="10" cols="70"></textarea>
                         </td>
                     </tr>
 
@@ -225,10 +222,16 @@ This tool allows you to access blobs in Blob storage.
 @section Scripts {
     <script>
         $(document).ready(function() {
+            $('.blob-folder').click(function() {
+                var folder = $(this).text().trim();
+                $('#blobPath').val(folder);
+            });
+
             $('.blob-filename').click(function() {
                 var filename = $(this).text().trim();
                 $('#blobName').val(filename);
             });
+
         });
     </script>
 }

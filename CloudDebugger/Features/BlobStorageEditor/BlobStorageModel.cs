@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CloudDebugger.Features.BlobStorage;
+namespace CloudDebugger.Features.BlobStorageEditor;
 
 public class BlobStorageModel
 {
@@ -25,6 +25,11 @@ public class BlobStorageModel
     /// True if we want to access the blob storage anonymously
     /// </summary>
     public bool AnonymousAccess { get; set; }
+
+    /// <summary>
+    /// Blob Path
+    /// </summary>
+    public string? Path { get; set; } = "/";
 
     /// <summary>
     /// Blob Name
