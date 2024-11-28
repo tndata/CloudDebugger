@@ -133,12 +133,30 @@ public class BlobStorageEditorController : Controller
             {
                 var container = client.GetBlobContainerClient(containerName);
 
-                var blobs = container.GetBlobs().ToList();
+                var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
+
+                // Always add an root element to the list, for easier navigation.
+                result.Add(("/", ""));
 
                 foreach (var blob in blobs)
                 {
-                    var blobSize = blob.Properties.ContentLength ?? 0;
-                    result.Add((blob.Name, blobSize.ToString()));
+
+
+                    // Is it a folder?
+                    if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
+                    {
+                        result.Add(("/" + blob.Name, ""));
+                    }
+                    else
+                    {
+                        var blobSize = blob.Properties.ContentLength ?? 0;
+                        result.Add((blob.Name, blobSize.ToString()));
+                    }
+
+
+
+
+
                 }
             }
         }

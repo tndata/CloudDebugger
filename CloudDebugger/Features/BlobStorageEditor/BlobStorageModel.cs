@@ -27,6 +27,11 @@ public class BlobStorageModel
     public bool AnonymousAccess { get; set; }
 
     /// <summary>
+    /// Blob Path
+    /// </summary>
+    public string? Path { get; set; } = "/";
+
+    /// <summary>
     /// Blob Name
     /// </summary>
     public string? BlobName { get; set; }
