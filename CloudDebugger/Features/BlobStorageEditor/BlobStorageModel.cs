@@ -24,7 +24,7 @@ public class BlobStorageModel
     /// <summary>
     /// True if we want to access the blob storage anonymously
     /// </summary>
-    public bool? AnonymousAccess { get; set; }
+    public bool AnonymousAccess { get; set; }
 
     /// <summary>
     /// Blob Path

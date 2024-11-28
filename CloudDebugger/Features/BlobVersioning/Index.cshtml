@@ -1,0 +1,124 @@
+﻿@model CloudDebugger.Features.BlobVersioning.BlobVersioningModel
+@{
+    ViewData["Title"] = "Blob Versioning Tool";
+}
+
+<h4>Blob Versioning tool</h4>
+Tools to explore versioned blobs.
+<br />
+<a href="/BlobStorage">Back</a>
+
+<br />
+<br />
+
+
+
+<form asp-controller="BlobVersioning" asp-action="Index" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Storage account name
+            </td>
+            <td class="col-md-10">
+                <input asp-for="StorageAccountName" style="min-width:30%">
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Container name</td>
+            <td class="col-md-6">
+                <input asp-for="ContainerName" style="min-width:30%">
+                <span asp-validation-for="ContainerName"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SAS Access key or<br /> SAS Token/URL</td>
+            <td class="col-md-10">
+                <input asp-for="SASToken" style="min-width:100%"><br />
+                (If missing it will authenticate using Managed Identity using DefaultAzureCredential)
+            </td>
+        </tr>
+
+    </table>
+
+
+    <br />
+    <h3>Create versioned blob</h3>
+    This button will created a blob named <b>VersionedBlob.txt</b> and make 10 changes to it with 1 second delay between each change.
+    <br />
+    <button type="submit" name="button" value="createversionedblob">Create versioned blob</button>
+
+
+    <br />
+    <br />
+    <h3>Read versioned blob</h3>
+    This tool will read the blob <b>VersionedBlob.txt</b> display all of its version.
+    <br />
+    <button type="submit" name="button" value="readversionedblob">Read versioned blob</button>
+
+
+    
+    @if (Model.BlobVersions != null && Model.BlobVersions.Count > 0)
+    {
+        <br />
+        <br />
+        <h3>Blob Versions</h3>
+ 
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Version Id</th>
+                 @*    <th>Last Modified</th> *@
+                    <th>IsDeleted</th>
+                    <th>IsLatestVersion</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var version in Model.BlobVersions)
+                {
+                    <tr>
+                        <td>@version.Name</td>
+                        <td>@version.VersionId</td>
+             @*            <td>@version.LastModified.ToString("g")</td> *@
+                        <td>@version.IsDeleted</td>
+                        <td>@version.IsLatestVersion</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <pre>@version.Content</pre>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+
+
+
+
+ </form>
+
+<br>
+<br>
+<br>
+
+@if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.ErrorMessage</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model?.Message))
+{
+    <b>@Model.Message</b>
+}
+
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-delegationToken">XXXXXXXXXXXXXX</a></li>
+</ul>
