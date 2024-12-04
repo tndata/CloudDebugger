@@ -22,6 +22,11 @@ public class BlobVersioningModel
     public string? SASToken { get; set; }
 
     /// <summary>
+    /// Blob Name
+    /// </summary>
+    public string? BlobName { get; set; }
+
+    /// <summary>
     /// The list of all versions of a given blob
     /// </summary>
     public List<BlobVersionDetails>? BlobVersions { get; set; } = [];

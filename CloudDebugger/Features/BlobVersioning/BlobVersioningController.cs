@@ -3,28 +3,27 @@ using Azure.Storage.Blobs.Models;
 using CloudDebugger.Features.BlobStorageEditor;
 using CloudDebugger.SharedCode.BlobStorage;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Amqp;
+
 
 namespace CloudDebugger.Features.BlobVersioning;
 
 /// <summary>
+/// BlobVersioning Tool
 /// </summary>
 public class BlobVersioningController : Controller
 {
-    private readonly ILogger<BlobVersioningController> _logger;
-
-    private const string blobName = "VersionedBlob.txt";
+    private const string defaultBlobName = "VersionedBlob2.txt";
 
     private const string authenticationApproach = "authenticationApproach";
 
     private const string storageAccountSessionKey = "blobStorageAccount";
     private const string containerSessionKey = "blobContainer";
     private const string sasTokenSessionKey = "blobSasToken";
+    private const string blobNameSessionKey = "blobName";
 
 
-    public BlobVersioningController(ILogger<BlobVersioningController> logger)
+    public BlobVersioningController()
     {
-        _logger = logger;
     }
 
     [HttpGet]
@@ -32,9 +31,10 @@ public class BlobVersioningController : Controller
     {
         var model = new BlobVersioningModel()
         {
-            StorageAccountName = HttpContext.Session.GetString(storageAccountSessionKey),
-            ContainerName = HttpContext.Session.GetString(containerSessionKey),
-            SASToken = HttpContext.Session.GetString(sasTokenSessionKey),
+            StorageAccountName = HttpContext.Session.GetString(storageAccountSessionKey) ?? "",
+            ContainerName = HttpContext.Session.GetString(containerSessionKey) ?? "",
+            SASToken = HttpContext.Session.GetString(sasTokenSessionKey) ?? "",
+            BlobName = HttpContext.Session.GetString(blobNameSessionKey) ?? defaultBlobName
         };
 
         return View(model);
@@ -57,11 +57,13 @@ public class BlobVersioningController : Controller
         string storageAccount = model.StorageAccountName?.Trim() ?? "";
         string containerName = model.ContainerName?.Trim() ?? "";
         string sasToken = model.SASToken?.Trim() ?? "";
+        string blobName = model.BlobName?.Trim() ?? defaultBlobName;
 
         //Remember Storage Account and ContainerName
         HttpContext.Session.SetString(storageAccountSessionKey, storageAccount);
         HttpContext.Session.SetString(containerSessionKey, containerName);
         HttpContext.Session.SetString(sasTokenSessionKey, sasToken);
+        HttpContext.Session.SetString(blobNameSessionKey, blobName);
 
         try
         {
@@ -73,7 +75,7 @@ public class BlobVersioningController : Controller
                     break;
                 case "readversionedblob":
                     model.BlobVersions = ReadVersionedBlob(model);
-                    model.Message = "Blob created and overwritten 10 times.";
+                    model.Message = "Read all blob versions.";
                     break;
                 default:
                     break;
@@ -99,14 +101,14 @@ public class BlobVersioningController : Controller
         {
             var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
 
-            var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version, prefix: blobName);
+            var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version, prefix: model?.BlobName);
 
             var sortedBlobVersion = blobVersions.OrderByDescending(version => version.VersionId);
 
             foreach (BlobItem version in blobVersions)
             {
                 //Download blob version
-                var blobClient = container.GetBlobClient(blobName).WithVersion(version.VersionId);
+                var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
                 BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
                 string blobContents = downloadResult.Content.ToString();
 
@@ -123,6 +125,11 @@ public class BlobVersioningController : Controller
                 result.Add(blobDetail);
             }
         }
+
+        //Sort the result
+        result = result.OrderByDescending(r => r.IsLatestVersion)
+                       .ThenByDescending(r => DateTime.Parse(r.VersionId ?? "")).ToList();
+
 
         return result;
     }
@@ -142,9 +149,9 @@ public class BlobVersioningController : Controller
             {
                 var container = client.GetBlobContainerClient(model.ContainerName.Trim());
 
-                for (int i = 0; i < 10; i++)
+                for (int i = 1; i <= 10; i++)
                 {
-                    BlobClient blobClient = container.GetBlobClient(blobName);
+                    BlobClient blobClient = container.GetBlobClient(model.BlobName);
 
                     string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow;
 

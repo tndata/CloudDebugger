@@ -39,38 +39,46 @@ Tools to explore versioned blobs.
                 (If missing it will authenticate using Managed Identity using DefaultAzureCredential)
             </td>
         </tr>
+        <tr>
+            <td class="col-md-2">Blob name</td>
+            <td class="col-md-6">
+                <input asp-for="BlobName" style="min-width:30%">
+                <span asp-validation-for="BlobName"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
 
     </table>
 
 
     <br />
     <h3>Create versioned blob</h3>
-    This button will created a blob named <b>VersionedBlob.txt</b> and make 10 changes to it with 1 second delay between each change.
+    This button will created a blob named <b>VersionedBlob.txt</b> and make 10 changes to it with <b>1 second delay</b> between each change.
     <br />
-    <button type="submit" name="button" value="createversionedblob">Create versioned blob</button>
+    <button type="submit" name="button" value="createversionedblob">Create Versioned Blob</button>
 
 
     <br />
     <br />
-    <h3>Read versioned blob</h3>
-    This tool will read the blob <b>VersionedBlob.txt</b> display all of its version.
+    <h3>List blob versions</h3>
+    This tool will list all the versions of the <b>VersionedBlob.txt</b> blob.
     <br />
-    <button type="submit" name="button" value="readversionedblob">Read versioned blob</button>
+    <button type="submit" name="button" value="readversionedblob">Get Versions</button>
 
 
-    
+
     @if (Model.BlobVersions != null && Model.BlobVersions.Count > 0)
     {
         <br />
         <br />
         <h3>Blob Versions</h3>
- 
+
         <table class="table">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>Version Id</th>
-                 @*    <th>Last Modified</th> *@
+                    @*    <th>Last Modified</th> *@
                     <th>IsDeleted</th>
                     <th>IsLatestVersion</th>
                 </tr>
@@ -78,18 +86,35 @@ Tools to explore versioned blobs.
             <tbody>
                 @foreach (var version in Model.BlobVersions)
                 {
-                    <tr>
-                        <td>@version.Name</td>
-                        <td>@version.VersionId</td>
-             @*            <td>@version.LastModified.ToString("g")</td> *@
-                        <td>@version.IsDeleted</td>
-                        <td>@version.IsLatestVersion</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">
-                            <pre>@version.Content</pre>
-                        </td>
-                    </tr>
+                    if (@version.IsLatestVersion == false)
+                    {
+                        <tr>
+                            <td>@version.Name</td>
+                            <td>@version.VersionId</td>
+                            <td>@version.IsDeleted</td>
+                            <td>@version.IsLatestVersion</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <pre>@version.Content</pre>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @* Make this row all in bold *@
+                        <tr style="background-color: lightblue;">
+                            <td><b>@version.Name</b></td>
+                            <td><b>@version.VersionId</b></td>
+                            <td><b>@version.IsDeleted</b></td>
+                            <td><b>@version.IsLatestVersion</b></td>
+                        </tr>
+                        <tr style="background-color: lightblue;">
+                            <td colspan="4">
+                                <pre><b>@version.Content</b></pre>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
@@ -99,12 +124,8 @@ Tools to explore versioned blobs.
 
 
 
- </form>
-
-<br>
-<br>
-<br>
-
+</form>
+<br />
 @if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
 {
     <div class="alert alert-danger" role="alert">
@@ -117,6 +138,9 @@ Tools to explore versioned blobs.
     <b>@Model.Message</b>
 }
 
+<br>
+<br>
+<br>
 
 <h5>Resources</h5>
 <ul>

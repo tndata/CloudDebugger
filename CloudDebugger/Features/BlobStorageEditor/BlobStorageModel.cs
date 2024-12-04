@@ -29,7 +29,7 @@ public class BlobStorageModel
     /// <summary>
     /// Blob Path
     /// </summary>
-    public string? Path { get; set; } = "/";
+    public string? Path { get; set; } = "";
 
     /// <summary>
     /// Blob Name
