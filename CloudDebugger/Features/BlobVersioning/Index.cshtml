@@ -51,7 +51,7 @@ Tools to explore versioned blobs.
 
     <br />
     <h3>Create versioned blob</h3>
-    This button will created a blob named <b>VersionedBlob.txt</b> and make 10 changes to it with <b>1 second delay</b> between each change.
+    This button will created a blob and make 10 changes to it with <b>1 second delay</b> between each change.
     <br />
     <button type="submit" name="button" value="createversionedblob">Create Versioned Blob</button>
 
@@ -59,10 +59,12 @@ Tools to explore versioned blobs.
     <br />
     <br />
     <h3>List blob versions</h3>
-    This tool will list all the versions of the <b>VersionedBlob.txt</b> blob.
+    This tool will list all the versions of the specified blob.
     <br />
     <button type="submit" name="button" value="readversionedblob">Get Versions</button>
 
+    <br />
+    <br />
     <b>@Model.AuthenticationMessage</b>
 
     @if (Model.BlobVersions != null && Model.BlobVersions.Count > 0)
