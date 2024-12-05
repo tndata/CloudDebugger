@@ -8,6 +8,7 @@ This tool allows you to access blobs in Blob storage.
 <br />
 <a href="/BlobStorage">Back</a>
 <br>
+<br>
 
 <form asp-controller="BlobStorageEditor" asp-action="AccessBlobs" method="post">
 
@@ -55,7 +56,7 @@ This tool allows you to access blobs in Blob storage.
 
                 Path:   <input asp-for="Path" style="min-width:30%" id="blobPath">&nbsp;<button type="submit" name="button" value="listblobs">List blobs</button><br />
 
-                @ViewData["authenticationApproach"]
+                @Model.AuthenticationMessage
 
                 <table class="table table-bordered">
 
@@ -145,24 +146,24 @@ This tool allows you to access blobs in Blob storage.
                                 <h5>Properties</h5>
                                 <table class="table table-bordered">
                                     <tr>
-                                        <td>blob Type</td>
-                                        <td>@Model.Blob.BlobType</td>
+                                        <td class="col-md-2">blob Type</td>
+                                        <td class="col-md-10">@Model.Blob.BlobType</td>
                                     </tr>
                                     <tr>
-                                        <td>ContentType</td>
-                                        <td>@Model.Blob.ContentType</td>
+                                        <td class="col-md-2">ContentType</td>
+                                        <td class="col-md-10">@Model.Blob.ContentType</td>
                                     </tr>
                                     <tr>
-                                        <td>CreatedOn</td>
-                                        <td>@Model.Blob.CreatedOn</td>
+                                        <td class="col-md-2">CreatedOn</td>
+                                        <td class="col-md-10">@Model.Blob.CreatedOn</td>
                                     </tr>
                                     <tr>
-                                        <td>LastAccessed</td>
-                                        <td>@Model.Blob.LastAccessed</td>
+                                        <td class="col-md-2">LastAccessed</td>
+                                        <td class="col-md-10">@Model.Blob.LastAccessed</td>
                                     </tr>
                                     <tr>
-                                        <td>LastModified</td>
-                                        <td>@Model.Blob.LastModified</td>
+                                        <td class="col-md-2">LastModified</td>
+                                        <td class="col-md-10">@Model.Blob.LastModified</td>
                                     </tr>
                                 </table>
                             </td>

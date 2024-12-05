@@ -12,7 +12,6 @@ namespace CloudDebugger.Features.BlobStorageEditor;
 public class BlobStorageEditorController : Controller
 {
     private readonly ILogger<BlobStorageEditorController> _logger;
-    private const string authenticationApproach = "authenticationApproach";
 
     private const string storageAccountSessionKey = "blobStorageAccount";
     private const string containerSessionKey = "blobContainer";
@@ -35,16 +34,6 @@ public class BlobStorageEditorController : Controller
             AnonymousAccess = false
         };
 
-        try
-        {
-            model.ContainerContent = TryGetContainerContent(model);
-        }
-        catch (Exception exc)
-        {
-            string str = $"Exception:\r\n{exc.Message}";
-            model.ErrorMessage = str;
-        }
-
         return View(model);
     }
 
@@ -59,6 +48,7 @@ public class BlobStorageEditorController : Controller
 
         model.Message = "";
         model.ErrorMessage = "";
+        model.AuthenticationMessage = "";
         ModelState.Clear();
 
         string storageAccount = model.StorageAccountName?.Trim() ?? "";
@@ -70,26 +60,34 @@ public class BlobStorageEditorController : Controller
         HttpContext.Session.SetString(containerSessionKey, containerName);
         HttpContext.Session.SetString(sasTokenSessionKey, sasToken);
 
+        BlobServiceClient? client = null;
+
         try
         {
-            switch (button)
-            {
-                case "listblobs":
-                    //Do nothing, we always lists the files when we click on a button
-                    break;
-                case "loadblob":
+            (client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
+            model.AuthenticationMessage = message;
 
-                    _logger.LogInformation("BlobStorage.LoadBlob");
-                    var (blobDetails, blobContent) = LoadBlob(model);
-                    model.Blob = blobDetails;
-                    model.BlobContent = blobContent;
-                    break;
-                case "writeblob":
-                    _logger.LogInformation("BlobStorage.WriteBlob");
-                    WriteBlob(model);
-                    break;
-                default:
-                    break;
+            if (client != null)
+            {
+                switch (button)
+                {
+                    case "listblobs":
+                        //Do nothing, we always lists the files when we click on a button
+                        break;
+                    case "loadblob":
+
+                        _logger.LogInformation("BlobStorage.LoadBlob");
+                        var (blobDetails, blobContent) = LoadBlob(model, client);
+                        model.Blob = blobDetails;
+                        model.BlobContent = blobContent;
+                        break;
+                    case "writeblob":
+                        _logger.LogInformation("BlobStorage.WriteBlob");
+                        WriteBlob(model, client);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         catch (Exception exc)
@@ -101,7 +99,8 @@ public class BlobStorageEditorController : Controller
         try
         {
             //Always try to get the content, even if the above fails
-            model.ContainerContent = TryGetContainerContent(model);
+            if (client != null)
+                model.ContainerContent = TryGetContainerContent(model, client);
         }
         catch (Exception exc)
         {
@@ -118,7 +117,7 @@ public class BlobStorageEditorController : Controller
     /// </summary>
     /// <param name="model"></param>
     /// <returns>Returns an empty list if it can't access the content</returns>
-    private List<(string name, string size)> TryGetContainerContent(BlobStorageModel model)
+    private static List<(string name, string size)> TryGetContainerContent(BlobStorageModel model, BlobServiceClient client)
     {
         var result = new List<(string name, string size)>();
 
@@ -126,37 +125,24 @@ public class BlobStorageEditorController : Controller
 
         if (!String.IsNullOrEmpty(containerName))
         {
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
-            ViewData[authenticationApproach] = message;
+            var container = client.GetBlobContainerClient(containerName);
 
-            if (client != null)
+            var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
+
+            // Always add an root element to the list, for easier navigation.
+            result.Add(("/", ""));
+
+            foreach (var blob in blobs)
             {
-                var container = client.GetBlobContainerClient(containerName);
-
-                var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
-
-                // Always add an root element to the list, for easier navigation.
-                result.Add(("/", ""));
-
-                foreach (var blob in blobs)
+                // Is it a folder?
+                if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
                 {
-
-
-                    // Is it a folder?
-                    if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
-                    {
-                        result.Add(("/" + blob.Name, ""));
-                    }
-                    else
-                    {
-                        var blobSize = blob.Properties.ContentLength ?? 0;
-                        result.Add((blob.Name, blobSize.ToString()));
-                    }
-
-
-
-
-
+                    result.Add(("/" + blob.Name, ""));
+                }
+                else
+                {
+                    var blobSize = blob.Properties.ContentLength ?? 0;
+                    result.Add((blob.Name, blobSize.ToString()));
                 }
             }
         }
@@ -165,54 +151,43 @@ public class BlobStorageEditorController : Controller
     }
 
 
-    private (BlobDetails? blobDetails, string? blobContent) LoadBlob(BlobStorageModel model)
+    private static (BlobDetails? blobDetails, string? blobContent) LoadBlob(BlobStorageModel model, BlobServiceClient client)
     {
-        if (model != null)
+        if (string.IsNullOrWhiteSpace(model.ContainerName))
+            throw new ArgumentNullException(nameof(model), "model.ContainerName is null or empty.");
+        if (string.IsNullOrWhiteSpace(model.BlobName))
+            throw new ArgumentNullException(nameof(model), "model.BlobName is null or empty.");
+
+        var container = client.GetBlobContainerClient(model.ContainerName.Trim());
+        BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());
+
+        BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+
+        var lastAccessed = "[Not set]";
+        if (downloadResult.Details.LastAccessed != DateTimeOffset.MinValue)
+            lastAccessed = downloadResult.Details.LastAccessed.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
+
+        var content = downloadResult.Content.ToString();
+
+        var blobDetails = new BlobDetails()
         {
-            if (string.IsNullOrWhiteSpace(model.ContainerName))
-                throw new ArgumentNullException(nameof(model), "model.ContainerName is null or empty.");
-            if (string.IsNullOrWhiteSpace(model.BlobName))
-                throw new ArgumentNullException(nameof(model), "model.BlobName is null or empty.");
+            BlobType = downloadResult.Details.BlobType.ToString(),
+            ContentType = downloadResult.Details.ContentType.ToString(),
+            CreatedOn = downloadResult.Details.CreatedOn.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"),
+            LastAccessed = lastAccessed,
+            LastModified = downloadResult.Details.LastModified.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"),
+        };
 
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
-            ViewData[authenticationApproach] = message;
-
-            if (client != null)
-            {
-                var container = client.GetBlobContainerClient(model.ContainerName.Trim());
-                BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());
-
-                BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
-
-                var lastAccessed = "[Not set]";
-                if (downloadResult.Details.LastAccessed != DateTimeOffset.MinValue)
-                    lastAccessed = downloadResult.Details.LastAccessed.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
-
-                var content = downloadResult.Content.ToString();
-
-                var blobDetails = new BlobDetails()
-                {
-                    BlobType = downloadResult.Details.BlobType.ToString(),
-                    ContentType = downloadResult.Details.ContentType.ToString(),
-                    CreatedOn = downloadResult.Details.CreatedOn.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"),
-                    LastAccessed = lastAccessed,
-                    LastModified = downloadResult.Details.LastModified.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"),
-                };
-
-                foreach (var metadata in downloadResult.Details.Metadata)
-                {
-                    blobDetails.MetaData.Add(metadata.Key, metadata.Value.ToString());
-                }
-
-                return (blobDetails, content);
-            }
+        foreach (var metadata in downloadResult.Details.Metadata)
+        {
+            blobDetails.MetaData.Add(metadata.Key, metadata.Value.ToString());
         }
 
-        return (null, null);
+        return (blobDetails, content);
     }
 
 
-    private void WriteBlob(BlobStorageModel model)
+    private static void WriteBlob(BlobStorageModel model, BlobServiceClient client)
     {
         if (model != null)
         {
@@ -221,10 +196,7 @@ public class BlobStorageEditorController : Controller
             if (string.IsNullOrWhiteSpace(model.BlobName))
                 throw new ArgumentNullException(nameof(model), "model is null or empty.");
 
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
-            ViewData[authenticationApproach] = message;
-
-            if (client != null && model.Blob != null)
+            if (model.Blob != null)
             {
                 var container = client.GetBlobContainerClient(model.ContainerName.Trim());
                 BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());

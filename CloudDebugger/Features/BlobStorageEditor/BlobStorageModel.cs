@@ -50,13 +50,13 @@ public class BlobStorageModel
     /// <summary>
     /// Details about the loaded blob
     /// </summary>
-    public BlobDetails? Blob { get; set; } = new();
-
-    /// <summary>
-    /// How did we try to authenticate?
-    /// </summary>
-    public string? AuthenticationApproach { get; set; }
+    public BlobDetails? Blob { get; set; }
 
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
+
+    /// <summary>
+    /// How did we authenticate to Azure
+    /// </summary>
+    public string? AuthenticationMessage { get; set; }
 }
