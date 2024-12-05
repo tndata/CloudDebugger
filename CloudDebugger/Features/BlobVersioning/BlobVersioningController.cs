@@ -1,9 +1,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using CloudDebugger.Features.BlobStorageEditor;
 using CloudDebugger.SharedCode.BlobStorage;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace CloudDebugger.Features.BlobVersioning;
 
@@ -12,9 +10,7 @@ namespace CloudDebugger.Features.BlobVersioning;
 /// </summary>
 public class BlobVersioningController : Controller
 {
-    private const string defaultBlobName = "VersionedBlob2.txt";
-
-    private const string authenticationApproach = "authenticationApproach";
+    private const string defaultBlobName = "VersionedBlob.txt";
 
     private const string storageAccountSessionKey = "blobStorageAccount";
     private const string containerSessionKey = "blobContainer";
@@ -44,14 +40,12 @@ public class BlobVersioningController : Controller
     [HttpPost]
     public IActionResult Index(BlobVersioningModel model, string button)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        if (model == null)
-            return View(new BlobStorageModel());
+        if (!ModelState.IsValid || model == null)
+            return View(new BlobVersioningModel());
 
         model.Message = "";
         model.ErrorMessage = "";
+        model.AuthenticationMessage = "";
         ModelState.Clear();
 
         string storageAccount = model.StorageAccountName?.Trim() ?? "";
@@ -59,7 +53,7 @@ public class BlobVersioningController : Controller
         string sasToken = model.SASToken?.Trim() ?? "";
         string blobName = model.BlobName?.Trim() ?? defaultBlobName;
 
-        //Remember Storage Account and ContainerName
+        //Remember these fields in the session
         HttpContext.Session.SetString(storageAccountSessionKey, storageAccount);
         HttpContext.Session.SetString(containerSessionKey, containerName);
         HttpContext.Session.SetString(sasTokenSessionKey, sasToken);
@@ -67,18 +61,24 @@ public class BlobVersioningController : Controller
 
         try
         {
-            switch (button)
+            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, anonymousAccess: false);
+            model.AuthenticationMessage = message;
+
+            if (client != null)
             {
-                case "createversionedblob":
-                    CreateVersionedBlob(model);
-                    model.Message = "Blob created and overwritten 10 times.";
-                    break;
-                case "readversionedblob":
-                    model.BlobVersions = ReadVersionedBlob(model);
-                    model.Message = "Read all blob versions.";
-                    break;
-                default:
-                    break;
+                switch (button)
+                {
+                    case "createversionedblob":
+                        CreateVersionedBlob(model, client);
+                        model.Message = "Blob created and overwritten 10 times.";
+                        break;
+                    case "readversionedblob":
+                        model.BlobVersions = ReadVersionedBlob(model, client);
+                        model.Message = "Read all blob versions.";
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         catch (Exception exc)
@@ -90,76 +90,70 @@ public class BlobVersioningController : Controller
         return View(model);
     }
 
-    private List<BlobVersionDetails>? ReadVersionedBlob(BlobVersioningModel model)
+
+    /// <summary>
+    /// Return a list of all the versions of a given blob.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="client"></param>
+    /// <returns></returns>
+    private static List<BlobVersionDetails>? ReadVersionedBlob(BlobVersioningModel model, BlobServiceClient client)
     {
         var result = new List<BlobVersionDetails>();
 
-        (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, anonymousAccess: false);
-        ViewData[authenticationApproach] = message;
+        var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
 
-        if (client != null)
+        var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version, prefix: model?.BlobName);
+
+        foreach (BlobItem version in blobVersions)
         {
-            var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
+            //Download blob version
+            var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
+            BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+            string blobContents = downloadResult.Content.ToString();
 
-            var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version, prefix: model?.BlobName);
-
-            var sortedBlobVersion = blobVersions.OrderByDescending(version => version.VersionId);
-
-            foreach (BlobItem version in blobVersions)
+            var blobDetail = new BlobVersionDetails()
             {
-                //Download blob version
-                var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
-                BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
-                string blobContents = downloadResult.Content.ToString();
+                Name = version.Name,
+                VersionId = version.VersionId,
+                Content = blobContents,
+                IsLatestVersion = version.IsLatestVersion ?? false,
+                IsDeleted = version.Deleted
+            };
 
-
-                var blobDetail = new BlobVersionDetails()
-                {
-                    Name = version.Name,
-                    VersionId = version.VersionId,
-                    Content = blobContents,
-                    IsLatestVersion = version.IsLatestVersion ?? false,
-                    IsDeleted = version.Deleted
-                };
-
-                result.Add(blobDetail);
-            }
+            result.Add(blobDetail);
         }
 
         //Sort the result
         result = result.OrderByDescending(r => r.IsLatestVersion)
                        .ThenByDescending(r => DateTime.Parse(r.VersionId ?? "")).ToList();
 
-
         return result;
     }
 
-    private void CreateVersionedBlob(BlobVersioningModel model)
+
+    /// <summary>
+    /// Create a blob and overwrite it 10 times
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="client"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    private static void CreateVersionedBlob(BlobVersioningModel model, BlobServiceClient client)
     {
-        if (model != null)
+        if (string.IsNullOrWhiteSpace(model.ContainerName))
+            throw new ArgumentNullException(nameof(model), "model is null or empty.");
+
+        var container = client.GetBlobContainerClient(model.ContainerName.Trim());
+
+        for (int i = 1; i <= 10; i++)
         {
-            if (string.IsNullOrWhiteSpace(model.ContainerName))
-                throw new ArgumentNullException(nameof(model), "model is null or empty.");
+            BlobClient blobClient = container.GetBlobClient(model.BlobName);
 
+            string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow;
 
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, anonymousAccess: false);
-            ViewData[authenticationApproach] = message;
+            Thread.Sleep(1000);
 
-            if (client != null)
-            {
-                var container = client.GetBlobContainerClient(model.ContainerName.Trim());
-
-                for (int i = 1; i <= 10; i++)
-                {
-                    BlobClient blobClient = container.GetBlobClient(model.BlobName);
-
-                    string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow;
-
-                    Thread.Sleep(1000);
-
-                    blobClient.UploadAsync(BinaryData.FromString(blobContents), overwrite: true).Wait();
-                }
-            }
+            blobClient.UploadAsync(BinaryData.FromString(blobContents), overwrite: true).Wait();
         }
     }
 }

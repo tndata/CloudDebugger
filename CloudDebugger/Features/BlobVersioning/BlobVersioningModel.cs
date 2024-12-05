@@ -24,6 +24,7 @@ public class BlobVersioningModel
     /// <summary>
     /// Blob Name
     /// </summary>
+    [Required]
     public string? BlobName { get; set; }
 
     /// <summary>
@@ -33,4 +34,9 @@ public class BlobVersioningModel
 
     public string? ErrorMessage { get; set; }
     public string? Message { get; set; }
+
+    /// <summary>
+    /// How did we authenticate to Azure
+    /// </summary>
+    public string? AuthenticationMessage { get; set; }
 }

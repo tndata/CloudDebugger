@@ -3,15 +3,13 @@
     ViewData["Title"] = "Blob Versioning Tool";
 }
 
-<h4>Blob Versioning tool</h4>
+<h4>Blob Versioning Tool</h4>
 Tools to explore versioned blobs.
 <br />
 <a href="/BlobStorage">Back</a>
 
 <br />
 <br />
-
-
 
 <form asp-controller="BlobVersioning" asp-action="Index" method="post">
 
@@ -65,7 +63,7 @@ Tools to explore versioned blobs.
     <br />
     <button type="submit" name="button" value="readversionedblob">Get Versions</button>
 
-
+    <b>@Model.AuthenticationMessage</b>
 
     @if (Model.BlobVersions != null && Model.BlobVersions.Count > 0)
     {
@@ -78,7 +76,6 @@ Tools to explore versioned blobs.
                 <tr>
                     <th>Name</th>
                     <th>Version Id</th>
-                    @*    <th>Last Modified</th> *@
                     <th>IsDeleted</th>
                     <th>IsLatestVersion</th>
                 </tr>
@@ -121,9 +118,6 @@ Tools to explore versioned blobs.
     }
 
 
-
-
-
 </form>
 <br />
 @if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
@@ -140,9 +134,9 @@ Tools to explore versioned blobs.
 
 <br>
 <br>
-<br>
 
 <h5>Resources</h5>
 <ul>
-    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-delegationToken">XXXXXXXXXXXXXX</a></li>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-Versioning">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview">Blob versioning</a></li>
 </ul>
