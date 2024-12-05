@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CloudDebugger.Features.BlobStorageEditor;
 
@@ -24,6 +25,8 @@ public class BlobStorageModel
     /// <summary>
     /// True if we want to access the blob storage anonymously
     /// </summary>
+    [Required]
+    [JsonRequired]
     public bool AnonymousAccess { get; set; }
 
     /// <summary>

@@ -79,7 +79,7 @@ public class WebHookApiController : ControllerBase
                 AddWebHookEntryToLog(hookRequest);
 
                 // Send a separate notification to the SignalR based webhooks page.
-                await SendToSignalR(hookId, hookRequest);
+                await SendToSignalR(hookId, hookRequest, signalRhubContext);
             }
 
             WebHookValidation.CheckIfEventGridSchemaValdationRequest(e =>
@@ -112,7 +112,7 @@ public class WebHookApiController : ControllerBase
     /// <param name="hookId"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    private async Task SendToSignalR(int hookId, WebHookLogEntry entry)
+    private static async Task SendToSignalR(int hookId, WebHookLogEntry entry, IHubContext<WebHookHub> hubContext)
     {
         if (entry == null)
             return;
@@ -153,7 +153,7 @@ public class WebHookApiController : ControllerBase
         }
 
 
-        await signalRhubContext.Clients.All.SendAsync(signalRMessage, color, content);
+        await hubContext.Clients.All.SendAsync(signalRMessage, color, content);
     }
 
     /// <summary>

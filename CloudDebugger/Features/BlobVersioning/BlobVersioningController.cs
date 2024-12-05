@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using CloudDebugger.SharedCode.BlobStorage;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace CloudDebugger.Features.BlobVersioning;
 
@@ -103,20 +104,29 @@ public class BlobVersioningController : Controller
 
         var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
 
-        var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version, prefix: model?.BlobName);
+        var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: model?.BlobName);
 
         foreach (BlobItem version in blobVersions)
         {
-            //Download blob version
-            var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
-            BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
-            string blobContents = downloadResult.Content.ToString();
+            string blobContent = "";
+
+            // Only download blob content for non-deleted blobs.
+            if (!version.Deleted)
+            {
+                var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
+                BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+                blobContent = downloadResult.Content.ToString();
+            }
+            else
+            {
+                blobContent = "Blob content can't be downloaded for deleted blobs.";
+            }
 
             var blobDetail = new BlobVersionDetails()
             {
                 Name = version.Name,
                 VersionId = version.VersionId,
-                Content = blobContents,
+                Content = blobContent,
                 IsLatestVersion = version.IsLatestVersion ?? false,
                 IsDeleted = version.Deleted
             };
@@ -126,7 +136,7 @@ public class BlobVersioningController : Controller
 
         //Sort the result
         result = result.OrderByDescending(r => r.IsLatestVersion)
-                       .ThenByDescending(r => DateTime.Parse(r.VersionId ?? "")).ToList();
+                       .ThenByDescending(r => DateTime.ParseExact(r.VersionId ?? "", "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)).ToList();
 
         return result;
     }
