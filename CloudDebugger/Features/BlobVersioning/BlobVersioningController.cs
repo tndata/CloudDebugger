@@ -159,7 +159,7 @@ public class BlobVersioningController : Controller
         {
             BlobClient blobClient = container.GetBlobClient(model.BlobName);
 
-            string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow;
+            string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
             Thread.Sleep(1000);
 

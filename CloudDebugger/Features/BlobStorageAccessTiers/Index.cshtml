@@ -1,0 +1,142 @@
+﻿@model CloudDebugger.Features.BlobStorageAccessTiers.BlobStorageAccessTiersModel
+@{
+    ViewData["Title"] = "Blob Access Tiers Tool";
+}
+
+<h4>Blob Access Tiers Tool</h4>
+Tools to explore the blob storage access tiers
+<br />
+<a href="/BlobStorage">Back</a>
+
+<br />
+<br />
+
+<form asp-controller="BlobStorageAccessTiers" asp-action="Index" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Storage account name
+            </td>
+            <td class="col-md-10">
+                <input asp-for="StorageAccountName" style="min-width:30%">
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Container name</td>
+            <td class="col-md-10">
+                <input asp-for="ContainerName" style="min-width:30%">
+                <span asp-validation-for="ContainerName"></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">SAS Access key or<br /> SAS Token/URL</td>
+            <td class="col-md-10">
+                <input asp-for="SASToken" style="min-width:100%"><br />
+                (If missing it will authenticate using Managed Identity using DefaultAzureCredential)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <button type="submit" name="button" value="CreateBlobs">Create 5 Sample blobs</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <button type="submit" name="button" value="ListBlobs">List Blobs</button>
+            </td>
+        </tr>
+    </table>
+
+
+    <br />
+    @if (!String.IsNullOrWhiteSpace(Model?.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.ErrorMessage</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+
+
+
+    <table class="table table-bordered">
+
+        @if (Model != null && Model.Blobs != null)
+        {
+            int currentTier = 0;
+            foreach (var blob in Model.Blobs)
+            {
+                @if (blob.TierOrder != currentTier)
+                {
+                    <tr style="background-color: lightblue;">
+                        <td class="col-md-4"><h5>Tier: @blob.AccessTier</h5></td>
+                        <td class="col-md-6"></td>
+                    </tr>
+                    currentTier = blob.TierOrder;
+                }
+
+                <tr>
+                    <td class="col-md-6">
+                        <b>@blob.Name</b>
+
+                        <table class="table">
+                            <tr>
+                                <td class="col-md-2">AccessTier</td>
+                                <td class="col-md-10">@blob.AccessTier</td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-2">AccessTierInferred</td>
+                                <td class="col-md-10">@blob.AccessTierInferred</td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-2">AccessTierChangedOn</td>
+                                <td class="col-md-10">@blob.AccessTierChangedOn</td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-2">RehydratePriority</td>
+                                <td class="col-md-10">@blob.RehydratePriority</td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-2">ArchiveStatus</td>
+                                <td class="col-md-10">@blob.ArchiveStatus</td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-2">Change Tier</td>
+                                <td class="col-md-10">
+                                    <button type="submit" name="button" value="Hot:@blob.Name" @(blob.AccessTier == "Hot" ? "disabled" : "")>Hot</button>
+                                    <button type="submit" name="button" value="Cool:@blob.Name" @(blob.AccessTier == "Cool" ? "disabled" : "")>Cool</button>
+                                    <button type="submit" name="button" value="Cold:@blob.Name" @(blob.AccessTier == "Cold" ? "disabled" : "")>Cold</button>
+                                    <button type="submit" name="button" value="Archive:@blob.Name" @(blob.AccessTier == "Archive" ? "disabled" : "")>Archive</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="col-md-6">
+                        <pre>@blob.Content</pre>
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</form>
+
+<br />
+
+<br>
+<br>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/BlobStorage-AccessTiers">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview">Access tiers for blob data</a></li>
+</ul>
