@@ -35,8 +35,8 @@ public class BlobStorageDelegationSasTokenController : Controller
     {
         var model = new UserDelegationModel()
         {
-            StorageAccountName = "clouddebuggerstorage",
-            ContainerName = "clouddebugger",
+            StorageAccountName = "",
+            ContainerName = "",
             BlobName = "MyBlob.txt"
         };
 

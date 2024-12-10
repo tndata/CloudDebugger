@@ -196,13 +196,10 @@ public class BlobStorageEditorController : Controller
             if (string.IsNullOrWhiteSpace(model.BlobName))
                 throw new ArgumentNullException(nameof(model), "model is null or empty.");
 
-            if (model.Blob != null)
-            {
-                var container = client.GetBlobContainerClient(model.ContainerName.Trim());
-                BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());
+            var container = client.GetBlobContainerClient(model.ContainerName.Trim());
+            BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());
 
-                blobClient.UploadAsync(BinaryData.FromString(model.BlobContent ?? "Empty"), overwrite: true).Wait();
-            }
+            blobClient.UploadAsync(BinaryData.FromString(model.BlobContent ?? "Empty"), overwrite: true).Wait();
         }
     }
 }
