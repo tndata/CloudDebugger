@@ -5,15 +5,21 @@ namespace CloudDebugger.Features.QueueStorageSender;
 public class SendMessagesModel
 {
     /// <summary>
-    /// The full URL to the queue
+    /// Storage account name (must be lowercase)
     /// </summary>
     [Required]
-    public string? QueueUrl { get; set; } = "";
+    public string? StorageAccountName { get; set; }
 
     /// <summary>
-    /// Optional SAS Token
+    /// Queue Name (must be lowercase)
     /// </summary>
-    public string? SasToken { get; set; } = "";
+    [Required]
+    public string? QueueName { get; set; }
+
+    /// <summary>
+    /// Optional SAS token
+    /// </summary>
+    public string? SASToken { get; set; }
 
     /// <summary>
     /// The message number to start counting from 

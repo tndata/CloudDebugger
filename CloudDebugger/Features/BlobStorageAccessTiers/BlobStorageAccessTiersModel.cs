@@ -17,7 +17,7 @@ public class BlobStorageAccessTiersModel
     public string? ContainerName { get; set; }
 
     /// <summary>
-    /// )Optional SAS token
+    /// Optional SAS token
     /// </summary>
     public string? SASToken { get; set; }
 

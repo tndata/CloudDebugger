@@ -5,15 +5,21 @@ namespace CloudDebugger.Features.QueueStorageReceiver;
 public class ReceiveMessagesModel
 {
     /// <summary>
-    /// The URL to the queue storage
+    /// Storage account name (must be lowercase)
     /// </summary>
     [Required]
-    public string? QueueUrl { get; set; } = "";
+    public string? StorageAccountName { get; set; }
 
     /// <summary>
-    /// Optional SAS access token
+    /// Queue Name (must be lowercase)
     /// </summary>
-    public string? SasToken { get; set; } = "";
+    [Required]
+    public string? QueueName { get; set; }
+
+    /// <summary>
+    /// Optional SAS token
+    /// </summary>
+    public string? SASToken { get; set; }
 
     /// <summary>
     /// True if we should delete the messages from the queue after reading

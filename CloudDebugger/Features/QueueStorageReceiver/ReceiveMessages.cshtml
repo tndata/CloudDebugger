@@ -16,16 +16,25 @@ This tool allows you to receive messages from an Azure Queue Storage. It will re
     <h5>Queue and Connection details</h5>
     <table class="table">
         <tr>
-            <td class="col-md-2">SAS token</td>
+            <td class="col-md-2">
+                Storage account name
+            </td>
             <td class="col-md-10">
-                <input asp-for="SasToken" style="min-width:100%"><br />
-                Leave empty to use managed identity.
+                <input asp-for="StorageAccountName" style="min-width:30%">
             </td>
         </tr>
         <tr>
-            <td class="col-md-2">Queue URL</td>
+            <td class="col-md-2">Storage Queue name</td>
             <td class="col-md-10">
-                <input asp-for="QueueUrl" style="min-width:100%"><br />
+                <input asp-for="QueueName" style="min-width:30%">
+                <span asp-validation-for="QueueName"></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Access key or<br />SAS Token/URL</td>
+            <td class="col-md-10">
+                <input asp-for="SASToken" style="min-width:100%"><br />
+                (If missing it will authenticate using Managed Identity using DefaultAzureCredential)
             </td>
         </tr>
         <tr>

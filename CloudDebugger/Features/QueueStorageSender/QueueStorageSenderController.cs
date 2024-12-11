@@ -22,8 +22,9 @@ public class QueueStorageSenderController : Controller
 {
 
     // Keys for the Session Storage
-    private const string QueueUrlSessionKey = "QueueStorageUrlString";
-    private const string queueSasTokenSessionKey = "QueueStorageSasTokenString";
+    private const string storageAccountSessionKey = "StorageAccount";
+    private const string queueNameSessionKey = "QueueNameContainer";
+    private const string sasTokenSessionKey = "QueueSasToken";
 
     private const string authenticationApproach = "authenticationApproach";
 
@@ -36,8 +37,9 @@ public class QueueStorageSenderController : Controller
     {
         var model = new SendMessagesModel()
         {
-            SasToken = HttpContext.Session.GetString(queueSasTokenSessionKey) ?? "",
-            QueueUrl = HttpContext.Session.GetString(QueueUrlSessionKey) ?? "",
+            StorageAccountName = HttpContext.Session.GetString(storageAccountSessionKey) ?? "",
+            QueueName = HttpContext.Session.GetString(queueNameSessionKey) ?? "",
+            SASToken = HttpContext.Session.GetString(sasTokenSessionKey) ?? "",
 
             MessageToSend = """
             {
@@ -87,19 +89,29 @@ public class QueueStorageSenderController : Controller
 
         ViewData[authenticationApproach] = "";
 
-        string sasToken = model.SasToken ?? "";
-        string queueUrl = model.QueueUrl ?? "";
+        string storageAccount = model.StorageAccountName?.Trim() ?? "";
+        string queueName = model.QueueName?.Trim() ?? "";
+        string sasToken = model.SASToken?.Trim() ?? "";
 
-        //Remember these values in the Session
-        HttpContext.Session.SetString(queueSasTokenSessionKey, sasToken);
-        HttpContext.Session.SetString(QueueUrlSessionKey, queueUrl);
-
+        //Remember these fields in the session
+        HttpContext.Session.SetString(storageAccountSessionKey, storageAccount);
+        HttpContext.Session.SetString(queueNameSessionKey, queueName);
+        HttpContext.Session.SetString(sasTokenSessionKey, sasToken);
         try
         {
-            (QueueClient? client, string message) = QueueStorageClientBuilder.CreateQueueClient(new Uri(queueUrl), sasToken);
+            (QueueServiceClient? queueServiceClient, string message) = QueueStorageClientBuilder.CreateQueueServiceClient(storageAccount, sasToken);
             ViewData[authenticationApproach] = message;
 
-            await SendMessages(client, model);
+            if (queueServiceClient != null)
+            {
+                var client = queueServiceClient.GetQueueClient(queueName);
+
+                await SendMessages(client, model);
+            }
+            else
+            {
+                throw new InvalidOperationException("Could not create a QueueServiceClient");
+            }
         }
         catch (Exception exc)
         {

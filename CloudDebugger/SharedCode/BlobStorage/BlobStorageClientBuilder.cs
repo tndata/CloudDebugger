@@ -24,7 +24,7 @@ public static class BlobStorageClientBuilder
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public static (BlobServiceClient? client, string message) GetBlobServiceClient(string? storageAccountName, string? sasToken, bool anonymousAccess)
+    public static (BlobServiceClient? client, string message) CreateBlobServiceClient(string? storageAccountName, string? sasToken, bool anonymousAccess)
     {
         storageAccountName = storageAccountName?.ToLower().Trim() ?? "";
         sasToken = sasToken?.Trim() ?? "";
@@ -83,7 +83,7 @@ public static class BlobStorageClientBuilder
                 var client = new BlobServiceClient(new Uri(sasToken), blobOptions);
                 return (client, message);
             }
-            else if (sasToken.Contains("sig="))
+            else if (IsSasToken(sasToken))
             {
                 // SAS token
                 var message = "Tried to authenticate using SAS token";
@@ -101,5 +101,15 @@ public static class BlobStorageClientBuilder
                 return (client, message);
             }
         }
+    }
+
+    /// <summary>
+    /// Returns true if the string is a SAS token
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    static bool IsSasToken(string token)
+    {
+        return token.Contains("sv=") && token.Contains("se=") && token.Contains("sig=");
     }
 }

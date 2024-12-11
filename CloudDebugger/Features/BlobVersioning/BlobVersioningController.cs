@@ -62,7 +62,7 @@ public class BlobVersioningController : Controller
 
         try
         {
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, anonymousAccess: false);
+            (var client, var message) = BlobStorageClientBuilder.CreateBlobServiceClient(model.StorageAccountName, model.SASToken, anonymousAccess: false);
             model.AuthenticationMessage = message;
 
             if (client != null)

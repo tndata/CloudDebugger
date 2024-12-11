@@ -25,8 +25,9 @@ namespace CloudDebugger.Features.QueueStorageReceiver;
 public class QueueStorageReceiverController : Controller
 {
     // Keys for the Session Storage
-    private const string QueueUrlSessionKey = "QueueStorageUrlString";
-    private const string queueSasTokenSessionKey = "QueueStorageSasTokenString";
+    private const string storageAccountSessionKey = "StorageAccount";
+    private const string queueNameSessionKey = "QueueNameContainer";
+    private const string sasTokenSessionKey = "QueueSasToken";
 
     private const string authenticationApproach = "authenticationApproach";
     private const int WaitForMessagesTimeout = 10000;       //ms
@@ -41,8 +42,9 @@ public class QueueStorageReceiverController : Controller
     {
         var model = new ReceiveMessagesModel()
         {
-            SasToken = HttpContext.Session.GetString(queueSasTokenSessionKey) ?? "",
-            QueueUrl = HttpContext.Session.GetString(QueueUrlSessionKey) ?? "",
+            StorageAccountName = HttpContext.Session.GetString(storageAccountSessionKey) ?? "",
+            QueueName = HttpContext.Session.GetString(queueNameSessionKey) ?? "",
+            SASToken = HttpContext.Session.GetString(sasTokenSessionKey) ?? "",
         };
 
         return View(model);
@@ -73,54 +75,66 @@ public class QueueStorageReceiverController : Controller
 
         ViewData[authenticationApproach] = "";
 
-        string sasToken = model.SasToken ?? "";
-        string queueUrl = model.QueueUrl ?? "";
+        string storageAccount = model.StorageAccountName?.Trim() ?? "";
+        string queueName = model.QueueName?.Trim() ?? "";
+        string sasToken = model.SASToken?.Trim() ?? "";
 
-        //Remember these values in the Session
-        HttpContext.Session.SetString(queueSasTokenSessionKey, sasToken);
-        HttpContext.Session.SetString(QueueUrlSessionKey, queueUrl);
+        //Remember these fields in the session
+        HttpContext.Session.SetString(storageAccountSessionKey, storageAccount);
+        HttpContext.Session.SetString(queueNameSessionKey, queueName);
+        HttpContext.Session.SetString(sasTokenSessionKey, sasToken);
 
         try
         {
-            (QueueClient? client, string message) = QueueStorageClientBuilder.CreateQueueClient(new Uri(queueUrl), sasToken);
+            (QueueServiceClient? queueServiceClient, string message) = QueueStorageClientBuilder.CreateQueueServiceClient(storageAccount, sasToken);
             ViewData[authenticationApproach] = message;
 
-            using (var CTS = new CancellationTokenSource(WaitForMessagesTimeout))
+            if (queueServiceClient != null)
             {
-                QueueMessage[] messages = await client.ReceiveMessagesAsync(maxMessages: MaxNumberOfMessagesToRetrieve, cancellationToken: CTS.Token);
 
-                model.ReceivedMessages = [];
+                var client = queueServiceClient.GetQueueClient(queueName);
 
-                foreach (QueueMessage receivedMessage in messages)
+                using (var CTS = new CancellationTokenSource(WaitForMessagesTimeout))
                 {
-                    var messageIdentifier = receivedMessage.MessageId;
+                    QueueMessage[] messages = await client.ReceiveMessagesAsync(maxMessages: MaxNumberOfMessagesToRetrieve, cancellationToken: CTS.Token);
 
-                    var popReceipt = receivedMessage.PopReceipt;
-                    var body = receivedMessage.Body.ToString();
-                    var dequeueCount = receivedMessage.DequeueCount;
+                    model.ReceivedMessages = [];
 
-                    var nextVisibleOn = receivedMessage.NextVisibleOn?.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz") ?? "Null";
-                    var insertedOn = receivedMessage.InsertedOn?.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz") ?? "Null";
-                    var expiresOn = receivedMessage.ExpiresOn?.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz") ?? "Null";
-
-                    var sb = new StringBuilder();
-                    sb.AppendLine($"messageIdentifier: {messageIdentifier}");
-                    sb.AppendLine($"insertedOn: {insertedOn} expiresOn: {expiresOn} nextVisibleOn: {nextVisibleOn}");
-                    sb.AppendLine($"popReceipt: {popReceipt}");
-                    sb.AppendLine($"dequeueCount: {dequeueCount}");
-                    sb.AppendLine($"body: {body}");
-
-                    model.ReceivedMessages.Add(sb.ToString());
-
-                    if (model.DeleteMessagesAfterRead)
+                    foreach (QueueMessage receivedMessage in messages)
                     {
-                        // Let the service know we're finished with
-                        // the message and it can be safely deleted.
+                        var messageIdentifier = receivedMessage.MessageId;
 
-                        //If the message is not deleted, the message will be invisible for default 30 seconds. (visibility timeout)
-                        await client.DeleteMessageAsync(receivedMessage.MessageId, receivedMessage.PopReceipt);
+                        var popReceipt = receivedMessage.PopReceipt;
+                        var body = receivedMessage.Body.ToString();
+                        var dequeueCount = receivedMessage.DequeueCount;
+
+                        var nextVisibleOn = receivedMessage.NextVisibleOn?.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz") ?? "Null";
+                        var insertedOn = receivedMessage.InsertedOn?.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz") ?? "Null";
+                        var expiresOn = receivedMessage.ExpiresOn?.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz") ?? "Null";
+
+                        var sb = new StringBuilder();
+                        sb.AppendLine($"messageIdentifier: {messageIdentifier}");
+                        sb.AppendLine($"insertedOn: {insertedOn} expiresOn: {expiresOn} nextVisibleOn: {nextVisibleOn}");
+                        sb.AppendLine($"popReceipt: {popReceipt}");
+                        sb.AppendLine($"dequeueCount: {dequeueCount}");
+                        sb.AppendLine($"body: {body}");
+
+                        model.ReceivedMessages.Add(sb.ToString());
+
+                        if (model.DeleteMessagesAfterRead)
+                        {
+                            // Let the service know we're finished with
+                            // the message and it can be safely deleted.
+
+                            //If the message is not deleted, the message will be invisible for default 30 seconds. (visibility timeout)
+                            await client.DeleteMessageAsync(receivedMessage.MessageId, receivedMessage.PopReceipt);
+                        }
                     }
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException("Could not create a QueueServiceClient");
             }
         }
         catch (Exception exc)

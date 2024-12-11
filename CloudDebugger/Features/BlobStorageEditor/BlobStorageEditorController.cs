@@ -64,7 +64,7 @@ public class BlobStorageEditorController : Controller
 
         try
         {
-            (client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
+            (client, var message) = BlobStorageClientBuilder.CreateBlobServiceClient(model.StorageAccountName, model.SASToken, model.AnonymousAccess);
             model.AuthenticationMessage = message;
 
             if (client != null)

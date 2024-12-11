@@ -13,8 +13,8 @@ namespace CloudDebugger.Features.BlobStorageAccessTiers;
 /// </summary>
 public class BlobStorageAccessTiersController : Controller
 {
-    private const string storageAccountSessionKey = "blobStorageAccount";
-    private const string containerSessionKey = "blobContainer";
+    private const string storageAccountSessionKey = "StorageAccount";
+    private const string containerNameSessionKey = "blobContainerName";
     private const string sasTokenSessionKey = "blobSasToken";
 
     private const string HotTier = "Hot";
@@ -32,7 +32,7 @@ public class BlobStorageAccessTiersController : Controller
         var model = new BlobStorageAccessTiersModel()
         {
             StorageAccountName = HttpContext.Session.GetString(storageAccountSessionKey) ?? "",
-            ContainerName = HttpContext.Session.GetString(containerSessionKey) ?? "",
+            ContainerName = HttpContext.Session.GetString(containerNameSessionKey) ?? "",
             SASToken = HttpContext.Session.GetString(sasTokenSessionKey) ?? "",
         };
 
@@ -57,13 +57,13 @@ public class BlobStorageAccessTiersController : Controller
 
         //Remember these fields in the session
         HttpContext.Session.SetString(storageAccountSessionKey, storageAccount);
-        HttpContext.Session.SetString(containerSessionKey, containerName);
+        HttpContext.Session.SetString(containerNameSessionKey, containerName);
         HttpContext.Session.SetString(sasTokenSessionKey, sasToken);
 
         try
         {
-            (var client, var message) = BlobStorageClientBuilder.GetBlobServiceClient(model.StorageAccountName,
-                                                                                      model.SASToken,
+            (var client, var message) = BlobStorageClientBuilder.CreateBlobServiceClient(storageAccount,
+                                                                                      sasToken,
                                                                                       anonymousAccess: false);
             model.AuthenticationMessage = message;
 
