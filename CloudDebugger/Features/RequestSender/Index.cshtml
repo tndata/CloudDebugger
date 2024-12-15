@@ -1,0 +1,116 @@
+﻿@model CloudDebugger.Features.RequestSender.RequestSenderModel
+@{
+    ViewData["Title"] = "Cloud Debugger - send HTTP Requests tool";
+}
+
+<h3>HTTP Request Sender</h3>
+This tool allows you to send HTTP requests to a URL and see the response.
+
+<br>
+<br>
+
+<h4>Request</h4>
+<form asp-controller="RequestSender" asp-action="Index" method="post">
+
+
+    <tr>
+            <td class="col-md-2"><label asp-for="URL">URL:</label></td>
+
+            <td class="col-md-10">
+                <table>
+                    <tr>
+                        <td class="align-top">  
+                           <select class="form-control" id="method" asp-for="HttpMethod" style="width:85px">  
+                               <option value="GET">GET</option>  
+                               <option value="POST">POST</option>  
+                               <option value="PUT">PUT</option>  
+                               <option value="DELETE">DELETE</option>  
+                               <option value="OPTIONS">OPTIONS</option>  
+                               <option value="HEAD">HEAD</option>  
+                           </select>  
+                        </td>
+                        <td>
+                            <input asp-for="URL" class="form-control" required />
+                             (The default https://httpbin.org/anything URL will mirror the request sent to it)
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2"><label asp-for="RequestHeaders">Request Headers:</label></td>
+            <td class="col-md-10">
+                <textarea asp-for="RequestHeaders" class="form-control" rows="5"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2"><label asp-for="AuthenticationToken">Authentication token:</label></td>
+            <td class="col-md-10">
+                <textarea asp-for="AuthenticationToken" class="form-control" rows="1"></textarea>
+                (Optional, adds the authorization header if set)
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2"><label asp-for="RequestBody">Request Body:</label></td>
+            <td class="col-md-10"><textarea asp-for="RequestBody" class="form-control" rows="8"></textarea></td>
+        </tr>
+    </table>
+    <button type="submit" class="btn btn-primary">Send Request</button>
+    <br />
+    @if (Model.ResponseStatusCode != null)
+    {
+        <br />
+        <h4>Response</h4>
+        <table class="table table-bordered">
+            <tr>
+                <td>Status Code:</td>
+                <td>@Model.ResponseStatusCode</td>
+            </tr>
+            <tr>
+                <td>Headers:</td>
+                <td>
+                    <pre>@Model.ResponseHeaders</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Body:</td>
+                <td>
+                    <pre>@Model.ResponseBody</pre>
+                </td>
+            </tr>
+        </table>
+    }
+
+
+
+    @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.ErrorMessage</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+    <br />
+</form>
+
+<br>
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/RequestSender">Documentation</a></li>
+    <li><a href="https://httpbin.org">httpbin.org</a></li>
+</ul>
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+
