@@ -11,27 +11,28 @@ This tool allows you to send HTTP requests to a URL and see the response.
 
 <h4>Request</h4>
 <form asp-controller="RequestSender" asp-action="Index" method="post">
-
-
-    <tr>
+    <table class="table">
+        <tr>
             <td class="col-md-2"><label asp-for="URL">URL:</label></td>
 
             <td class="col-md-10">
                 <table>
                     <tr>
-                        <td class="align-top">  
-                           <select class="form-control" id="method" asp-for="HttpMethod" style="width:85px">  
-                               <option value="GET">GET</option>  
-                               <option value="POST">POST</option>  
-                               <option value="PUT">PUT</option>  
-                               <option value="DELETE">DELETE</option>  
-                               <option value="OPTIONS">OPTIONS</option>  
-                               <option value="HEAD">HEAD</option>  
-                           </select>  
+                        <td class="align-top">
+                            <label for="method">
+                                <select class="form-control" id="method" asp-for="HttpMethod" style="width:75px">
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                    <option value="DELETE">DELETE</option>
+                                    <option value="OPTIONS">OPTIONS</option>
+                                    <option value="HEAD">HEAD</option>
+                                </select>
+                            </label>
                         </td>
                         <td>
-                            <input asp-for="URL" class="form-control" required />
-                             (The default https://httpbin.org/anything URL will mirror the request sent to it)
+                            <input id="URL" asp-for="URL" class="form-control" required />
+                            (The default https://httpbin.org/anything URL will mirror the request sent to it)
                         </td>
                     </tr>
                 </table>
@@ -40,19 +41,19 @@ This tool allows you to send HTTP requests to a URL and see the response.
         <tr>
             <td class="col-md-2"><label asp-for="RequestHeaders">Request Headers:</label></td>
             <td class="col-md-10">
-                <textarea asp-for="RequestHeaders" class="form-control" rows="5"></textarea>
+                <textarea id="RequestHeaders" asp-for="RequestHeaders" class="form-control" rows="5"></textarea>
             </td>
         </tr>
         <tr>
             <td class="col-md-2"><label asp-for="AuthenticationToken">Authentication token:</label></td>
             <td class="col-md-10">
-                <textarea asp-for="AuthenticationToken" class="form-control" rows="1"></textarea>
+                <textarea id="AuthenticationToken" asp-for="AuthenticationToken" class="form-control" rows="1"></textarea>
                 (Optional, adds the authorization header if set)
             </td>
         </tr>
         <tr>
             <td class="col-md-2"><label asp-for="RequestBody">Request Body:</label></td>
-            <td class="col-md-10"><textarea asp-for="RequestBody" class="form-control" rows="8"></textarea></td>
+            <td class="col-md-10"><textarea id="RequestBody" asp-for="RequestBody" class="form-control" rows="8"></textarea></td>
         </tr>
     </table>
     <button type="submit" class="btn btn-primary">Send Request</button>

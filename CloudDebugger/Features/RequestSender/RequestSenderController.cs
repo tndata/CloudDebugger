@@ -28,7 +28,9 @@ public class RequestSenderController : Controller
             RequestHeaders = """
                             Header1: Value1
                             User-Agent: Cloud Debugger
-                            """
+                            """,
+            Message = "",
+            ErrorMessage = ""
         };
 
         return View(model);
