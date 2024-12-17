@@ -64,19 +64,19 @@ This tool allows you to send HTTP requests to a URL and see the response.
         <h4>Response</h4>
         <table class="table table-bordered">
             <tr>
-                <td>Status Code:</td>
-                <td>@Model.ResponseStatusCode</td>
+                <td class="col-md-2">Status Code:</td>
+                <td class="col-md-10">@Model.ResponseStatusCode</td>
             </tr>
             <tr>
-                <td>Headers:</td>
-                <td>
+                <td class="col-md-2">Headers:</td>
+                <td class="col-md-10">
                     <pre>@Model.ResponseHeaders</pre>
                 </td>
             </tr>
             <tr>
-                <td>Body:</td>
-                <td style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                    <pre>@Model.ResponseBody</pre>
+                <td class="col-md-2">Body:</td>
+                <td class="col-md-10" style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                    <pre style="white-space: pre-wrap; word-break: break-word;">@Model.ResponseBody</pre>
                 </td>
             </tr>
         </table>
@@ -104,6 +104,7 @@ This tool allows you to send HTTP requests to a URL and see the response.
 <ul>
     <li><a href="https://github.com/tndata/CloudDebugger/wiki/RequestSender">Documentation</a></li>
     <li><a href="https://httpbin.org">httpbin.org</a></li>
+    <li><a href="https://jsonformatter.org/">jsonformatter.org</a></li>
 </ul>
 
 
