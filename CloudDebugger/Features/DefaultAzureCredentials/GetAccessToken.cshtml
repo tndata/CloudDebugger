@@ -59,39 +59,46 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
         </td>
         <!-- Column 1 end -->
         <!-- Column 2 start -->
-        <td class="col-md-6"> 
+        <td class="col-md-6">
 
-            @if (Model.UrlToJWTIOSite != null)
+            @if (Model != null)
             {
-                @:Explore the access token on <a href="@Model.UrlToJWTIOSite" target="_blank">https://jwt.io</a> or <a href="@Model.UrlToJWTMSSite" target="_blank">https://jwt.ms</a><br />
-            }
-            <table>
 
-                <tr>
-                    <td>
-                        <br />Expires: <b>@Model.AccessToken.ExpiresOn.ToString("HH:mm:ss") (in @((int)Model.AccessToken.ExpiresOn.Subtract(DateTime.UtcNow).TotalMinutes) min)</b><br>
-                    </td>
-                </tr>
-                @if (@Model.AccessToken.RefreshOn.HasValue)
+                @if (Model.UrlToJWTIOSite != null)
                 {
+                    @:Explore the access token on <a href="@Model.UrlToJWTIOSite" target="_blank">https://jwt.io</a> or <a href="@Model.UrlToJWTMSSite" target="_blank">https://jwt.ms</a><br />
+                }
+                <table>
+
+                    @if (Model.AccessToken.Token != null)
+                    {
+                        <tr>
+                            <td>
+                                <br />Expires: <b>@Model.AccessToken.ExpiresOn.ToString("HH:mm:ss") (in @((int)Model.AccessToken.ExpiresOn.Subtract(DateTime.UtcNow).TotalMinutes) min)</b><br>
+                            </td>
+                        </tr>
+                    }
+                    @if (@Model.AccessToken.RefreshOn.HasValue)
+                    {
+                        <tr>
+                            <td>
+                                <br />Refresh on <b>@Model.AccessToken.RefreshOn.Value.ToString("HH:mm:ss") (in @((int)Model.AccessToken.RefreshOn.Value.Subtract(DateTime.UtcNow).TotalMinutes) min)</b><br />
+                                Specifies the time when the cached token should be proactively refreshed.
+                            </td>
+                        </tr>
+                    }
+
                     <tr>
-                        <td>
-                            <br />Refresh on <b>@Model.AccessToken.RefreshOn.Value.ToString("HH:mm:ss") (in @((int)Model.AccessToken.RefreshOn.Value.Subtract(DateTime.UtcNow).TotalMinutes) min)</b><br />
-                            Specifies the time when the cached token should be proactively refreshed.
+                        <td>&nbsp;</td>
+                    </tr>
+
+                    <tr>
+                        <td id="access_token" style="width: 500px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                            @(Model.AccessToken.Token ?? "No token found")
                         </td>
                     </tr>
-                }
-
-                <tr>
-                    <td>&nbsp;</td>
-                </tr>
-
-                <tr>
-                    <td id="access_token" style="width: 500px; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                        @(Model.AccessToken.Token ?? "No token found")
-                    </td>
-                </tr>
-            </table>
+                </table>
+            }
         </td>
 
         <!-- Column 2 end -->
@@ -101,7 +108,6 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
 
 <br />
 <br />
-
 
 <h4>Selected credential provider</h4>
 This is the token credential that successfully retrieved an access token.
