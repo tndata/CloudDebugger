@@ -4,15 +4,15 @@ using Flurl;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CloudDebugger.Features.TokenCredentailsExplorer;
+namespace CloudDebugger.Features.TokenCredentialsExplorer;
 
-public class TokenCredentailsExplorerController : Controller
+public class TokenCredentialsExplorerController : Controller
 {
-    private readonly ILogger<TokenCredentailsExplorerController> _logger;
+    private readonly ILogger<TokenCredentialsExplorerController> _logger;
 
     private static readonly string[] scopes = ["https://management.azure.com//.default"];
 
-    public TokenCredentailsExplorerController(ILogger<TokenCredentailsExplorerController> logger)
+    public TokenCredentialsExplorerController(ILogger<TokenCredentialsExplorerController> logger)
     {
         _logger = logger;
     }
@@ -22,7 +22,7 @@ public class TokenCredentailsExplorerController : Controller
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var model = new TokenCredentailsExplorerModel()
+        var model = new TokenCredentialsExplorerModel()
         {
             CurrentCredentialIndex = credential
         };

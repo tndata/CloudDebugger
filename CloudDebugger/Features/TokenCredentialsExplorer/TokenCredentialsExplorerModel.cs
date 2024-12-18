@@ -1,8 +1,8 @@
 ﻿using Azure.Core;
 
-namespace CloudDebugger.Features.TokenCredentailsExplorer;
+namespace CloudDebugger.Features.TokenCredentialsExplorer;
 
-public class TokenCredentailsExplorerModel
+public class TokenCredentialsExplorerModel
 {
     /// <summary>
     /// The received access token.
