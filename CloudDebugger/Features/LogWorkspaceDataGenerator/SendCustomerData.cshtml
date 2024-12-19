@@ -1,14 +1,14 @@
-﻿@model CloudDebugger.Features.LogWorkspace.LogWorkspaceModel
+﻿@model CloudDebugger.Features.LogWorkspaceDataGenerator.LogWorkspaceModel
 @{
-    ViewData["Title"] = "Cloud Debugger - Send events to Log Analytics Workspace";
+    ViewData["Title"] = "Cloud Debugger - Send Customer Log Analytics Workspace";
 }
 
-<h3>Send data to a Log Analytics Workspace</h3>
-This tool will send 10 log entries to a Log Analytics Workspace.
+<h3>Send Customer Log Analytics Workspace</h3>
+This tool will generate and send 100 Customer log entries to a Log Analytics Workspace. Perfect for practicing fundamental KSQL queries.
 <br>
 <br>
 
-<form asp-controller="LogWorkSpace" asp-action="Index" method="post">
+<form asp-controller="LogWorkspaceDataGenerator" asp-action="SendCustomerData" method="post">
 
 
     <table class="table">

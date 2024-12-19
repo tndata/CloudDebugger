@@ -113,7 +113,7 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
 This is the token credential that successfully retrieved an access token.
 <table class="table table-bordered">
 
-    @if (Model.SelectedTokenCredential != null)
+    @if (Model?.SelectedTokenCredential != null)
     {
         <tr>
             <th>

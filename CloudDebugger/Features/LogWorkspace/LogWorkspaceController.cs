@@ -1,9 +1,12 @@
+using CloudDebugger.SharedCode.LogAnalyticsWorkspace;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudDebugger.Features.LogWorkspace;
 
 /// <summary>
-/// Send log data to Log Analytics with the HTTP Data Collector API
+/// This tool will send 10 log entries to a Log Analytics Workspace.
+/// /// 
+/// Send sample log data to Log Analytics with the HTTP Data Collector API
 /// https://learn.microsoft.com/en-us/rest/api/loganalytics/create-request
 /// </summary>
 public class LogWorkspaceController : Controller
@@ -19,7 +22,7 @@ public class LogWorkspaceController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public IActionResult SendTestData()
     {
         var model = new LogWorkspaceModel()
         {
@@ -33,7 +36,7 @@ public class LogWorkspaceController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Index(LogWorkspaceModel model)
+    public async Task<IActionResult> SendTestData(LogWorkspaceModel model)
     {
         if (ModelState.IsValid && model != null)
         {
@@ -52,7 +55,7 @@ public class LogWorkspaceController : Controller
 
                 var logStatements = GenerateSampleLogStatements(model.LogMessage);
 
-                await LogSender.SendLogStatements(logStatements, model.LogType!, model.WorkspaceId!, model.WorkspaceKey!);
+                await LogAnalyticsWorkspaceSender.SendLogStatements(logStatements, model.LogType!, model.WorkspaceId!, model.WorkspaceKey!);
 
                 model.Message = $"{NumberOfLogStatementsToSend} Log statements sent to table {model.LogType} in your Log Analytics Workspace! It will take a few minutes before the data shows up in your Workspace.";
 
@@ -83,7 +86,7 @@ public class LogWorkspaceController : Controller
             {
                 Message = logMessage + " #" + i,
                 Severity = severity[index],
-                Timestamp = DateTime.UtcNow
+                TimeGenerated = DateTime.UtcNow
             };
 
             tmp.Add(logData);
