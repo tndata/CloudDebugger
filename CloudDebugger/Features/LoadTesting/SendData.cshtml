@@ -1,0 +1,80 @@
+﻿@model CloudDebugger.Features.LoadTesting.LoadTestingModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Load Testing Tool";
+}
+
+<h3>Load Testing Tool</h3>
+This tool allows you to send a large number of HTTP requests to a specified endpoint.
+<br />
+<br />
+The application will stop once the specified number of requests has been sent or after 180 seconds to avoid being interrupted by the Azure HTTP request timeout (240 seconds).
+<br>
+<br>
+
+<form asp-controller="LoadTesting" asp-action="SendData" method="post">
+
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">Total number of requests to send</td>
+            <td class="col-md-10">
+                <input asp-for="TotalNumberOfRequests" style="min-width:50%"><br />
+                <span asp-validation-for="TotalNumberOfRequests"></span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-md-2">Number of concurrent requests</td>
+            <td class="col-md-6">
+                <input asp-for="NumberOfConcurrentRequests" style="min-width:90%"><br />
+                <span asp-validation-for="NumberOfConcurrentRequests"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+        <tr>
+            <td class="col-md-2">Target URL</td>
+            <td class="col-md-6">
+                <input asp-for="TargetURL" style="min-width:90%"><br />(use $ID to insert a random value between 1 and 100)
+                <span asp-validation-for="TargetURL"></span>
+            </td>
+            <td class="col-md-4"></td>
+        </tr>
+       
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <input type="submit" name="submit" value="Send Requests" /><br />
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    @if (!String.IsNullOrWhiteSpace(Model.Exception))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+
+<br>
+<br>
+<br>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/LoadTesting">Documentation</a></li>
+</ul>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
