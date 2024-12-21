@@ -3,7 +3,7 @@
     ViewData["Title"] = "Cloud Debugger - Send events to Log Analytics Workspace";
 }
 
-<h3>Send test data to a Log Analytics Workspace</h3>s
+<h3>Send test data to a Log Analytics Workspace</h3>
 This tool will send 10 log entries to a Log Analytics Workspace.
 <br>
 <br>
@@ -45,11 +45,17 @@ This tool will send 10 log entries to a Log Analytics Workspace.
             <td class="col-md-8"></td>
         </tr>
 
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <input type="submit" name="submit" value="Send Log Statements" /><br />
+            </td>
+        </tr>
 
     </table>
 
     <br>
-    <input type="submit" name="submit" value="Send log statements" /><br />
+
 
     @if (!String.IsNullOrWhiteSpace(Model.Exception))
     {

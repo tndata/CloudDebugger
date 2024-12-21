@@ -46,7 +46,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
  
-### Logging
+### Observabilty
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)
 * [Write a message to the log](https://github.com/tndata/CloudDebugger/wiki/Logging)
 * [Write to standard output and error](https://github.com/tndata/CloudDebugger/wiki/WriteToStdOutErr)
