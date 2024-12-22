@@ -137,19 +137,12 @@ public class ApiEndpointsController : ControllerBase
                     while (!cts.Token.IsCancellationRequested)
                     {
                         var data = System.Text.Encoding.UTF8.GetBytes("Some CPU intensive task");
-                        var hash = System.Security.Cryptography.SHA256.HashData(data);
+                        _ = System.Security.Cryptography.SHA256.HashData(data);
                     }
                 }, cts.Token));
             }
 
-            try
-            {
-                await Task.WhenAll(tasks);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("CPU intensive tasks were canceled after 1 minute");
-            }
+            await Task.WhenAll(tasks);
         }
 
         return Ok("CPU intensive tasks completed");
@@ -186,14 +179,7 @@ public class ApiEndpointsController : ControllerBase
                 }, cts.Token));
             }
 
-            try
-            {
-                await Task.WhenAll(tasks);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("Memory intensive tasks were canceled after 1 minute");
-            }
+            await Task.WhenAll(tasks);
         }
 
         return Ok("Memory intensive tasks completed");

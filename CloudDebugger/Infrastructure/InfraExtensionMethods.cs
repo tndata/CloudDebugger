@@ -1,4 +1,5 @@
-﻿using CloudDebugger.Features.Health;
+﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
+using CloudDebugger.Features.Health;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
 
@@ -100,14 +101,18 @@ public static class InfraExtensionMethods
 
     /// <summary>
     /// Configure application insighhts
+    /// 
+    /// https://learn.microsoft.com/en-us/azure/azure-monitor/app/opentelemetry-enable?
+    /// 
+    /// GitHub: Azure Monitor Distro client library for .NET
+    /// https://github.com/Azure/azure-sdk-for-net/tree/Azure.Monitor.OpenTelemetry.AspNetCore_1.2.0/sdk/monitor/Azure.Monitor.OpenTelemetry.AspNetCore
     /// </summary>
     /// <param name="builder"></param>
     public static void AddAndApplicationInsights(this WebApplicationBuilder builder)
     {
-        builder.Services.AddApplicationInsightsTelemetry(o =>
-        {
-            //Options https://github.com/microsoft/ApplicationInsights-dotnet/blob/main/NETCORE/src/Shared/Extensions/ApplicationInsightsServiceOptions.cs
-            o.EnableDebugLogger = true;
-        });
+        builder.Services.AddOpenTelemetry()
+                        .UseAzureMonitor(o =>
+                        {
+                        });
     }
 }

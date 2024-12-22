@@ -8,13 +8,13 @@ public class LoadTestingModel
     /// <summary>
     /// Gets or sets the total number of requests to be sent during the load test.
     /// </summary>
-    public int TotalNumberOfRequests { get; set; }
+    public int? TotalNumberOfRequests { get; set; }
 
     [Required]
     /// <summary>
     /// Gets or sets the number of concurrent requests to be sent during the load test.
     /// </summary>
-    public int NumberOfConcurrentRequests { get; set; }
+    public int? NumberOfConcurrentRequests { get; set; }
 
     [Required]
     /// <summary>
