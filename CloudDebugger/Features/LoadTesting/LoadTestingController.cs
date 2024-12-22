@@ -90,7 +90,7 @@ public class LoadTestingController : Controller
                                     Interlocked.Increment(ref totalNumberOfFailedRequests);
                                 }
                             }
-                            catch (Exception exc)
+                            catch
                             {
                                 Interlocked.Increment(ref totalNumberOfFailedRequests);
                             }

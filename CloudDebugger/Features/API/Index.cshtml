@@ -13,7 +13,8 @@ The following endpoints are defined:
 <br />
 <a href="/api/customers/2">GET /api/customers/2</a> - Get a specific customer (1-100).
 <br />
-<a href="/api/CustomersSlow/2">GET /api/customersSlow/2</a> - Get a specific customer (1-100), ID=10 takes 1s, others 20ms.
+<a href="/api/CustomersSlow/2">GET /api/customersSlow/2</a> - Get a specific customer (1-100) with a delay. Customer with ID=10 takes 1 second to execute.
+  All other takes a random time with a distribution centered around 50ms.
 <br />
 <a href="/api/echo">GET /api/echo</a> - Echo back the received response headers.
 <br />

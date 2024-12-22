@@ -8,10 +8,13 @@ namespace CloudDebugger.Features.Api;
 /// 
 /// This REST API endpoint provides a few useful API endpoints for testing purposes
 /// 
-/// /api/customers      Returns a JSON document with  100 customers
-/// /api/customers/1    Returns a specific customer back as JSON (1-100)
-/// /api/echo           Returns back the received request headers as a JSON document.
-/// /api/time           Returns the current time as a string      
+/// /api/customers       Returns a JSON document with  100 customers
+/// /api/customers/1     Returns a specific customer back as JSON (1-100)
+/// /api/echo            Returns back the received request headers as a JSON document.
+/// /api/time            Returns the current time as a string     
+/// /api/cpu             Simulates CPU intensive tasks for 1 minute
+/// /api/memory          Simulates memory intensive tasks for 1 minute
+/// /api/customersSlow/1 Returns a specific customer back as JSON (1-100) with a delay
 /// </summary>
 [Route("/api")]
 [ApiController]
@@ -55,7 +58,8 @@ public class ApiEndpointsController : ControllerBase
     }
 
     /// <summary>
-    /// Returns a specific customer (1-100) ,however, customer with ID=10 takes 1 second to execute. All other takes 20ms to complete.
+    /// Returns a specific customer (1-100), however, customer with ID=10 takes 1 second to execute. 
+    /// All other takes a random time with a distribution centered around 50ms.
     /// </summary>
     /// <param name="id">Customer Id</param>
     /// <returns></returns>
@@ -68,11 +72,13 @@ public class ApiEndpointsController : ControllerBase
 
         if (id == 10)
         {
-            await Task.Delay(1000);
+            await Task.Delay(1500);
         }
         else
         {
-            await Task.Delay(20);
+            var random = new Random();
+            double delay = Math.Abs(random.NextGaussian(50, 15)); // mean 50ms, stddev 15ms
+            await Task.Delay((int)delay);
         }
 
         return cust != null
@@ -191,6 +197,17 @@ public class ApiEndpointsController : ControllerBase
         }
 
         return Ok("Memory intensive tasks completed");
+    }
+}
+public static class RandomExtensions
+{
+    public static double NextGaussian(this Random random, double mean = 0, double stdDev = 1)
+    {
+        // Use the Box-Muller transform to generate a pair of independent standard normally distributed random numbers
+        double u1 = 1.0 - random.NextDouble(); // uniform(0,1] random doubles
+        double u2 = 1.0 - random.NextDouble();
+        double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); // random normal(0,1)
+        return mean + stdDev * randStdNormal; // random normal(mean,stdDev^2)
     }
 }
 
