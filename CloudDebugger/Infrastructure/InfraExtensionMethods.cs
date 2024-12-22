@@ -2,6 +2,7 @@
 using CloudDebugger.Features.Health;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
+using Serilog;
 
 namespace CloudDebugger.Infrastructure;
 
@@ -110,9 +111,25 @@ public static class InfraExtensionMethods
     /// <param name="builder"></param>
     public static void AddAndApplicationInsights(this WebApplicationBuilder builder)
     {
-        builder.Services.AddOpenTelemetry()
-                        .UseAzureMonitor(o =>
-                        {
-                        });
+        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            //The library will crash with an exception if the connection string is missing :-(
+            builder.Services.AddOpenTelemetry()
+                            .UseAzureMonitor(o =>
+                            {
+                                o.ConnectionString = connectionString;
+
+                                o.Diagnostics.IsDistributedTracingEnabled = true;
+                                o.Diagnostics.IsLoggingEnabled = true;
+
+                                o.EnableLiveMetrics = true;
+                                o.SamplingRatio = 1.0f;         //The default value is 1.0F, indicating that all telemetry items are sampled.
+                            });
+        }
+        else
+        {
+            Log.Information("Application Insights is disabled because the connection string is missing.");
+        }
     }
 }

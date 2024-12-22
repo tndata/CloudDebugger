@@ -99,9 +99,9 @@ public class LogWorkspaceDataGeneratorController : Controller
             var severity = severities[i % severities.Count];
             var environment = environments[i % environments.Count];
             var customer = customers[i % customers.Count];
-            var product = products[i % products.Count];
+            var (Name, Price) = products[i % products.Count];
             var quantity = i % 4 + 1; // Cycles between 1 and 4
-            var totalAmount = product.Price * quantity;
+            var totalAmount = Price * quantity;
 
             // Generate timestamp based on index
             var timestamp = DateTime.UtcNow.Date.AddMinutes(i % 1440); // Spreads entries across one day
@@ -110,7 +110,7 @@ public class LogWorkspaceDataGeneratorController : Controller
             var logData = new LogWorkspaceLogEntry
             {
                 TimeGenerated = timestamp,
-                Message = $"{customer} purchased {quantity} x {product.Name} for ${totalAmount}.",
+                Message = $"{customer} purchased {quantity} x {Name} for ${totalAmount}.",
                 Severity = severity,
                 Type = "ECommerceLog",
                 CorrelationId = $"CID-{i:D4}",
@@ -125,13 +125,13 @@ public class LogWorkspaceDataGeneratorController : Controller
                 CustomDimensions = new Dictionary<string, string>
             {
                 { "CustomerName", customer },
-                { "ProductName", product.Name },
+                { "ProductName", Name },
                 { "PaymentStatus", severity == "Error" ? "Failed" : "Successful" }
             },
                 Metrics = new Dictionary<string, double>
             {
                 { "Quantity", quantity },
-                { "UnitPrice", product.Price },
+                { "UnitPrice", Price },
                 { "TotalAmount", totalAmount }
             }
             };
