@@ -59,6 +59,8 @@ public class LoadTestingController : Controller
         int totalNumberOfFailedRequests = 0;
         var random = new Random();
 
+
+
         using (var client = new HttpClient())
         {
             client.Timeout = TimeSpan.FromSeconds(RequestTimeoutSeconds);
@@ -66,6 +68,9 @@ public class LoadTestingController : Controller
             using (CancellationTokenSource cts = new(TimeSpan.FromSeconds(CancellationTimeoutSeconds)))
             {
                 int requestsPerTask = totalNumberOfRequests / numberOfConcurrentRequests;
+
+                // Ensure the thread pool has enough threads
+                ThreadPool.SetMinThreads(numberOfConcurrentRequests, numberOfConcurrentRequests);
 
                 for (int i = 0; i < numberOfConcurrentRequests; i++)
                 {
@@ -78,8 +83,7 @@ public class LoadTestingController : Controller
                                 string targetUrlWithId = targetURL.Replace("$ID", random.Next(1, 101).ToString()); //(1 - 100)
                                 HttpResponseMessage response = await client.GetAsync(new Uri(targetUrlWithId), cts.Token);
 
-
-                                Console.WriteLine($"Sent Request #{i} on Task {j} on TID {Environment.CurrentManagedThreadId} to {targetUrlWithId}");
+                                Console.WriteLine("###" + targetUrlWithId);
 
                                 if (response.IsSuccessStatusCode)
                                 {
