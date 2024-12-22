@@ -35,9 +35,16 @@ public class LoadTestingController : Controller
                 model.Exception = "";
                 model.Message = "";
 
-                string result = SendRequests(model.TargetURL, model.TotalNumberOfRequests, model.NumberOfConcurrentRequests);
-
-                model.Message = result;
+                // Ensure the nullable integers have values before passing them
+                if (model.TotalNumberOfRequests.HasValue && model.NumberOfConcurrentRequests.HasValue)
+                {
+                    string result = SendRequests(model.TargetURL, model.TotalNumberOfRequests.Value, model.NumberOfConcurrentRequests.Value);
+                    model.Message = result;
+                }
+                else
+                {
+                    model.Exception = "TotalNumberOfRequests or NumberOfConcurrentRequests is null.";
+                }
             }
             catch (Exception exc)
             {
