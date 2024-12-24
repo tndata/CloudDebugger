@@ -1,7 +1,7 @@
 using Azure.Core.Diagnostics;
-using Azure.MyIdentity;
 using CloudDebugger;
 using CloudDebugger.Infrastructure;
+using CloudDebugger.SharedCode.AzureSDKEventLogger;
 using Serilog;
 using Serilog.Events;
 using System.Diagnostics.Tracing;
@@ -15,30 +15,19 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .MinimumLevel.Override("Microsoft.AspNetCore.Session", LogEventLevel.Verbose)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
+    // .WriteTo.Console()
     .CreateBootstrapLogger();
 
 
 Banners.DisplayPreStartupBanner();
 
-// TODO: Cleanup
-var eventListener = new AzureEventSourceListener((e, message) =>
+
+// Log all internal Azure SDK events. These events can then be viewed by the AzureSDKEventViewer tool.
+var eventListener = new AzureEventSourceListener((evnt, message) =>
 {
-    // Only log messages from "Azure-Core" event source
-    //Azure-Messaging-ServiceBus
-    //Azure-Messaging-EventHubs
-
-    if (e.EventSource.Name is "Azure-Core" or "Azure-Identity")
-    {
-        MyAzureIdentityLog.AddToLog(e.EventSource.Name.ToString(), message);
-    }
-    else
-    {
-        Console.WriteLine(e.EventSource.Name);
-    }
-
+    AzureEventLogger.AddEventToLog(evnt, message);
 },
-    level: EventLevel.Verbose);
+level: EventLevel.Verbose);
 
 
 try

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CloudDebugger.Features.CredentialsEventLog;
 
 /// <summary>
-/// This controller is used to view the internal custom Eventlog from the custom MyAzureIdentity library log class.
+/// This controller is used to view the internal custom Eventlog from the custom MyAzureIdentity library.
 /// </summary>
 public class CredentialsEventLogController : Controller
 {
@@ -14,10 +14,9 @@ public class CredentialsEventLogController : Controller
 
     public IActionResult ViewEventLog()
     {
-        // Get the internal custom Eventlog from the custom MyAzureIdentity library log class
         var model = new ViewLogModel()
         {
-            Log = MyAzureIdentityLog.Log
+            Log = MyAzureIdentityLog.LogEntries
         };
 
         return View(model);

@@ -45,6 +45,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Errors](https://github.com/tndata/CloudDebugger/wiki/Errors)
 * [Network Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
 * [Runtime Details](https://github.com/tndata/CloudDebugger/wiki/Diagnostics)
+* [Azure SDK Event log](https://github.com/tndata/CloudDebugger/wiki/AzureSDKEventLog)
  
 ### Observabilty
 * [Log Analytics Workspace](https://github.com/tndata/CloudDebugger/wiki/LogWorkspace)

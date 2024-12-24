@@ -1,17 +1,17 @@
-﻿@model CloudDebugger.Features.CredentialsEventLog.ViewLogModel
+﻿@model CloudDebugger.Features.AzureSDKEventLogViewer.ViewLogModel
 @{
-    ViewData["Title"] = "Cloud Debugger - View Log";
+    ViewData["Title"] = "Cloud Debugger - Azure SDK Events";
 }
 
-<h5>View internal MyAzureIdentity log</h5>
-This page will display the internal log of the MyAzureIdentityLibrary.
+<h5>View internal Azure SDK events</h5>
+This page will display the internal events emitted by the Azure SDK.
 
 <br />
-<a href="/DefaultAzureCredentials/index">Back</a>&nbsp;&nbsp;<a href="/CredentialsEventLog/ClearEventLog">Clear the log</a>
+<a href="/AzureSDKEventLogViewer/ClearEventLog">Clear the log</a>
 <br />
 <br />
 
-<h5>The internal event log</h5>
+<h5>Internal Azure SDK events</h5>
 <table class="table table-bordered">
 
     <tr>
@@ -28,10 +28,10 @@ This page will display the internal log of the MyAzureIdentityLibrary.
                     <pre>@entry.EntryTime.ToString("hh:mm:ss")</pre>
                 </td>
                 <td>
-                    <pre>@Html.Raw(@entry.Context.ToString())</pre>
+                    <pre>@Html.Raw(@entry.EventType?.ToString() ?? "Unknown")</pre>
                 </td>
                 <td style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                    <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(@entry.Message.ToString().Replace("]", "]\r\n"))</pre>
+                    <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(@entry.Message?.ToString()?.Replace("]", "]\r\n") ?? "")</pre>
                 </td>
             </tr>
         }
@@ -50,5 +50,5 @@ This page will display the internal log of the MyAzureIdentityLibrary.
 <br />
 <h5>Resources</h5>
 <ul>
-    <li><a href="https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog">Documentation</a></li>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/AzureSDKEventLog">Documentation</a></li>
 </ul>

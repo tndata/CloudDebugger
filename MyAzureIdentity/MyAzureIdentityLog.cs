@@ -5,23 +5,34 @@
     /// </summary>
     public static class MyAzureIdentityLog
     {
-        public readonly static List<AzureIdentityLogEntry> Log = new();
+        private readonly static List<AzureIdentityLogEntry> log = new();
         private readonly static object lockObj = new();
+
+        public static List<AzureIdentityLogEntry> LogEntries
+        {
+            get
+            {
+                lock (lockObj)
+                {
+                    return new List<AzureIdentityLogEntry>(log);
+                }
+            }
+        }
 
         public static void AddToLog(string context, string message)
         {
             lock (lockObj)
             {
 
-                Log.Add(new AzureIdentityLogEntry()
+                log.Add(new AzureIdentityLogEntry()
                 {
                     EntryTime = DateTime.UtcNow,
                     Context = context,
                     Message = message
                 });
 
-                if (Log.Count > 500)
-                    Log.RemoveAt(0);
+                if (log.Count > 500)
+                    log.RemoveAt(0);
             }
         }
 
@@ -29,7 +40,7 @@
         {
             lock (lockObj)
             {
-                Log.Clear();
+                log.Clear();
             }
         }
     }
