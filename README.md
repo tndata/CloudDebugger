@@ -20,6 +20,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 ### HTTP Request tools
 * [Current Request Viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
 * [Calling External APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
+* [Load Testing](https://github.com/tndata/CloudDebugger/wiki/LoadTesting)
 * [Request Logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 * [Request Sender](https://github.com/tndata/CloudDebugger/wiki/RequestSender)
 
