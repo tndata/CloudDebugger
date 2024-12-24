@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CloudDebugger.Features.LoadTesting;
 
 /// <summary>
-/// Controller for handling load testing operations.
+/// Controller for load testing, allowing concurrent requests to be sent to a specified destination.
 /// </summary>
 public class LoadTestingController : Controller
 {
@@ -65,8 +65,6 @@ public class LoadTestingController : Controller
         int totalNumberOfSuccessFullRequests = 0;
         int totalNumberOfFailedRequests = 0;
         var random = new Random();
-
-
 
         using (var client = new HttpClient())
         {
