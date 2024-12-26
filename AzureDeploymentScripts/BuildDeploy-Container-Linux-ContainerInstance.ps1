@@ -55,7 +55,8 @@ Write-Host "`n`nCreating Azure Container Instance"
 $container = az container create --resource-group $rgname `
                                 --name $containerInstanceName `
                                 --image "${acrname}.azurecr.io/${imagename}:latest" `
-                                --cpu 0.5 `
+                                --os-type Linux `
+								--cpu 0.5 `
                                 --memory 0.5 `
                                 --ports 8080 `
                                 --dns-name-label $containerInstanceName `

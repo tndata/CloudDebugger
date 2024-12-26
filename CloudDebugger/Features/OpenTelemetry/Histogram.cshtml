@@ -1,0 +1,68 @@
+﻿@model CloudDebugger.Features.OpenTelemetry.HistogramModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Histogram";
+}
+
+<h4>Histogram</h4>
+<p>
+    This tool will create Histograms.
+    The collected metrics can be viewed <a href="/OpenTelemetryMetricsViewer/ViewMetrics">here</a>.
+</p>
+
+<p><a href="/OpenTelemetry">Back</a></p>
+
+<section>
+    <h5>Standard Histogram</h5>
+    <p>
+        This histogram, named <b>StandardHistogram</b>, uses default bucket boundaries.
+        When you click the button below, it records a recognizable powers-of-two pattern
+        (1,2,4,8,... up to 512) at midpoints from 50 to 950 in increments of 100.
+    </p>
+    <form asp-controller="OpenTelemetry" asp-action="StandardHistogram" method="post">
+        <input type="submit" name="submit" value="Increment standard histogram" />
+    </form>
+</section>
+
+<br>
+<br>
+
+<section>
+    <h5>Advanced Histogram</h5>
+    <p>
+        This histogram, named <b>AdvancedHistogram</b>, uses an explicit set of 10 buckets
+        between 0 and 1000. When you click the button below, the same powers-of-two pattern
+        is recorded (1,2,4,8,... up to 512) at midpoints from 50 to 950.
+    </p>
+    <form asp-controller="OpenTelemetry" asp-action="AdvancedHistogram" method="post">
+        <input type="submit" name="submit" value="Increment advanced histogram" />
+    </form>
+</section>
+
+<br />
+<br />
+
+@if (!String.IsNullOrWhiteSpace(Model?.Exception))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.Exception</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model?.Message))
+{
+    <div class="alert alert-success" role="alert">
+        <b>@Model.Message</b>
+    </div>
+}
+
+<br>
+<br>
+
+<section>
+    <h5>Resources</h5>
+    <ul>
+        <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
+        <li><a href="https://opentelemetry.io/">OpenTelemetry homepage</a></li>
+        <li><a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/README.md">OpenTelemetry Specification</a></li>
+    </ul>
+</section>

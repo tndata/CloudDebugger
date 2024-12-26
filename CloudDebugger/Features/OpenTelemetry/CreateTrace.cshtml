@@ -1,0 +1,51 @@
+﻿@model CloudDebugger.Features.OpenTelemetry.OpenTelemetryModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Send a Complex Trace OpenTelemetry";
+}
+
+<h4>Send a Complex Trace OpenTelemetry</h4>
+<p>This tool will create a bit more complex OpenTelemetry trace. 
+The collected traces can be viewed <a href="/OpenTelemetryTracesViewer/ViewTraces">here</a></p>
+<p><a href="/OpenTelemetry">Back</a></p>
+
+<form asp-controller="OpenTelemetry" asp-action="CreateTrace" method="post">
+    <table class="table">
+        <tr>
+            <td class="col-md-2">Custom Message</td>
+            <td class="col-md-10">
+                <input asp-for="LogMessage" class="form-control" />
+                <span asp-validation-for="LogMessage" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2"></td>
+            <td class="col-md-10">
+                <input type="submit" name="submit" value="Create Trace" class="btn btn-primary" />
+            </td>
+        </tr>
+    </table>
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Exception))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
+    {
+        <div class="alert alert-success" role="alert">
+            <b>@Model.Message</b>
+        </div>
+    }
+</form>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
+    <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
+</ul>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

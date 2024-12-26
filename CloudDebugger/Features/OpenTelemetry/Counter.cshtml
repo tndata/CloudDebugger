@@ -1,0 +1,76 @@
+﻿@model CloudDebugger.Features.OpenTelemetry.CounterModel
+@{
+    ViewData["Title"] = "Cloud Debugger - OpenTelemetry Counters";
+}
+
+<h4>OpenTelemetry Counters</h4>
+<p>
+    This page demonstrates how to create and increment custom metrics counters.
+    You can view the collected metrics
+    <a href="/OpenTelemetryMetricsViewer/ViewMetrics">here</a>.
+</p>
+
+<p><a href="/OpenTelemetry">Back</a></p>
+
+<section>
+    <h5>Simple Counter</h5>
+    <p>
+        <b>SimpleCounter</b> is incremented by one each time you click the button below.
+        This counter has the following tags attached to every increment:
+    </p>
+    <ul>
+        <li><code>user.id</code></li>
+        <li><code>operation.name</code></li>
+    </ul>
+    <form asp-controller="OpenTelemetry" asp-action="Counter" method="post">
+        <input type="submit" name="submit" value="Increment Simple Counter" />
+    </form>
+</section>
+
+<br />
+<br />
+
+<section>
+    <h5>Advanced Counter</h5>
+    <p>
+        <b>AdvancedCounter</b> is also incremented by one on each click, but it includes a random
+        <code>country</code> tag. That tag is assigned to one of the following values:
+    </p>
+    <ul>
+        <li>Sweden</li>
+        <li>Denmark</li>
+        <li>Norway</li>
+        <li>Finland</li>
+    </ul>
+    <form asp-controller="OpenTelemetry" asp-action="AdvancedCounter" method="post">
+        <input type="submit" name="submit" value="Increment Advanced Counter" />
+    </form>
+</section>
+
+<br />
+<br />
+
+@if (!String.IsNullOrWhiteSpace(Model?.Exception))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.Exception</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model?.Message))
+{
+    <div class="alert alert-success" role="alert">
+        <b>@Model.Message</b>
+    </div>
+}
+
+<br />
+<br />
+
+<section>
+    <h5>Resources</h5>
+    <ul>
+        <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
+        <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
+    </ul>
+</section>

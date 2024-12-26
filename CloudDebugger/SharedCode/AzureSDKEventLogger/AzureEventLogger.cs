@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Tracing;
 using System.Text;
 
-namespace CloudDebugger.SharedCode.AzureSDKEventLogger;
+namespace CloudDebugger.SharedCode.AzureSdkEventLogger;
 
 /// <summary>
 /// Logger for all the events from the Azure SDK
@@ -24,18 +24,17 @@ public static class AzureEventLogger
         }
     }
 
-    public static void AddEventToLog(EventWrittenEventArgs evnt, string message)
+    /// <summary>
+    /// We don't render the message, as its part of the payload.
+    /// </summary>
+    /// <param name="evnt"></param>
+    public static void AddEventToLog(EventWrittenEventArgs evnt)
     {
-        // Log additional event details if needed
-        Console.WriteLine($"Event Level: {evnt.Level}, Event Keywords: {evnt.Keywords}, Event Opcode: {evnt.Opcode}");
-
         var sb = new StringBuilder();
-
 
         sb.AppendLine("Event Details");
 
         sb.AppendLine();
-        //sb.AppendLine(message);       //Skip the message for now, its part of the payload.
         sb.AppendLine();
         sb.AppendLine($"ActivityId: {evnt.ActivityId}");        //The activity ID on the thread that the event was written to.
         sb.AppendLine($"EventID: {evnt.EventId}");              //The event identifier.
