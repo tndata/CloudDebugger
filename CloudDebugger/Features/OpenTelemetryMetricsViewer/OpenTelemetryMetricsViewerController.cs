@@ -241,6 +241,8 @@ public class OpenTelemetryMetricsViewerController : Controller
             sb.AppendLine($"  Min:   {min}");
             sb.AppendLine($"  Max:   {max}");
         }
+        sb.AppendLine();
+        sb.AppendLine("== Buckets ==");
 
         bool isFirstIteration = true;
         double previousExplicitBound = default;
@@ -248,17 +250,19 @@ public class OpenTelemetryMetricsViewerController : Controller
         {
             if (isFirstIteration)
             {
-                sb.Append("(-Infinity,");
+                sb.Append("  (-Infinity,");
                 sb.Append(histogramMeasurement.ExplicitBound);
                 sb.Append(']');
                 sb.Append(':');
                 sb.Append(histogramMeasurement.BucketCount);
+                sb.AppendLine();
+
                 previousExplicitBound = histogramMeasurement.ExplicitBound;
                 isFirstIteration = false;
             }
             else
             {
-                sb.Append('(');
+                sb.Append("  [");
                 sb.Append(previousExplicitBound);
                 sb.Append(',');
                 if (!double.IsPositiveInfinity(histogramMeasurement.ExplicitBound))
@@ -274,6 +278,7 @@ public class OpenTelemetryMetricsViewerController : Controller
                 sb.Append(']');
                 sb.Append(':');
                 sb.Append(histogramMeasurement.BucketCount);
+                sb.AppendLine();
             }
         }
     }

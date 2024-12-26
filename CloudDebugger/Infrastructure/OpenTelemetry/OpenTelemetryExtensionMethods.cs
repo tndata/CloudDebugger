@@ -85,6 +85,11 @@ public static class OpenTelemetryExtensionMethods
                            o.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000;
                        }).AddConsoleExporter();
 
+                //Custom Histogram with fixed custom bucket sizes
+                metrics.AddView("AdvancedHistogram", new ExplicitBucketHistogramConfiguration
+                {
+                    Boundaries = new double[] { 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 }
+                });
 
                 metrics.AddMeter("CloudDebugger.Counters");
             })

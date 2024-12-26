@@ -3,52 +3,54 @@
     ViewData["Title"] = "Cloud Debugger - View OpenTelemetry Traces";
 }
 
-<h5>View OpenTelemetry Traces</h5>
-This page will display the latest OpenTelemetry traces.<br />
-<a href="/OpenTelemetry/index">Back</a>&nbsp;&nbsp;<a href="/OpenTelemetryTracesViewer/ClearTraceLog">Clear the log</a>
-<br />
-<br />
-It will ignore the following traces:
-<ul>
-    <li>Requests to the /OpenTelemetry pages</li>
-    <li>Internal ASP.NET Core requests debugging requests, like browserlink</li>
-</ul>
-<br />
+<h4>View OpenTelemetry Traces</h4>
+<p>
+    This page displays the latest OpenTelemetry traces.<br />
+    <a href="/OpenTelemetry/index">Back</a>&nbsp;&nbsp;
+    <a href="/OpenTelemetryTracesViewer/ClearTraceLog">Clear the log</a>
+</p>
 
-<h5>Trace entries</h5>
+<p>
+    The following traces are ignored:
+    <ul>
+        <li>Requests to the <code>/OpenTelemetry</code> pages</li>
+        <li>Internal ASP.NET Core debugging requests (e.g., BrowserLink)</li>
+    </ul>
+</p>
+
+<h5>Trace Entries</h5>
 <table class="table table-bordered">
-
-    <tr>
-        <th>Time</th>
-        <th>Log entry (UTC)</th>
-    </tr>
-
-    @if (Model.Entries != null && Model.Entries.Count > 0)
-    {
-        foreach (var entry in Model.Entries)
+    <thead>
+        <tr>
+            <th>Time (UTC)</th>
+            <th>Trace Entry</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Entries != null && Model.Entries.Count > 0)
+        {
+            foreach (var entry in Model.Entries)
+            {
+                <tr>
+                    <td class="col-md-1">
+                        <pre>@entry.Time.ToString("HH:mm:ss")</pre>
+                    </td>
+                    <td class="col-md-11" style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                        <b><pre>@Html.Raw(entry.Subject)</pre></b>
+                        <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(entry.Data)</pre>
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td class="col-md-1">
-                    <pre>@entry.Time.ToString("hh:mm:ss")</pre>
-                </td>
-                <td class="col-md-11" style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                    <b><pre>@Html.Raw(@entry.Subject)</pre></b>
-                    <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(@entry.Data)</pre>
-                </td>
+                <td colspan="2">No trace data found</td>
             </tr>
         }
-    }
-    else
-    {
-        <tr>
-            <td>No log data found</td>
-        </tr>
-    }
-
+    </tbody>
 </table>
 
-
-<br />
 <br />
 <h5>Resources</h5>
 <ul>

@@ -4,9 +4,14 @@
 }
 
 <h4>Write Custom Event to OpenTelemetry</h4>
-<p>This tool will create a custom OpenTelemetry event.</p>
-<p>The collected traces can be viewed <a href="/OpenTelemetryTracesViewer/ViewTraces">here</a></p>
-<p><a href="/OpenTelemetry">Back</a></p>
+<p>
+    This tool will create a custom OpenTelemetry event.
+    The resulting trace events can be viewed
+    <a href="/OpenTelemetryTracesViewer/ViewTraces">here</a>.
+</p>
+<p>
+    <a href="/OpenTelemetry">Back</a>
+</p>
 
 <form asp-controller="OpenTelemetry" asp-action="CustomEvent" method="post">
     <table class="table">
@@ -26,14 +31,14 @@
     </table>
 </form>
 
-@if (!String.IsNullOrWhiteSpace(Model?.Exception))
+@if (!string.IsNullOrWhiteSpace(Model?.Exception))
 {
     <div class="alert alert-danger" role="alert">
         <pre>@Model.Exception</pre>
     </div>
 }
 
-@if (!String.IsNullOrWhiteSpace(Model?.Message))
+@if (!string.IsNullOrWhiteSpace(Model?.Message))
 {
     <div class="alert alert-success" role="alert">
         <b>@Model.Message</b>

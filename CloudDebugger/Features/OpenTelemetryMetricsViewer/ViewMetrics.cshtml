@@ -3,49 +3,48 @@
     ViewData["Title"] = "Cloud Debugger - View OpenTelemetry Metrics";
 }
 
-<h5>View OpenTelemetry Metrics</h5>
-This page will display the latest OpenTelemetry metrics.
-<br />
-<a href="/OpenTelemetry/index">Back</a>&nbsp;&nbsp;<a href="/OpenTelemetryLog/ClearMetricsLog">Clear the log</a>
+<h4>View OpenTelemetry Metrics</h4>
+<p>
+    This page displays the latest OpenTelemetry metrics.<br />
+    <a href="/OpenTelemetry/index">Back</a>&nbsp;&nbsp;
+    <a href="/OpenTelemetryMetricsViewer/ClearMetricsLog">Clear the log</a>
+</p>
 
-
-<br />
 <br />
 
 <h5>Metrics</h5>
 <table class="table table-bordered">
-
-    <tr>
-        <th>Time (UTC)</th>
-        <th>Log entry</th>
-    </tr>
-
-    @if (Model.Entries != null && Model.Entries.Count > 0)
-    {
-        foreach (var entry in Model.Entries)
+    <thead>
+        <tr>
+            <th>Time (UTC)</th>
+            <th>Metrics Entry</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Entries != null && Model.Entries.Count > 0)
+        {
+            foreach (var entry in Model.Entries)
+            {
+                <tr>
+                    <td class="col-md-1">
+                        <pre>@entry.Time.ToString("HH:mm:ss")</pre>
+                    </td>
+                    <td class="col-md-11" style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                        <b><pre>@Html.Raw(entry.Subject)</pre></b>
+                        <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(entry.Data)</pre>
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td class="col-md-1">
-                    <pre>@entry.Time.ToString("hh:mm:ss")</pre>
-                </td>
-                <td class="col-md-11" style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                    <b><pre>@Html.Raw(@entry.Subject)</pre></b>
-                    <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(@entry.Data)</pre>
-                </td>
+                <td colspan="2">No metric data found</td>
             </tr>
         }
-    }
-    else
-    {
-        <tr>
-            <td>No log data found</td>
-        </tr>
-    }
-
+    </tbody>
 </table>
 
-
-<br />
 <br />
 <h5>Resources</h5>
 <ul>

@@ -61,16 +61,17 @@ public class OpenTelemetryLogViewerController : Controller
         {
             var sb = new StringBuilder();
 
+            sb.AppendLine("== Log Metadata ==");
+            sb.AppendLine($"Timestamp:    {log.Timestamp:O}");
+            sb.AppendLine($"Category:     {log.CategoryName}");
+            sb.AppendLine($"LogLevel:     {log.LogLevel}");
+            sb.AppendLine();
+
             sb.AppendLine($"== Trace Context ==");
             sb.AppendLine($"TraceId:      {log.TraceId}");
             sb.AppendLine($"SpanId:       {log.SpanId}");
             sb.AppendLine($"TraceFlags:   {log.TraceFlags}");
             sb.AppendLine($"TraceState:   {log.TraceState}");
-
-            sb.AppendLine();
-            sb.AppendLine("== Log Metadata ==");
-            sb.AppendLine($"Timestamp:    {log.Timestamp:O}");
-            sb.AppendLine($"Category:     {log.CategoryName}");
 
             if (!string.IsNullOrWhiteSpace(log.FormattedMessage))
             {

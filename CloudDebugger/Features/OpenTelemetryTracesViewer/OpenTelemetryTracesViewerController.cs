@@ -43,16 +43,6 @@ public class OpenTelemetryTracesViewerController : Controller
         return RedirectToAction("ViewTraces");
     }
 
-    /// <summary>
-    /// Clear the OpenTelemetry Logs log
-    /// </summary>
-    /// <returns></returns>
-    public IActionResult ClearLogs()
-    {
-        OpenTelemetryObserver.LogItemsLog.Clear();
-
-        return RedirectToAction("ViewLogs");
-    }
 
     /// <summary>
     /// We ignore tags, as it just contains the string representation of TagObjects

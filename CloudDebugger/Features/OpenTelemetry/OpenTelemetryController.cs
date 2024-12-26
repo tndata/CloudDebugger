@@ -26,6 +26,17 @@ public class OpenTelemetryController : Controller
     private static readonly Counter<int> simpleCounter = meter.CreateCounter<int>(name: "SimpleCounter", unit: "clicks", description: "A very simple counter");
     private static readonly Counter<int> advancedCounter = meter.CreateCounter<int>(name: "AdvancedCounter", unit: "clicks", description: "A slightly more advanceded counter");
 
+    // The "StandardHistogram" uses the default aggregator/buckets
+    private static readonly Histogram<long> standardHistogram = meter.CreateHistogram<long>(
+        name: "StandardHistogram",
+        unit: "none",
+        description: "Sample standard histogram with default boundaries.");
+
+    private static readonly Histogram<long> advancedHistogram = meter.CreateHistogram<long>(
+        name: "AdvancedHistogram",
+        unit: "none",
+        description: "Sample histogram with 10 buckets between 0 and 1000.");
+
     private static readonly string[] countries = { "Sweden", "Denmark", "Norway", "Finland" };
     private static readonly Random random = new();
 
@@ -35,9 +46,9 @@ public class OpenTelemetryController : Controller
         return View();
     }
 
-    public IActionResult SimpleCounter()
+    public IActionResult Counter()
     {
-        var model = new SimpleCounterModel()
+        var model = new CounterModel()
         {
         };
 
@@ -45,7 +56,7 @@ public class OpenTelemetryController : Controller
     }
 
     [HttpPost]
-    public IActionResult SimpleCounter(SimpleCounterModel model)
+    public IActionResult Counter(CounterModel model)
     {
         try
         {
@@ -62,17 +73,19 @@ public class OpenTelemetryController : Controller
             };
 
             simpleCounter.Add(1, tags);
+
+            model.Message = "Simple counter incremented";
         }
         catch (Exception exc)
         {
             model.Exception = exc.ToString();
         }
 
-        return View("SimpleCounter", model);
+        return View("Counter", model);
     }
 
     [HttpPost]
-    public IActionResult AdvancedCounter(SimpleCounterModel model)
+    public IActionResult AdvancedCounter(CounterModel model)
     {
         try
         {
@@ -83,20 +96,22 @@ public class OpenTelemetryController : Controller
             model.Exception = "";
 
 
-
+            string country = GetRandomCountry();
             var tags = new KeyValuePair<string, object?>[]
             {
-                new("country", GetRandomCountry()),
+                new("country",country)
             };
 
             advancedCounter.Add(1, tags);
+
+            model.Message = $"Advanced counter incremented with country='{country}'";
         }
         catch (Exception exc)
         {
             model.Exception = exc.ToString();
         }
 
-        return View("SimpleCounter", model);
+        return View("Counter", model);
     }
 
 
@@ -106,6 +121,83 @@ public class OpenTelemetryController : Controller
         return countries[index];
     }
 
+    public IActionResult Histogram()
+    {
+        var model = new HistogramModel()
+        {
+        };
+
+        return View(model);
+    }
+
+
+
+    [HttpPost]
+    public IActionResult StandardHistogram(HistogramModel model)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            model.Message = "";
+            model.Exception = "";
+
+            for (int i = 0; i < 10; i++)
+            {
+                long midpointValue = i * 100 + 50;   // e.g., 50, 150, 250, ...
+                int count = (int)Math.Pow(2, i);     // 1,2,4,8,...512
+
+                for (int c = 0; c < count; c++)
+                {
+                    // Each call to Record is considered one measurement for the aggregator
+                    standardHistogram.Record(midpointValue);
+                }
+            }
+
+            model.Message = "Simple Histogram updated";
+        }
+        catch (Exception exc)
+        {
+            model.Exception = exc.ToString();
+        }
+
+        return View("Histogram", model);
+    }
+
+
+    [HttpPost]
+    public IActionResult AdvancedHistogram(HistogramModel model)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            model.Message = "";
+            model.Exception = "";
+
+            for (int i = 0; i < 10; i++)
+            {
+                long midpointValue = i * 100 + 50;   // e.g., 50, 150, 250, ...
+                int count = (int)Math.Pow(2, i);     // 1,2,4,8,...512
+
+                for (int c = 0; c < count; c++)
+                {
+                    // Each call to Record is considered one measurement for the aggregator
+                    advancedHistogram.Record(midpointValue);
+                }
+            }
+
+            model.Message = "Advanced Histogram updated";
+        }
+        catch (Exception exc)
+        {
+            model.Exception = exc.ToString();
+        }
+
+        return View("Histogram", model);
+    }
 
 
     /// <summary>
