@@ -45,9 +45,6 @@ public static class OpenTelemetryExtensionMethods
     {
         var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
 
-        //TODO: !!! 
-        connectionString = "";
-
         if (string.IsNullOrEmpty(connectionString))
         {
             //Configure OpenTelemetry with the default setup
