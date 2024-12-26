@@ -85,7 +85,7 @@ Tools to explore versioned blobs.
             <tbody>
                 @foreach (var version in Model.BlobVersions)
                 {
-                    if (@version.IsLatestVersion == false)
+                    if (!@version.IsLatestVersion)
                     {
                         <tr>
                             <td>@version.Name</td>
@@ -101,7 +101,7 @@ Tools to explore versioned blobs.
                     }
                     else
                     {
-                        @* Make this row all in bold *@
+                        @* Latest Version, Make this row all in bold *@
                         <tr style="background-color: lightblue;">
                             <td><b>@version.Name</b></td>
                             <td><b>@version.VersionId</b></td>
