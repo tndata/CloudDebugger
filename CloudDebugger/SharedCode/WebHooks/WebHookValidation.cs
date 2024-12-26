@@ -139,9 +139,13 @@ public static class WebHookValidation
         }
     }
 
-
-
-
+    /// <summary>
+    /// Consider: Retry the request if the response body is empty, can happen from time to time. Response body: ''
+    /// </summary>
+    /// <param name="hookId"></param>
+    /// <param name="LogEventHandler"></param>
+    /// <param name="callbackUrl"></param>
+    /// <param name="comment"></param>
     private static void SendCallBackRequest(int hookId, Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
     {
         //Call the callBackUrl to confirm the webhoook
@@ -171,8 +175,6 @@ public static class WebHookValidation
 
                 // Ensure to dispose the request after it's used
                 request.Dispose();
-
-                //TODO: Retry the request if the response body is empty, can happen from time to time. Response body: ''
 
                 // Read the response content as string
                 var result = response.Content.ReadAsStringAsync().Result;
