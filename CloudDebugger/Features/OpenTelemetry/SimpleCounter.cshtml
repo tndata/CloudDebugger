@@ -3,40 +3,62 @@
     ViewData["Title"] = "Cloud Debugger - Simple Counter";
 }
 
-<h4>Simple counter</h4>
-This tool will create a custom counter named SimpleCounter and increment it by one.
-<br /><a href="/OpenTelemetry">Back</a>
+<h4>Simple Counter</h4>
+<p>This tool will create custom metrics counters and increment them by one. 
+    The collected metrics can be viewed <a href="/OpenTelemetryMetricsViewer/ViewMetrics">here</a>.
+</p>
+
+<p><a href="/OpenTelemetry">Back</a></p>
+
+<section>
+    <h5>Simple Counter</h5>
+    <p>This counter, named <b>SimpleCounter</b>, is incremented by one each time the button is clicked. The counter has the following associated tags:</p>
+    <ul>
+        <li>user.id</li>
+        <li>operation.name</li>
+    </ul>
+    <form asp-controller="OpenTelemetry" asp-action="SimpleCounter" method="post">
+        <input type="submit" name="submit" value="Increment Simple Counter" />
+    </form>
+</section>
 
 <br>
 <br>
+<section>
+    <h5>Advanced Counter</h5>
+    <p>This counter, named <b>Advanced Counter</b>, is incremented by one each time the button is clicked. The counter has a country tag associated with it, and the country will randomly be assigned one of the following values:</p>
+    <ul>
+        <li>Sweden</li>
+        <li>Denmark</li>
+        <li>Norway</li>
+        <li>Finland</li>
+    </ul>
+    <form asp-controller="OpenTelemetry" asp-action="AdvancedCounter" method="post">
+        <input type="submit" name="submit" value="Increment Advanced Counter" />
+    </form>
+</section>
 
-<form asp-controller="OpenTelemetry" asp-action="SimpleCounter" method="post">
+@if (!String.IsNullOrWhiteSpace(Model?.Exception))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.Exception</pre>
+    </div>
+}
 
-    <input type="submit" name="submit" value="Increment Counter" /><br />
-
-
-    @if (!String.IsNullOrWhiteSpace(Model?.Exception))
-    {
-        <div class="alert alert-danger" role="alert">
-            <pre>@Model.Exception</pre>
-        </div>
-    }
-
-    @if (!String.IsNullOrWhiteSpace(Model?.Message))
-    {
+@if (!String.IsNullOrWhiteSpace(Model?.Message))
+{
+    <div class="alert alert-success" role="alert">
         <b>@Model.Message</b>
-    }
-
-</form>
+    </div>
+}
 
 <br>
 <br>
-<br>
 
-<h5>Resources</h5>
-<ul>
-    <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
-    <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
-</ul>
-
-
+<section>
+    <h5>Resources</h5>
+    <ul>
+        <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
+        <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
+    </ul>
+</section>

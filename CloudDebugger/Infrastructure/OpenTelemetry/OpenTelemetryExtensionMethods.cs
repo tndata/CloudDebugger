@@ -75,7 +75,7 @@ public static class OpenTelemetryExtensionMethods
             .ConfigureResource(r => r.AddService("CloudDebugger"))
             .WithLogging(logging =>
             {
-                //logging.AddProcessor(new SimpleLogRecordExportProcessor(new CustomConsoleExporter()));
+                logging.AddProcessor(new SimpleLogRecordExportProcessor(new CustomConsoleExporter()));
                 logging.AddInMemoryExporter(exportedLogItems);
             })
             .WithMetrics(metrics =>

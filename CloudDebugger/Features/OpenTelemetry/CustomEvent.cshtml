@@ -4,55 +4,41 @@
 }
 
 <h4>Write Custom Event to OpenTelemetry</h4>
-This tool will create a custom OpenTelemetry event.
-<br /><a href="/OpenTelemetry">Back</a>
-
-<br>
-<br>
+<p>This tool will create a custom OpenTelemetry event.</p>
+<p>The collected traces can be viewed <a href="/OpenTelemetryTracesViewer/ViewTraces">here</a></p>
+<p><a href="/OpenTelemetry">Back</a></p>
 
 <form asp-controller="OpenTelemetry" asp-action="CustomEvent" method="post">
-
     <table class="table">
         <tr>
-            <td class="col-md-2">
-                Custom Message
-            </td>
+            <td class="col-md-2">Custom Message</td>
             <td class="col-md-10">
-                <input asp-for="LogMessage">
-                <span asp-validation-for="LogMessage"></span>
-            </td>
+                <input asp-for="LogMessage" class="form-control" />
+                <span asp-validation-for="LogMessage" class="text-danger"></span>
             </td>
         </tr>
         <tr>
-            <td class="col-md-2">
-            </td>
+            <td class="col-md-2"></td>
             <td class="col-md-10">
-                <input type="submit" name="submit" value="Create Event" /><br />
+                <input type="submit" name="submit" value="Create Event" class="btn btn-primary" />
             </td>
         </tr>
-
     </table>
-
-    <br>
-    <br>
-
-    @if (!String.IsNullOrWhiteSpace(Model?.Exception))
-    {
-        <div class="alert alert-danger" role="alert">
-            <pre>@Model.Exception</pre>
-        </div>
-    }
-
-    @if (!String.IsNullOrWhiteSpace(Model?.Message))
-    {
-        <b>@Model.Message</b>
-    }
-
 </form>
 
-<br>
-<br>
-<br>
+@if (!String.IsNullOrWhiteSpace(Model?.Exception))
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@Model.Exception</pre>
+    </div>
+}
+
+@if (!String.IsNullOrWhiteSpace(Model?.Message))
+{
+    <div class="alert alert-success" role="alert">
+        <b>@Model.Message</b>
+    </div>
+}
 
 <h5>Resources</h5>
 <ul>
@@ -60,8 +46,6 @@ This tool will create a custom OpenTelemetry event.
     <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
 </ul>
 
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

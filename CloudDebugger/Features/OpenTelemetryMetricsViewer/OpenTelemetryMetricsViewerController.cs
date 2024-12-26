@@ -92,6 +92,7 @@ public class OpenTelemetryMetricsViewerController : Controller
             sb.AppendLine("== Data Points ==");
             foreach (ref readonly var point in metric.GetMetricPoints())
             {
+                sb.AppendLine($"  --Point--");
                 sb.AppendLine($"  Start Time: {point.StartTime.ToUniversalTime():O}");
                 sb.AppendLine($"  End Time:   {point.EndTime.ToUniversalTime():O}");
 
@@ -132,7 +133,7 @@ public class OpenTelemetryMetricsViewerController : Controller
                 sb.AppendLine("  Tags:");
                 foreach (var pointTag in point.Tags)
                 {
-                    sb.AppendLine($"    {pointTag.Key} {pointTag.Value}");
+                    sb.AppendLine($"    {pointTag.Key}: {pointTag.Value}");
                 }
 
                 // Exemplars
@@ -159,21 +160,21 @@ public class OpenTelemetryMetricsViewerController : Controller
 
         foreach (var metric in metricItemsLog)
         {
+            // Build a unique key based on metric name and labels
+            var keyBuilder = new StringBuilder(metric.Name);
+
             foreach (ref readonly var point in metric.GetMetricPoints())
             {
-                // Build a unique key based on metric name and labels
-                var keyBuilder = new StringBuilder(metric.Name);
-
                 foreach (var tag in point.Tags)
                 {
                     keyBuilder.Append($"|{tag.Key}:{tag.Value}");
                 }
-
-                var key = keyBuilder.ToString();
-
-                // Store the metric, overwriting older ones with the same key
-                deduplicatedMetrics[key] = metric;
             }
+
+            var key = keyBuilder.ToString();
+
+            // Store the metric, overwriting older ones with the same key
+            deduplicatedMetrics[key] = metric;
         }
 
         return deduplicatedMetrics;

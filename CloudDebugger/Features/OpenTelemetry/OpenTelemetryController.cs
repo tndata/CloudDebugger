@@ -24,6 +24,11 @@ public class OpenTelemetryController : Controller
 
     private static readonly Meter meter = new("CloudDebugger.Counters", "1.0");
     private static readonly Counter<int> simpleCounter = meter.CreateCounter<int>(name: "SimpleCounter", unit: "clicks", description: "A very simple counter");
+    private static readonly Counter<int> advancedCounter = meter.CreateCounter<int>(name: "AdvancedCounter", unit: "clicks", description: "A slightly more advanceded counter");
+
+    private static readonly string[] countries = { "Sweden", "Denmark", "Norway", "Finland" };
+    private static readonly Random random = new();
+
 
     public IActionResult Index()
     {
@@ -39,11 +44,6 @@ public class OpenTelemetryController : Controller
         return View(model);
     }
 
-    /// <summary>
-    /// Handles the submission of a custom event.
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
     [HttpPost]
     public IActionResult SimpleCounter(SimpleCounterModel model)
     {
@@ -58,8 +58,7 @@ public class OpenTelemetryController : Controller
             var tags = new KeyValuePair<string, object?>[]
             {
                 new("user.id", "user123"),
-                new("operation.name", "UserClick"),
-                new("hour", DateTime.UtcNow.Hour)
+                new("operation.name", "UserClick")
             };
 
             simpleCounter.Add(1, tags);
@@ -69,8 +68,45 @@ public class OpenTelemetryController : Controller
             model.Exception = exc.ToString();
         }
 
-        return View(model);
+        return View("SimpleCounter", model);
     }
+
+    [HttpPost]
+    public IActionResult AdvancedCounter(SimpleCounterModel model)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            model.Message = "";
+            model.Exception = "";
+
+
+
+            var tags = new KeyValuePair<string, object?>[]
+            {
+                new("country", GetRandomCountry()),
+            };
+
+            advancedCounter.Add(1, tags);
+        }
+        catch (Exception exc)
+        {
+            model.Exception = exc.ToString();
+        }
+
+        return View("SimpleCounter", model);
+    }
+
+
+    public static string GetRandomCountry()
+    {
+        int index = random.Next(countries.Length);
+        return countries[index];
+    }
+
+
 
     /// <summary>
     /// Handles the submission of a custom event.
