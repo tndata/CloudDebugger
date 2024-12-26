@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using CloudDebugger.Infrastructure.OpenTelemetry;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -31,7 +31,7 @@ public static class Banners
 
         //Get the build date, it is set in the project file, see https://stackoverflow.com/a/50607951/68490
         var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location ?? "");
-        Log.Information("Project Build time: {StartTime} UTC", versionInfo?.LegalCopyright);
+        Log.Information("Project Build time: {StartTime} UTC", versionInfo?.LegalCopyright ?? "");
     }
 
 

@@ -1,0 +1,57 @@
+﻿@model CloudDebugger.Features.OpenTelemetryLog.ViewTracesModel
+@{
+    ViewData["Title"] = "Cloud Debugger - View OpenTelemetry Traces";
+}
+
+<h5>View OpenTelemetry Traces</h5>
+This page will display the latest OpenTelemetry traces.<br />
+<a href="/OpenTelemetry/index">Back</a>&nbsp;&nbsp;<a href="/OpenTelemetryLog/ClearTraceLog">Clear the log</a>
+<br />
+<br />
+It will ignore the following traces:
+<ul>
+    <li>Requests to the /OpenTelemetry pages</li>
+    <li>Internal ASP.NET Core requests debugging requests, like browserlink</li>
+</ul>
+<br />
+
+<h5>Trace entries</h5>
+<table class="table table-bordered">
+
+    <tr>
+        <th>Time</th>
+        <th>Log entry</th>
+    </tr>
+
+    @if (Model.Entries != null && Model.Entries.Count > 0)
+    {
+        foreach (var entry in Model.Entries)
+        {
+            <tr>
+                <td>
+                    <pre>@entry.Time.ToString("hh:mm:ss")</pre>
+                </td>
+                <td style="width: 100%; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                    <b><pre>@Html.Raw(@entry.Subject)</pre></b>
+                    <pre style="white-space: pre-wrap; word-break: break-word;">@Html.Raw(@entry.Data)</pre>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td>No log data found</td>
+        </tr>
+    }
+
+</table>
+
+
+<br />
+<br />
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
+    <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
+</ul>

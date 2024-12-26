@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Tracing;
 
-namespace CloudDebugger.SharedCode.AzureSDKEventLogger;
+namespace CloudDebugger.SharedCode.AzureSdkEventLogger;
 
 public class EventLogEntry
 {

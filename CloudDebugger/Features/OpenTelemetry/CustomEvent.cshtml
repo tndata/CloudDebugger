@@ -1,0 +1,67 @@
+﻿@model CloudDebugger.Features.OpenTelemetry.OpenTelemetryModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Write Custom Event to OpenTelemetry";
+}
+
+<h4>Write Custom Event to OpenTelemetry</h4>
+This tool will create a custom OpenTelemetry event.
+<br /><a href="/OpenTelemetry">Back</a>
+
+<br>
+<br>
+
+<form asp-controller="OpenTelemetry" asp-action="CustomEvent" method="post">
+
+    <table class="table">
+        <tr>
+            <td class="col-md-2">
+                Custom Message
+            </td>
+            <td class="col-md-10">
+                <input asp-for="LogMessage">
+                <span asp-validation-for="LogMessage"></span>
+            </td>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-2">
+            </td>
+            <td class="col-md-10">
+                <input type="submit" name="submit" value="Create Event" /><br />
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+    <br>
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Exception))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+<br>
+<br>
+<br>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/OpenTelemetry">Documentation</a></li>
+    <li><a href="https://opentelemetry.io/">OpenTelemetry</a></li>
+</ul>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

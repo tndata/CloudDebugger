@@ -1,6 +1,6 @@
 ﻿using CloudDebugger.Features.WebHooks;
 using CloudDebugger.Infrastructure;
-using Serilog;
+using CloudDebugger.Infrastructure.OpenTelemetry;
 
 namespace CloudDebugger;
 
@@ -18,21 +18,19 @@ internal static class HostingExtensions
     {
         builder.Services.AddSingleton<IWebHookLog, WebHookLog>();
 
-        builder.Services.AddSerilog();
-
         builder.Services.AddSignalR();  //Used by the advanced webhooks
 
-        builder.AddAndApplicationInsights();
+        builder.ConfigureOpenTelemetry();
 
-        builder.AddAndConfigureHealth();
+        builder.AddConfigureHealth();
 
-        builder.AddAndConfigureHttpLogging();
+        builder.AddConfigureHttpLogging();
 
-        builder.AddAndConfigureControllersAndViews();
+        builder.ConfigureControllersAndViews();
 
-        builder.AddAndConfigureSession();
+        builder.AddSession();
 
-        builder.AddAndConfigureCORS();
+        builder.AddCORS();
 
         return builder.Build();
     }

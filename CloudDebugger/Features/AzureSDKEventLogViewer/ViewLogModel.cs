@@ -1,6 +1,6 @@
-﻿using CloudDebugger.SharedCode.AzureSDKEventLogger;
+﻿using CloudDebugger.SharedCode.AzureSdkEventLogger;
 
-namespace CloudDebugger.Features.AzureSDKEventLogViewer;
+namespace CloudDebugger.Features.AzureSdkEventLogViewer;
 
 public class ViewLogModel
 {

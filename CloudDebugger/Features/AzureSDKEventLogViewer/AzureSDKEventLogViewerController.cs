@@ -1,14 +1,14 @@
-using CloudDebugger.SharedCode.AzureSDKEventLogger;
+using CloudDebugger.SharedCode.AzureSdkEventLogger;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudDebugger.Features.AzureSDKEventLogViewer;
+namespace CloudDebugger.Features.AzureSdkEventLogViewer;
 
 /// <summary>
 /// This controller displays the internal events collected from the Azure SDK.
 /// </summary>
-public class AzureSDKEventLogViewerController : Controller
+public class AzureSdkEventLogViewerController : Controller
 {
-    public AzureSDKEventLogViewerController()
+    public AzureSdkEventLogViewerController()
     {
     }
 

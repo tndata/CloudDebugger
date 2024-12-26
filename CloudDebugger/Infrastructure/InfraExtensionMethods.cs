@@ -1,8 +1,6 @@
-﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
-using CloudDebugger.Features.Health;
+﻿using CloudDebugger.Features.Health;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.MyHttpLogging;
-using Serilog;
 
 namespace CloudDebugger.Infrastructure;
 
@@ -17,7 +15,7 @@ public static class InfraExtensionMethods
     /// Accept all origins
     /// </summary>
     /// <param name="builder"></param>
-    public static void AddAndConfigureCORS(this WebApplicationBuilder builder)
+    public static void AddCORS(this WebApplicationBuilder builder)
     {
         builder.Services.AddCors(options =>
         {
@@ -36,7 +34,7 @@ public static class InfraExtensionMethods
     /// Enable the session middlware, used to store temp data that is unique per browser session
     /// </summary>
     /// <param name="builder"></param>
-    public static void AddAndConfigureSession(this WebApplicationBuilder builder)
+    public static void AddSession(this WebApplicationBuilder builder)
     {
         builder.Services.AddSession(options =>
         {
@@ -55,7 +53,7 @@ public static class InfraExtensionMethods
     /// Enable the use fo the Feature folder structure.
     /// </summary>
     /// <param name="builder"></param>
-    public static void AddAndConfigureControllersAndViews(this WebApplicationBuilder builder)
+    public static void ConfigureControllersAndViews(this WebApplicationBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -77,7 +75,7 @@ public static class InfraExtensionMethods
     /// Add the customized version of the HttpLogging middleware that is part of this solution. 
     /// </summary>
     /// <param name="builder"></param>
-    public static void AddAndConfigureHttpLogging(this WebApplicationBuilder builder)
+    public static void AddConfigureHttpLogging(this WebApplicationBuilder builder)
     {
         builder.Services.AddMyHttpLogging(o =>
         {
@@ -94,42 +92,9 @@ public static class InfraExtensionMethods
     /// The health endpoints /health and /healthz are defined in the HostingExtension class.
     /// </summary>
     /// <param name="builder"></param>
-    public static void AddAndConfigureHealth(this WebApplicationBuilder builder)
+    public static void AddConfigureHealth(this WebApplicationBuilder builder)
     {
         builder.Services.AddHealthChecks()
                         .AddCheck<AppHealthCheck>("CloudDebuggerHealthCheck");
-    }
-
-    /// <summary>
-    /// Configure application insighhts
-    /// 
-    /// https://learn.microsoft.com/en-us/azure/azure-monitor/app/opentelemetry-enable?
-    /// 
-    /// GitHub: Azure Monitor Distro client library for .NET
-    /// https://github.com/Azure/azure-sdk-for-net/tree/Azure.Monitor.OpenTelemetry.AspNetCore_1.2.0/sdk/monitor/Azure.Monitor.OpenTelemetry.AspNetCore
-    /// </summary>
-    /// <param name="builder"></param>
-    public static void AddAndApplicationInsights(this WebApplicationBuilder builder)
-    {
-        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            //The library will crash with an exception if the connection string is missing :-(
-            builder.Services.AddOpenTelemetry()
-                            .UseAzureMonitor(o =>
-                            {
-                                o.ConnectionString = connectionString;
-
-                                o.Diagnostics.IsDistributedTracingEnabled = true;
-                                o.Diagnostics.IsLoggingEnabled = true;
-
-                                o.EnableLiveMetrics = true;
-                                o.SamplingRatio = 1.0f;         //The default value is 1.0F, indicating that all telemetry items are sampled.
-                            });
-        }
-        else
-        {
-            Log.Information("Application Insights is disabled because the connection string is missing.");
-        }
     }
 }

@@ -1,50 +1,42 @@
 using Azure.Core.Diagnostics;
 using CloudDebugger;
 using CloudDebugger.Infrastructure;
-using CloudDebugger.SharedCode.AzureSDKEventLogger;
-using Serilog;
-using Serilog.Events;
+using CloudDebugger.Infrastructure.OpenTelemetry;
+using CloudDebugger.SharedCode.AzureSdkEventLogger;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 using System.Diagnostics.Tracing;
 
 Console.Title = "CloudDebugger";
 DebuggerSettings.StartupTime = DateTime.UtcNow;
 
+var bootstrapLoggerFactory = LoggerFactory.Create(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.AddOpenTelemetry(logging =>
+    {
+        logging.SetResourceBuilder(
+            ResourceBuilder.CreateDefault().AddService("CloudDebugger.BootstrapLogger"));
+        logging.AddProcessor(new SimpleLogRecordExportProcessor(new CustomConsoleExporter()));
+    });
+});
 
-//Startup logging
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Session", LogEventLevel.Verbose)
-    .Enrich.FromLogContext()
-    // .WriteTo.Console()
-    .CreateBootstrapLogger();
-
-
-Banners.DisplayPreStartupBanner();
-
+// Step 2: Configure the global Log for bootstrap logging
+Log.Configure(bootstrapLoggerFactory);
 
 // Log all internal Azure SDK events. These events can then be viewed by the AzureSDKEventViewer tool.
 var eventListener = new AzureEventSourceListener((evnt, message) =>
 {
-    AzureEventLogger.AddEventToLog(evnt, message);
+    AzureEventLogger.AddEventToLog(evnt);
 },
 level: EventLevel.Verbose);
 
-
 try
 {
-    var builder = WebApplication.CreateBuilder(args);
+    Banners.DisplayPreStartupBanner();
 
-    builder.Host.UseSerilog((ctx, logger) =>
-    {
-        logger
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .MinimumLevel.Override("System", LogEventLevel.Information)
-            .WriteTo.Console(
-                outputTemplate:
-                "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
-            .Enrich.FromLogContext();
-    });
+    var builder = WebApplication.CreateBuilder(args);
 
     var app = builder
       .ConfigureServices()
@@ -59,13 +51,13 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application terminated unexpectedly");
+    Log.Critical(ex, "Application terminated unexpectedly");
 }
 finally
 {
+    Log.Information("Shutdown complete");
     eventListener.Dispose();
-    Log.Information("Shut down complete");
-    await Log.CloseAndFlushAsync();
+    bootstrapLoggerFactory.Dispose();
 }
 
 
