@@ -7,16 +7,6 @@
 
 		<!-- Exclude the project from analysis https://stackoverflow.com/questions/47939122 -->
 		<SonarQubeExclude>true</SonarQubeExclude>
-	</PropertyGroup>
-
-	
-	<!-- Supress warnings -->
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<WarningLevel>0</WarningLevel>
-	</PropertyGroup>
-
-	<!-- Supress warnings -->
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<WarningLevel>0</WarningLevel>
 	</PropertyGroup>
 
