@@ -1,12 +1,10 @@
 using CloudDebugger.Infrastructure.OpenTelemetry;
 using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace CloudDebugger.Features.OpenTelemetryLog;
+namespace CloudDebugger.Features.OpenTelemetryMetricsViewer;
 
 /// <summary>
 /// Controller for handling OpenTelemetry operations.
@@ -20,30 +18,10 @@ namespace CloudDebugger.Features.OpenTelemetryLog;
 /// SqlClient Instrumentation for OpenTelemetry
 /// https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/main/src/OpenTelemetry.Instrumentation.SqlClient
 /// </summary>
-public class OpenTelemetryLogController : Controller
+public class OpenTelemetryMetricsViewerController : Controller
 {
-    public OpenTelemetryLogController()
+    public OpenTelemetryMetricsViewerController()
     {
-    }
-
-    public IActionResult ViewTraces()
-    {
-        var model = new ViewTracesModel()
-        {
-            Entries = RenderTraceData(OpenTelemetryObserver.TraceItemsLog)
-        };
-
-        return View(model);
-    }
-
-    public IActionResult ViewLogs()
-    {
-        var model = new ViewLogsModel()
-        {
-            Entries = RenderLogData(OpenTelemetryObserver.LogItemsLog)
-        };
-
-        return View(model);
     }
 
     public IActionResult ViewMetrics()
@@ -56,27 +34,6 @@ public class OpenTelemetryLogController : Controller
         return View(model);
     }
 
-
-    /// <summary>
-    /// Clear the OpenTelemetry trace log
-    /// </summary>
-    public IActionResult ClearTraceLog()
-    {
-        OpenTelemetryObserver.TraceItemsLog.Clear();
-
-        return RedirectToAction("ViewTraces");
-    }
-
-    /// <summary>
-    /// Clear the OpenTelemetry Logs log
-    /// </summary>
-    /// <returns></returns>
-    public IActionResult ClearLogs()
-    {
-        OpenTelemetryObserver.LogItemsLog.Clear();
-
-        return RedirectToAction("ViewLogs");
-    }
 
     /// <summary>
     /// Clear the OpenTelemetry metrics log
@@ -101,7 +58,9 @@ public class OpenTelemetryLogController : Controller
     {
         var result = new List<MetricsEntry>();
 
-        foreach (var metric in metricItemsLog)
+        var deduplicatedMetrics = Deduplicate(metricItemsLog);
+
+        foreach (Metric metric in deduplicatedMetrics.Values)
         {
             var sb = new StringBuilder();
 
@@ -192,6 +151,35 @@ public class OpenTelemetryLogController : Controller
 
         return result;
     }
+
+
+    private static Dictionary<string, Metric> Deduplicate(ICollection<Metric> metricItemsLog)
+    {
+        var deduplicatedMetrics = new Dictionary<string, Metric>();
+
+        foreach (var metric in metricItemsLog)
+        {
+            foreach (ref readonly var point in metric.GetMetricPoints())
+            {
+                // Build a unique key based on metric name and labels
+                var keyBuilder = new StringBuilder(metric.Name);
+
+                foreach (var tag in point.Tags)
+                {
+                    keyBuilder.Append($"|{tag.Key}:{tag.Value}");
+                }
+
+                var key = keyBuilder.ToString();
+
+                // Store the metric, overwriting older ones with the same key
+                deduplicatedMetrics[key] = metric;
+            }
+        }
+
+        return deduplicatedMetrics;
+    }
+
+
 
     private static void RenderExemplars(StringBuilder sb, MetricPoint point)
     {
@@ -287,226 +275,5 @@ public class OpenTelemetryLogController : Controller
                 sb.Append(histogramMeasurement.BucketCount);
             }
         }
-    }
-
-
-    /// <summary>
-    /// Log record source:
-    /// https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry/Logs/LogRecord.cs 
-    /// </summary>
-    /// <param name="logItemsLog"></param>
-    /// <returns></returns>
-    private static List<LogEntry> RenderLogData(ICollection<LogRecord> logItemsLog)
-    {
-        var result = new List<LogEntry>();
-
-        foreach (var log in logItemsLog)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine($"== Trace Context ==");
-            sb.AppendLine($"TraceId:      {log.TraceId}");
-            sb.AppendLine($"SpanId:       {log.SpanId}");
-            sb.AppendLine($"TraceFlags:   {log.TraceFlags}");
-            sb.AppendLine($"TraceState:   {log.TraceState}");
-
-            sb.AppendLine();
-            sb.AppendLine("== Log Metadata ==");
-            sb.AppendLine($"Timestamp:    {log.Timestamp:O}");
-            sb.AppendLine($"Category:     {log.CategoryName}");
-
-            if (!string.IsNullOrWhiteSpace(log.FormattedMessage))
-            {
-                sb.AppendLine();
-                sb.AppendLine("== Formatted Message ==");
-                sb.AppendLine(log.FormattedMessage);
-            }
-
-            if (log.Body != null)
-            {
-                sb.AppendLine();
-                sb.AppendLine("== Body ==");
-                sb.AppendLine(log.Body);
-            }
-
-            // Don't render StateValues, they are depecrated.
-
-            if (log.Attributes != null && log.Attributes.Count > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine("== Attributes ==");
-                foreach (var attribute in log.Attributes)
-                {
-                    sb.AppendLine($"- {attribute.Key}: {attribute.Value}");
-                }
-            }
-
-            if (log.Exception != null)
-            {
-                sb.AppendLine();
-                sb.AppendLine("== Exception ==");
-                sb.AppendLine($"Type: {log.Exception.GetType().FullName}");
-                sb.AppendLine($"Message: {log.Exception.Message}");
-                sb.AppendLine("Stack Trace:");
-                sb.AppendLine(log.Exception.StackTrace);
-            }
-
-            result.Add(new LogEntry
-            {
-                Time = log.Timestamp.ToUniversalTime(),
-                Subject = log.CategoryName,
-                Data = sb.ToString()
-            });
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// We ignore tags, as it just contains the string representation of TagObjects
-    /// </summary>
-    /// <param name="traceLog"></param>
-    /// <returns></returns>
-    private static List<TraceEntry> RenderTraceData(ICollection<Activity> traceLog)
-    {
-        var result = new List<TraceEntry>();
-
-        foreach (var entry in traceLog)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine("== Activity Info ==");
-            sb.AppendLine($"Name:       {entry.DisplayName}");
-            sb.AppendLine($"ID:         {entry.Id}");
-            sb.AppendLine($"Parent ID:  {entry.ParentId}");
-            sb.AppendLine($"Trace ID:   {entry.TraceId}");
-            sb.AppendLine($"Span ID:    {entry.SpanId}");
-            sb.AppendLine($"Start Time: {entry.StartTimeUtc:O}");
-            sb.AppendLine($"Duration:   {entry.Duration.TotalMilliseconds} ms");
-
-            sb.AppendLine($"Status:             {entry.Status} {entry.StatusDescription}");
-            sb.AppendLine($"Recorded:           {entry.Recorded}");
-            sb.AppendLine($"IsAllDataRequested: {entry.IsAllDataRequested}");
-            sb.AppendLine($"IsStopped:          {entry.IsStopped}");
-            sb.AppendLine($"OperationName :     {entry.OperationName}");
-
-            RenderTraceBagage(entry, sb);
-
-            RenderTagObjects(entry, sb);
-
-            RenderTraceEvents(entry, sb);
-
-            RenderTraceLinks(entry, sb);
-
-            if (!IgnoreEntry(entry))
-            {
-                result.Add(new TraceEntry()
-                {
-                    Time = entry.StartTimeUtc,
-                    Subject = $"{entry.DisplayName} ({entry.Id})",
-                    Data = sb.ToString()
-                });
-            }
-        }
-
-        return result;
-    }
-
-    private static void RenderTraceLinks(Activity entry, StringBuilder sb)
-    {
-        if (entry.Links != null && entry.Links.Any())
-        {
-            sb.AppendLine("== Links ==");
-            foreach (var link in entry.Links)
-            {
-                sb.AppendLine($"  Trace ID: {link.Context.TraceId}, Span ID: {link.Context.SpanId}");
-                if (link.Tags != null && link.Tags.Any())
-                {
-                    foreach (var tag in link.Tags)
-                    {
-                        sb.AppendLine($"    {tag.Key}: {tag.Value}");
-                    }
-                }
-            }
-        }
-    }
-
-    private static void RenderTraceEvents(Activity entry, StringBuilder sb)
-    {
-        if (entry.Events != null && entry.Events.Any())
-        {
-            sb.AppendLine("== Events ==");
-            foreach (var activityEvent in entry.Events)
-            {
-                sb.AppendLine($"  Event: {activityEvent.Name} at {activityEvent.Timestamp:O}");
-                foreach (var attribute in activityEvent.Tags)
-                {
-                    sb.AppendLine($"    {attribute.Key}: {attribute.Value}");
-                }
-            }
-        }
-    }
-
-    private static void RenderTagObjects(Activity entry, StringBuilder sb)
-    {
-        if (entry.TagObjects.Any())
-        {
-            sb.AppendLine("");
-            sb.AppendLine("== TagObjects ==");
-
-            foreach (var tag in entry.TagObjects)
-            {
-                sb.AppendLine($"{tag.Key} {tag.Value}");
-            }
-            sb.AppendLine("");
-        }
-    }
-
-    private static void RenderTraceBagage(Activity entry, StringBuilder sb)
-    {
-        if (entry.Baggage != null && entry.Baggage.Any())
-        {
-            sb.AppendLine("");
-            sb.AppendLine("== Baggage ==");
-
-            foreach (var bag in entry.Baggage)
-            {
-                sb.AppendLine($"{bag.Key} {bag.Value}");
-            }
-            sb.AppendLine("");
-        }
-    }
-
-
-    /// <summary>
-    /// We ignore the following trace entries
-    /// 
-    /// /*/getScriptTag
-    /// /OpenTelemetry/*
-    /// /_vs/*
-    /// /_framework/*
-    /// 
-    /// </summary>
-    /// <param name="entry"></param>
-    /// <returns></returns>
-    private static bool IgnoreEntry(Activity entry)
-    {
-        var fullUrl = entry.Tags.FirstOrDefault(tag => tag.Key == "url.full").Value;
-
-        if (!string.IsNullOrEmpty(fullUrl) && fullUrl.Contains("/getScriptTag"))
-            return true;
-
-        var urlPath = entry.Tags.FirstOrDefault(tag => tag.Key == "url.path").Value;
-        if (!string.IsNullOrEmpty(urlPath))
-        {
-            if (urlPath.StartsWith("/_vs"))
-                return true;
-            if (urlPath.StartsWith("/_framework"))
-                return true;
-            if (urlPath.StartsWith("/OpenTelemetry"))
-                return true;
-        }
-
-        return false;
     }
 }

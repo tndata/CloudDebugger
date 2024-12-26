@@ -1,4 +1,4 @@
-﻿namespace CloudDebugger.Features.OpenTelemetryLog;
+﻿namespace CloudDebugger.Features.OpenTelemetryLogViewer;
 
 public class ViewLogsModel
 {

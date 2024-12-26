@@ -1,7 +1,7 @@
 ﻿// Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace CloudDebugger.Features.OpenTelemetryLog;
+namespace CloudDebugger.Features.OpenTelemetryMetricsViewer;
 
 /// <summary>
 /// Contains helper methods for the Base2ExponentialBucketHistogram class.

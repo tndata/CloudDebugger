@@ -22,18 +22,8 @@ public class OpenTelemetryController : Controller
     // This ActivitySource must be added to the sources that OpenTelemetry listens to, otherwise activities from this source will be ignored.
     private static readonly ActivitySource activitySource = new("CloudDebugger");
 
-    private static readonly Meter meter;
-    private static readonly Counter<int> simpleCounter;
-
-    static OpenTelemetryController()
-    {
-        meter = new("CloudDebugger.Counters", "1.0");
-        simpleCounter = meter.CreateCounter<int>(name: "SimpleCounter", unit: "clicks", description: "A very simple counter");
-    }
-
-    public OpenTelemetryController()
-    {
-    }
+    private static readonly Meter meter = new("CloudDebugger.Counters", "1.0");
+    private static readonly Counter<int> simpleCounter = meter.CreateCounter<int>(name: "SimpleCounter", unit: "clicks", description: "A very simple counter");
 
     public IActionResult Index()
     {
@@ -59,10 +49,13 @@ public class OpenTelemetryController : Controller
     {
         try
         {
+            if (!ModelState.IsValid)
+                return View(model);
+
             model.Message = "";
             model.Exception = "";
 
-            var tags = new KeyValuePair<string, object>[]
+            var tags = new KeyValuePair<string, object?>[]
             {
                 new("user.id", "user123"),
                 new("operation.name", "UserClick"),
