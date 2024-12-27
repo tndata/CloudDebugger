@@ -316,7 +316,7 @@ public class OpenTelemetryController : Controller
     }
 
 
-    private async Task DoWork1()
+    private static async Task DoWork1()
     {
         using (var activity = activitySource.StartActivity(name: "CheckForBannedUsers"))
         {
@@ -324,7 +324,7 @@ public class OpenTelemetryController : Controller
         }
     }
 
-    private async Task DoWork2()
+    private static async Task DoWork2()
     {
         using (var activity = activitySource.StartActivity(name: "CheckForFraud"))
         {
@@ -332,7 +332,7 @@ public class OpenTelemetryController : Controller
         }
     }
 
-    private async Task DoWork3()
+    private static async Task DoWork3()
     {
         using (var activity = activitySource.StartActivity(name: "CheckPoliceRecord"))
         {
@@ -340,7 +340,7 @@ public class OpenTelemetryController : Controller
         }
     }
 
-    private async Task DoWork4()
+    private static async Task DoWork4()
     {
         using (var activity = activitySource.StartActivity(name: "Make API call"))
         {
@@ -365,7 +365,7 @@ public class OpenTelemetryController : Controller
         }
     }
 
-    private async Task DoWork5(OpenTelemetryModel model)
+    private static async Task DoWork5(OpenTelemetryModel model)
     {
         using (var activity = activitySource.StartActivity(name: "Complex Step (AI Processing)"))
         {

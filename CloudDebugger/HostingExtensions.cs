@@ -61,6 +61,9 @@ internal static class HostingExtensions
 
         app.UseSession();
 
+        if (GlobalSettings.PrometheusExporterEnabled)
+            app.MapPrometheusScrapingEndpoint(); // Default endpoint: /metrics
+
         app.MapHub<WebHookHub>("/WebHookHub");
 
         app.MapControllerRoute(

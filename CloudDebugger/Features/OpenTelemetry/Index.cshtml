@@ -19,12 +19,18 @@ Tools related to OpenTelemetry.
 <br />
 
 
-<h4>OpenTelemetry Data</h4>
+<h4>Observe OpenTelemetry Data</h4>
 <a href="/OpenTelemetryTracesViewer/ViewTraces">View trace data</a>
 <br />
 <a href="/OpenTelemetryMetricsViewer/ViewMetrics">View metrics data</a>
 <br />
 <a href="/OpenTelemetryLogViewer/ViewLogs">View Log data</a>
+
+@if (GlobalSettings.PrometheusExporterEnabled)
+{
+    <br />
+    <a href="/Metrics">Metrics endpoint</a>
+}
 <br />
 <br />
 <br />

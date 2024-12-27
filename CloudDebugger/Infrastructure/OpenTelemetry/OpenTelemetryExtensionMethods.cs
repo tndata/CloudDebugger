@@ -92,7 +92,8 @@ public static class OpenTelemetryExtensionMethods
                 metrics.AddInMemoryExporter(exportedMetricItems, o =>
                        {
                            o.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000;
-                       }).AddConsoleExporter();
+                       }).AddConsoleExporter()
+                       .AddPrometheusExporter();
 
                 //Custom Histogram with fixed custom bucket sizes
                 metrics.AddView("AdvancedHistogram", new ExplicitBucketHistogramConfiguration
@@ -101,6 +102,7 @@ public static class OpenTelemetryExtensionMethods
                 });
 
                 metrics.AddMeter("CloudDebugger.Counters");
+                GlobalSettings.PrometheusExporterEnabled = true;
             })
             .WithTracing(tracing =>
             {
@@ -111,7 +113,6 @@ public static class OpenTelemetryExtensionMethods
                 // Add the OTLP Exporter if the OTEL_EXPORTER_OTLP_ENDPOINT variable is set
                 if (!string.IsNullOrEmpty(otlpServer))
                 {
-                    otlpServer = "";
                     otlpServer = otlpServer.Trim();
                     Log.Information("Enabling OTLP Exporter to '{server}'", otlpServer);
 
