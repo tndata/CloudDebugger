@@ -71,6 +71,7 @@ public static class OpenTelemetryExtensionMethods
     {
         Log.Information("Configuring and using Default OpenTelemetrySupport (Console and in-memory exporter)");
 
+        // OTEL Server must be in this form for Jaeger: http://[domain]:4318/v1/traces
         var otlpServer = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "";
 
         builder.Logging.ClearProviders();
@@ -110,7 +111,7 @@ public static class OpenTelemetryExtensionMethods
                 // Add the OTLP Exporter if the OTEL_EXPORTER_OTLP_ENDPOINT variable is set
                 if (!string.IsNullOrEmpty(otlpServer))
                 {
-                    otlpServer = "http://observability-jaeger.northeurope.azurecontainer.io:4318/v1/traces";
+                    otlpServer = "";
                     otlpServer = otlpServer.Trim();
                     Log.Information("Enabling OTLP Exporter to '{server}'", otlpServer);
 
@@ -121,7 +122,6 @@ public static class OpenTelemetryExtensionMethods
                         o.Protocol = OtlpExportProtocol.HttpProtobuf;
                     });
                 }
-
 
                 tracing.AddSource("CloudDebugger*");
                 tracing.AddSource("Microsoft.AspNetCore*");
