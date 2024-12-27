@@ -37,9 +37,12 @@ public class OpenTelemetryController : Controller
         unit: "none",
         description: "Sample histogram with 10 buckets between 0 and 1000.");
 
-    private static readonly string[] countries = { "Sweden", "Denmark", "Norway", "Finland" };
+    private static readonly string[] countries = ["Sweden", "Denmark", "Norway", "Finland"];
     private static readonly Random random = new();
 
+    public OpenTelemetryController()
+    {
+    }
 
     public IActionResult Index()
     {
@@ -114,7 +117,6 @@ public class OpenTelemetryController : Controller
         return View("Counter", model);
     }
 
-
     public static string GetRandomCountry()
     {
         int index = random.Next(countries.Length);
@@ -129,8 +131,6 @@ public class OpenTelemetryController : Controller
 
         return View(model);
     }
-
-
 
     [HttpPost]
     public IActionResult StandardHistogram(HistogramModel model)
@@ -200,13 +200,24 @@ public class OpenTelemetryController : Controller
     }
 
 
+    public IActionResult SimpleTrace()
+    {
+        var model = new OpenTelemetryModel()
+        {
+            LogMessage = "My simple trace message"
+        };
+
+        return View(model);
+    }
+
+
     /// <summary>
-    /// Handles the submission of a custom event.
+    /// Handles the submission of a simple trace
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult CustomEvent(OpenTelemetryModel model)
+    public IActionResult SimpleTrace(OpenTelemetryModel model)
     {
         try
         {
@@ -215,8 +226,8 @@ public class OpenTelemetryController : Controller
 
             if (ModelState.IsValid)
             {
-                // Start an activity
-                using (var activity = activitySource.StartActivity("CustomEventOperation"))
+                // Start a new root Activity
+                using (var activity = activitySource.StartActivity("SimpleTrace"))
                 {
                     if (activity != null)
                     {
@@ -251,7 +262,7 @@ public class OpenTelemetryController : Controller
         return View(model);
     }
 
-    public IActionResult CreateTrace()
+    public IActionResult ComplexTrace()
     {
         var model = new OpenTelemetryModel()
         {
@@ -267,7 +278,7 @@ public class OpenTelemetryController : Controller
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> CreateTrace(OpenTelemetryModel model)
+    public async Task<IActionResult> ComplexTrace(OpenTelemetryModel model)
     {
         try
         {
@@ -276,7 +287,24 @@ public class OpenTelemetryController : Controller
 
             if (ModelState.IsValid)
             {
-                model.Message = await GenerateTrace(model);
+                if (activitySource == null)
+                {
+                    // If activity is null, tracing is not enabled.
+                    model.Message = "Tracing is not enabled";
+                }
+                else
+                {
+                    // Start a new root Activity
+                    using (var activity = activitySource.StartActivity("ComplexTrace"))
+                    {
+                        await DoWork1();
+                        await DoWork2();
+                        await DoWork3();
+                        await DoWork4();
+                        await DoWork5(model);
+                    }
+                    model.Message = "Complex trace sent to OpenTelemetry";
+                }
             }
         }
         catch (Exception exc)
@@ -287,15 +315,62 @@ public class OpenTelemetryController : Controller
         return View(model);
     }
 
-    private static async Task<string> GenerateTrace(OpenTelemetryModel model)
+
+    private async Task DoWork1()
     {
-        using (var activity = activitySource.StartActivity(name: "Complex trace"))
+        using (var activity = activitySource.StartActivity(name: "CheckForBannedUsers"))
         {
-            if (activity == null)
+            await Task.Delay(500);
+        }
+    }
+
+    private async Task DoWork2()
+    {
+        using (var activity = activitySource.StartActivity(name: "CheckForFraud"))
+        {
+            await Task.Delay(500);
+        }
+    }
+
+    private async Task DoWork3()
+    {
+        using (var activity = activitySource.StartActivity(name: "CheckPoliceRecord"))
+        {
+            await Task.Delay(500);
+        }
+    }
+
+    private async Task DoWork4()
+    {
+        using (var activity = activitySource.StartActivity(name: "Make API call"))
+        {
+            if (activity is null)
+                return;
+
+            try
             {
-                // If activity is null, tracing is not enabled.
-                return "Tracing is not enabled";
+                // Simulate work: external call
+                //This request will take two seconds to complete
+                using (var client = new HttpClient())
+                {
+                    await client.GetStringAsync(new Uri("https://httpbin.org/delay/2"));
+                }
             }
+            catch (Exception ex)
+            {
+                activity.SetTag("error", true);
+                activity.SetTag("error.message", ex.Message);
+                throw;
+            }
+        }
+    }
+
+    private async Task DoWork5(OpenTelemetryModel model)
+    {
+        using (var activity = activitySource.StartActivity(name: "Complex Step (AI Processing)"))
+        {
+            if (activity is null)
+                return;
 
             // Set tags for the activity (key-value metadata)
             activity.SetTag("operation.id", Guid.NewGuid().ToString());
@@ -310,31 +385,29 @@ public class OpenTelemetryController : Controller
 
             // Log an initial event with metadata
             activity.AddEvent(new ActivityEvent("Trace started", tags: new ActivityTagsCollection
-            {
-                { "event.severity", "info" },
-                { "description", "Starting complex trace operation" }
-            }));
+                 {
+                     { "event.severity", "info" },
+                     { "description", "Starting complex trace operation" }
+                 }));
 
-            activity.AddEvent(new ActivityEvent("Processing workitem - step 1 (calling API)"));
+            activity.AddEvent(new ActivityEvent("Processing workitem - step 1"));
 
-            //This request will take two seconds to complete
-            using (var client = new HttpClient())
-            {
-                await client.GetStringAsync(new Uri("https://httpbin.org/delay/2"));
-            }
+            await Task.Delay(250);
 
             activity.AddEvent(new ActivityEvent("Processing workitem - step 2"));
+
             await Task.Delay(250);
 
             activity.AddEvent(new ActivityEvent("Processing workitem - step 3"));
+
             await Task.Delay(500);
 
             var eventTags = new ActivityTagsCollection(list: new Dictionary<string, object?>
-            {
-                { "Step", "3" },
-                { "Status", "OK" },
-                { "message", model.LogMessage },
-            });
+                 {
+                     { "eventTags.Step", "3" },
+                     { "eventTags.Status", "OK" },
+                     { "eventTags.message", model.LogMessage },
+                 });
 
             activity.AddEvent(new ActivityEvent("Processing the result - step 3", tags: eventTags));
 
@@ -342,12 +415,12 @@ public class OpenTelemetryController : Controller
 
             // Log completion of the operation
             activity.AddEvent(new ActivityEvent("Trace completed", tags: new ActivityTagsCollection
-            {
-                { "final.status", "Success" },
-                { "completion.timestamp", DateTime.UtcNow.ToString("o") }
-            }));
-
-            return "Complex trace sent to OpenTelemetry";
+                 {
+                     { "final.status", "Success" },
+                     { "completion.timestamp", DateTime.UtcNow.ToString("o") }
+                 }));
         }
+
     }
 }
+

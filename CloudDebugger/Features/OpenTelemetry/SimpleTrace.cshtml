@@ -1,11 +1,11 @@
 ﻿@model CloudDebugger.Features.OpenTelemetry.OpenTelemetryModel
 @{
-    ViewData["Title"] = "Cloud Debugger - Write Custom Event to OpenTelemetry";
+    ViewData["Title"] = "Cloud Debugger - Simple OpenTelemetry Trace";
 }
 
-<h4>Write Custom Event to OpenTelemetry</h4>
+<h4>Simple OpenTelemetry Trace</h4>
 <p>
-    This tool will create a custom OpenTelemetry event.
+    This tool will create a simple OpenTelemetry trace activity.
     The resulting trace events can be viewed
     <a href="/OpenTelemetryTracesViewer/ViewTraces">here</a>.
 </p>
@@ -13,7 +13,7 @@
     <a href="/OpenTelemetry">Back</a>
 </p>
 
-<form asp-controller="OpenTelemetry" asp-action="CustomEvent" method="post">
+<form asp-controller="OpenTelemetry" asp-action="SimpleTrace" method="post">
     <table class="table">
         <tr>
             <td class="col-md-2">Custom Message</td>
@@ -25,7 +25,7 @@
         <tr>
             <td class="col-md-2"></td>
             <td class="col-md-10">
-                <input type="submit" name="submit" value="Create Event" class="btn btn-primary" />
+                <input type="submit" name="submit" value="Create Trace" class="btn btn-primary" />
             </td>
         </tr>
     </table>

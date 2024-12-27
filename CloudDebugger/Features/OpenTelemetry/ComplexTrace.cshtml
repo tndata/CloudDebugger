@@ -1,14 +1,14 @@
 ﻿@model CloudDebugger.Features.OpenTelemetry.OpenTelemetryModel
 @{
-    ViewData["Title"] = "Cloud Debugger - Send a Complex Trace OpenTelemetry";
+    ViewData["Title"] = "Cloud Debugger - Complex OpenTelemetry Trace";
 }
 
-<h4>Send a Complex Trace OpenTelemetry</h4>
+<h4>Complex OpenTelemetry Trace</h4>
 <p>This tool will create a bit more complex OpenTelemetry trace. 
 The collected traces can be viewed <a href="/OpenTelemetryTracesViewer/ViewTraces">here</a></p>
 <p><a href="/OpenTelemetry">Back</a></p>
 
-<form asp-controller="OpenTelemetry" asp-action="CreateTrace" method="post">
+<form asp-controller="OpenTelemetry" asp-action="ComplexTrace" method="post">
     <table class="table">
         <tr>
             <td class="col-md-2">Custom Message</td>

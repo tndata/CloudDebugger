@@ -1,5 +1,6 @@
 ﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Instrumentation.Http;
 using OpenTelemetry.Logs;
@@ -54,13 +55,23 @@ public static class OpenTelemetryExtensionMethods
         {
             //Configure OpenTelemetry with Application Insights
             ConfigureApplicationInsights(builder, connectionString);
-
         }
     }
 
+
+
+    /// <summary>
+    /// Getting Started with Jaeger
+    /// https://github.com/open-telemetry/opentelemetry-dotnet/tree/main/docs/trace/getting-started-jaeger
+    /// OTLP Exporter for OpenTelemetry .NET
+    /// https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md
+    /// </summary>
+    /// <param name="builder"></param>
     private static void ConfigurDefaultOpenTelemetry(WebApplicationBuilder builder)
     {
         Log.Information("Configuring and using Default OpenTelemetrySupport (Console and in-memory exporter)");
+
+        var otlpServer = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "";
 
         builder.Logging.ClearProviders();
 
@@ -85,7 +96,7 @@ public static class OpenTelemetryExtensionMethods
                 //Custom Histogram with fixed custom bucket sizes
                 metrics.AddView("AdvancedHistogram", new ExplicitBucketHistogramConfiguration
                 {
-                    Boundaries = new double[] { 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 }
+                    Boundaries = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
                 });
 
                 metrics.AddMeter("CloudDebugger.Counters");
@@ -95,6 +106,22 @@ public static class OpenTelemetryExtensionMethods
                 tracing.AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
                         .AddInMemoryExporter(exportedTraceItems);
+
+                // Add the OTLP Exporter if the OTEL_EXPORTER_OTLP_ENDPOINT variable is set
+                if (!string.IsNullOrEmpty(otlpServer))
+                {
+                    otlpServer = "http://observability-jaeger.northeurope.azurecontainer.io:4318/v1/traces";
+                    otlpServer = otlpServer.Trim();
+                    Log.Information("Enabling OTLP Exporter to '{server}'", otlpServer);
+
+                    tracing.AddOtlpExporter(o =>
+                    {
+                        o.ExportProcessorType = ExportProcessorType.Simple;
+                        o.Endpoint = new Uri(otlpServer);
+                        o.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    });
+                }
+
 
                 tracing.AddSource("CloudDebugger*");
                 tracing.AddSource("Microsoft.AspNetCore*");
