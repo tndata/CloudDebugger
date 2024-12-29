@@ -187,8 +187,6 @@ namespace Azure.MyIdentity
 
         internal static Task DefaultDeviceCodeHandler(DeviceCodeInfo deviceCodeInfo, CancellationToken cancellationToken)
         {
-            Console.WriteLine(deviceCodeInfo.Message);
-
             return Task.CompletedTask;
         }
 

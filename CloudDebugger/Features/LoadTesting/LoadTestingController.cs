@@ -88,8 +88,6 @@ public class LoadTestingController : Controller
                                 string targetUrlWithId = targetURL.Replace("$ID", random.Next(1, 101).ToString()); //(1 - 100)
                                 HttpResponseMessage response = await client.GetAsync(new Uri(targetUrlWithId), cts.Token);
 
-                                Console.WriteLine("###" + targetUrlWithId);
-
                                 if (response.IsSuccessStatusCode)
                                 {
                                     Interlocked.Increment(ref totalNumberOfSuccessFullRequests);

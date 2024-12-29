@@ -34,7 +34,6 @@ namespace CloudDebugger.Infrastructure;
 /// boundedCollection.Add(4);
 /// boundedCollection.Add(5);
 /// boundedCollection.Add(6); // Oldest item (1) will be discarded
-/// Console.WriteLine(string.Join(", ", boundedCollection)); // Outputs: 2, 3, 4, 5, 6
 /// </summary>
 /// <typeparam name="T">The type of elements in the collection.</typeparam>
 public class BoundedConcurrentQueue<T> : ICollection<T>

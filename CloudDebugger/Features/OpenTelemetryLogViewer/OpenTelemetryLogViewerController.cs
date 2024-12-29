@@ -109,14 +109,51 @@ public class OpenTelemetryLogViewerController : Controller
                 sb.AppendLine(log.Exception.StackTrace);
             }
 
-            result.Add(new LogEntry
+            if (!IgnoreEntry(log))
             {
-                Time = log.Timestamp.ToUniversalTime(),
-                Subject = log.CategoryName,
-                Data = sb.ToString()
-            });
+                result.Add(new LogEntry
+                {
+                    Time = log.Timestamp.ToUniversalTime(),
+                    Subject = log.CategoryName,
+                    Data = sb.ToString()
+                });
+            }
         }
 
         return result;
+    }
+
+
+    /// <summary>
+    /// This is not that perfect, as it includes other log entries for the filtered out requests.
+    ///
+    /// We ignore the following log entries. 
+    ///
+    /// /*/getScriptTag
+    /// /OpenTelemetry/*
+    /// /_vs/*
+    /// /_framework/*
+    /// 
+    /// </summary>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    private static bool IgnoreEntry(LogRecord logRecord)
+    {
+        var urlPath = logRecord.Attributes?.FirstOrDefault(attr => attr.Key == "Path").Value as string;
+
+        if (urlPath != null)
+        {
+            if (urlPath.Contains("/getScriptTag"))
+                return true;
+
+            if (urlPath.StartsWith("/_vs"))
+                return true;
+            if (urlPath.StartsWith("/_framework"))
+                return true;
+            if (urlPath.StartsWith("/OpenTelemetry"))
+                return true;
+        }
+
+        return false;
     }
 }

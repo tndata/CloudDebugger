@@ -149,7 +149,6 @@ public class EventGridController : Controller
                 Subject = "Order" + order.OrderId
             };
 
-            Console.WriteLine(@event.Subject);
             return @event;
         }
         else
@@ -188,7 +187,6 @@ public class EventGridController : Controller
                 EventTime = DateTime.UtcNow
             };
 
-            Console.WriteLine(@event.Subject);
             return @event;
         }
         else

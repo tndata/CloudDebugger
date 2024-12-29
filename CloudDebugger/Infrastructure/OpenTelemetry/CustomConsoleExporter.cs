@@ -26,14 +26,25 @@ public class CustomConsoleExporter : BaseExporter<LogRecord>
             foreach (var record in batch)
             {
                 var timestamp = record.Timestamp.ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                var level = record.LogLevel;
+                var level = record.LogLevel switch
+
+                {
+                    LogLevel.Information => "INF",
+                    LogLevel.Debug => "DBG",
+                    LogLevel.Trace => "TRC",
+                    LogLevel.Warning => "WRN",
+                    LogLevel.Error => "ERR",
+                    LogLevel.Critical => "CRT",
+                    LogLevel.None => "NON",
+                    _ => "UNK"
+                };
                 var sourceContext = record.CategoryName;
+
 
                 // Prefer FormattedMessage if available; fallback to manually rendering Body
                 var message = record.FormattedMessage ?? PopulateMessageTemplate(record.Body, record.Attributes);
 
-                Console.WriteLine($"[{timestamp} {level}] {sourceContext}");
-                Console.WriteLine(message);
+                Console.WriteLine($"[{timestamp} {level}] {sourceContext} {message}");
                 if (record.Exception != null)
                 {
                     Console.WriteLine(record.Exception);
