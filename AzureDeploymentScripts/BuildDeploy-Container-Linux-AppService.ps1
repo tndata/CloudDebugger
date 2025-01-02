@@ -10,7 +10,14 @@
 
 . .\_Settings.ps1
 
-# Step 1: Create managed identity
+
+# Step 1: Create the resource group
+Write-Host "`nCreating resource group '${rgname}'."
+$resGroup = az group create --name $rgname --location $location | ConvertFrom-Json
+$resId = $resGroup.id
+Write-Host "Resource group created with id: ${resId}"
+
+# Step 2: Create managed identity
 Write-Host "`nCreating a managed identity."
 $identity = az identity create `
         --name $identityName `
@@ -25,7 +32,7 @@ Write-Host "id: ${identityId}"
 Write-Host "PrincipalId: ${principalId}"
 Write-Host "ClientId: ${clientId}"
 
-# Step 2: Create the Linux App Service Plan
+# Step 3: Create the Linux App Service Plan
 Write-Host "`nCreating a Linux App Service Plan named '${AppServicePlan_linux}'."
 $servicePlan = az appservice plan create `
     --name $AppServicePlan_linux `
@@ -43,7 +50,7 @@ Write-Host "`nWaiting 15s to ensure the identity is fully registered and propaga
 Start-Sleep -Seconds 15
 
 
-# Step 3: Query for the Azure Container Registry ID
+# Step 4: Query for the Azure Container Registry ID
 Write-Host "`n`nQuerying for the container registry ID"
 $containerRegistry = az acr show `
     --name $acrName `
@@ -53,7 +60,7 @@ $acrId = $containerRegistry.id
 Write-Host "Azure Container Registry ID: ${acrid}"
 
 
-# Step 4: Assign the AcrPull role to the managed identity on the ACR
+# Step 5: Assign the AcrPull role to the managed identity on the ACR
 Write-Host "`n`nAssigning AcrPull role to the managed identity on the container registry."
 $role = az role assignment create `
         --assignee $principalId `
@@ -62,7 +69,7 @@ $role = az role assignment create `
         --output json `
         --output json | ConvertFrom-Json
 
-# Step 5: Create App Service and deploy the default .NET 9 runtime, we deploy the container at the end of the script.
+# Step 6: Create App Service and deploy the default .NET 9 runtime, we deploy the container at the end of the script.
 Write-Host "`n`nCreating the App Service with the default runtime 'DOTNETCORE:9.0'."
 $AppService = az webapp create `
     --name $AppServiceName_container_linux `
@@ -76,7 +83,7 @@ $hostName = $AppService.defaultHostName
 $appServiceID = $AppService.id
 Write-Host "App Service created, id: ${appServiceID}"
 
-# Step 6: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
+# Step 7: Set the AZURE_CLIENT_ID Environment variable (To get managed Identity to work inside the app)
 Write-Host "`nSet the AZURE_CLIENT_ID environment variable/configuration."
 $tmp = az webapp config appsettings set `
     --name $AppServiceName_container_linux `
@@ -84,7 +91,7 @@ $tmp = az webapp config appsettings set `
 	--settings AZURE_CLIENT_ID=$clientId `
 	--output json | ConvertFrom-Json
 
-# Step 7: Set the AcrUserManagedIdentityID using  
+# Step 8: Set the AcrUserManagedIdentityID using  
 Write-Host "`nSet the identity in the App Service for accessing the ACR."
 $data="{\""acrUserManagedIdentityID\"": \""${clientId}\""}"
 $tmp = az webapp config set `
@@ -94,7 +101,7 @@ $tmp = az webapp config set `
     --output json | ConvertFrom-Json
 
 
-# Step 8: Verify the ACR access settings  
+# Step 9: Verify the ACR access settings  
 $settings = az webapp config show `
     --resource-group $rgname `
     --name $AppServiceName_container_linux `
@@ -104,7 +111,7 @@ Write-Host "acrUseManagedIdentityCreds='$($settings.acrUseManagedIdentityCreds)'
 Write-Host "acrUserManagedIdentityID='$($settings.acrUserManagedIdentityId)'"
 
 
-# Step 9: Enable Application Logging (Filesystem)
+# Step 10: Enable Application Logging (Filesystem)
 Write-Host "`nEnabling application logging for the Container App Service."
 $tmp = az webapp log config `
     --name $AppServiceName_container_linux `
@@ -115,7 +122,7 @@ $tmp = az webapp log config `
     --output json | ConvertFrom-Json
                              
 
-#  Step 10: Now, when everything is setup correctly, we can switch to use the container image instead.
+#  Step 11: Now, when everything is setup correctly, we can switch to use the container image instead.
 $imagePath = "${acrname}.azurecr.io/${imagename}:latest"
 Write-Host "`n`nChange the service to use the container ${imagePath}."
 az webapp config container set `
