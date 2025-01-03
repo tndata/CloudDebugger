@@ -87,7 +87,7 @@ public static class OpenTelemetryExtensionMethods
                 metrics.AddInMemoryExporter(exportedMetricItems, o =>
                        {
                            o.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000;
-                       }).AddConsoleExporter()
+                       })
                        .AddPrometheusExporter();
 
                 //Custom Histogram with fixed custom bucket sizes
@@ -143,8 +143,8 @@ public static class OpenTelemetryExtensionMethods
 
         builder.Logging.AddFilter("Default", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger", LogLevel.Trace);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore", LogLevel.Information);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.Hosting.Lifetime", LogLevel.Information);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore", LogLevel.Debug);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.Hosting.Lifetime", LogLevel.Debug);
         builder.Logging.SetMinimumLevel(LogLevel.Information);
     }
 
