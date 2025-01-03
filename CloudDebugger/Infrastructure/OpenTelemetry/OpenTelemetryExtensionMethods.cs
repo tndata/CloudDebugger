@@ -44,20 +44,17 @@ public static class OpenTelemetryExtensionMethods
     /// <param name="builder"></param>
     public static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
     {
-        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+        builder.Logging.ClearProviders();
 
-        if (string.IsNullOrEmpty(connectionString))
+        //Configure OpenTelemetry with the default setup
+        ConfigurDefaultOpenTelemetry(builder);
+
+        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+        if (!string.IsNullOrEmpty(connectionString))
         {
-            //Configure OpenTelemetry with the default setup
-            ConfigurDefaultOpenTelemetry(builder);
-        }
-        else
-        {
-            //Configure OpenTelemetry with Application Insights
             ConfigureApplicationInsights(builder, connectionString);
         }
     }
-
 
 
     /// <summary>
@@ -73,8 +70,6 @@ public static class OpenTelemetryExtensionMethods
 
         // OTEL Server must be in this form for Jaeger: http://[domain]:4318/v1/traces
         var otlpServer = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "";
-
-        builder.Logging.ClearProviders();
 
         ICollection<Activity> exportedTraceItems = OpenTelemetryObserver.TraceItemsLog;
         ICollection<Metric> exportedMetricItems = OpenTelemetryObserver.MetricItemsLog;
