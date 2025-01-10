@@ -139,13 +139,10 @@ public class OpenTelemetryLogViewerController : Controller
     /// <returns></returns>
     private static bool IgnoreEntry(LogRecord logRecord)
     {
-        var urlPath = logRecord.Attributes?.FirstOrDefault(attr => attr.Key == "Path").Value as string;
-
-        if (urlPath != null)
+        if (logRecord.Attributes?.FirstOrDefault(attr => attr.Key == "Path").Value is string urlPath)
         {
             if (urlPath.Contains("/getScriptTag"))
                 return true;
-
             if (urlPath.StartsWith("/_vs"))
                 return true;
             if (urlPath.StartsWith("/_framework"))
