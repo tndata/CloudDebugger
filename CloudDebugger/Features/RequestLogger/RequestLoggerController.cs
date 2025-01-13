@@ -40,7 +40,7 @@ public class RequestLoggerController : Controller
         return RedirectToAction("RequestList");
     }
 
-    public IActionResult RequestDetails(int id)
+    public IActionResult RequestDetails([FromRoute] int id)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

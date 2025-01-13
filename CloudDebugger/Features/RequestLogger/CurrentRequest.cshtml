@@ -1,7 +1,15 @@
-﻿@using Microsoft.AspNetCore.Server.Kestrel.Core.Features
+﻿@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Server.Kestrel.Core.Features
 @using System.Net.Security
+@using CloudDebugger.Infrastructure.Middlewares
 @{
     ViewData["Title"] = "Cloud Debugger - Request headers";
+
+    // Get details about the incoming request before it is modified by the middlewares
+    // (including ForwardedHeaders middleware)
+    var rawRequest = Context.Items["RawRequestDetails"] as RawRequestDetails;
+
+    var displayUrl = Context.Request.GetDisplayUrl();
 }
 
 <h3>Current HTTP(s) request details</h3>
@@ -14,6 +22,17 @@ This tool provides detailed insights into the current HTTP(s) request.
 
 <h4>HTTP(s) protocol details</h4>
 <table class="table table-bordered">
+    <tr>
+        <td class="col-md-2">Request URL</td>
+        <td class="col-md-10">@displayUrl</td>
+    </tr>
+    @if (rawRequest != null && rawRequest.RawUrl != displayUrl)
+    {
+        <tr>
+            <td class="col-md-2">Raw incoming URL</td>
+            <td class="col-md-10">@rawRequest.RawUrl</td>
+        </tr>
+    }
     <tr>
         <td class="col-md-2">Received protocol</td>
         <td class="col-md-10">@Context.Request.Protocol</td>
@@ -52,7 +71,7 @@ This tool provides detailed insights into the current HTTP(s) request.
                 <td class="col-md-2">KeyExchange algorithm</td>
                 <td class="col-md-10">
                     @sslStream.KeyExchangeAlgorithm.ToString()
-                    @if((int)(sslStream.KeyExchangeAlgorithm) == 44550)
+                    @if ((int)(sslStream.KeyExchangeAlgorithm) == 44550)
                     {
                         @:(DiffieHellman)
                     }
@@ -93,6 +112,7 @@ This tool provides detailed insights into the current HTTP(s) request.
 }
 
 <h4>Request headers</h4>
+These are the headers that our controllers and views receive.
 
 <table class="table table-bordered">
     @foreach (var header in Context.Request.Headers.OrderBy(h => h.Key))
@@ -108,6 +128,66 @@ This tool provides detailed insights into the current HTTP(s) request.
     }
 </table>
 
+<br />
+<br />
+
+@if (rawRequest != null && rawRequest.RawIncomingHeaders != null)
+{
+    <h4>Raw Request headers</h4>
+    @:These are the raw incoming request headers, before any middleware has modified or added more headers.
+
+    <table class="table table-bordered">
+        @foreach (var head in rawRequest.RawIncomingHeaders.OrderBy(h => h.Key).ToList())
+        {
+            <tr>
+                <td class="col-md-2">@head.Key</td>
+                <td class="col-md-10 text-break">@head.Value</td>
+            </tr>
+        }
+    </table>
+
+    var rawRequestHeaders = rawRequest.RawIncomingHeaders;
+    var finalRequestHeaders = Context.Request.Headers;
+    var allKeys = rawRequestHeaders.Keys.Union(finalRequestHeaders.Keys).OrderBy(k => k);
+    bool DifferencesFound = false;
+
+    <br />
+    <br />
+    <h4>Request header differences</h4>
+    @:Lists the differences between the incoming request headers and the final request headers after the request pipeline has been processed.
+    <table class="table table-bordered">
+        <tr>
+            <th class="col-md-2">Header</th>
+            <th class="col-md-5">Raw Incoming Request</th>
+            <th class="col-md-5">Final Request</th>
+        </tr>
+
+
+        @foreach (var key in allKeys)
+        {
+            var rawValue = rawRequestHeaders.ContainsKey(key) ? rawRequestHeaders[key].ToString() : "N/A";
+            var finalValue = finalRequestHeaders.ContainsKey(key) ? finalRequestHeaders[key].ToString() : "N/A";
+            if (rawValue != finalValue)
+            {
+                DifferencesFound = true;
+                <tr>
+                    <td class="col-md-2">@key</td>
+                    <td class="col-md-5 text-break">@rawValue</td>
+                    <td class="col-md-5 text-break">@finalValue</td>
+                </tr>
+            }
+        }
+
+        @if (DifferencesFound == false)
+        {
+            <tr>
+                <td colspan="3">No differences found</td>
+            </tr>
+        }
+    </table>
+}
+
+
 <br>
 <br>
 <h4>Resources</h4>
@@ -116,4 +196,3 @@ This tool provides detailed insights into the current HTTP(s) request.
     <li><a href="https://en.wikipedia.org/wiki/List_of_HTTP_header_fields">List of HTTP header fields</a> (Wikipedia)</li>
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">HTTP headers</a> (Mozilla)</li>
 </ul>
-

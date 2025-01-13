@@ -1,5 +1,6 @@
 ﻿using CloudDebugger.Features.WebHooks;
 using CloudDebugger.Infrastructure;
+using CloudDebugger.Infrastructure.Middlewares;
 using CloudDebugger.Infrastructure.OpenTelemetry;
 using Microsoft.AspNetCore.HttpOverrides;
 
@@ -49,7 +50,14 @@ internal static class HostingExtensions
 
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedPrefix;
+            options.ForwardedHeaders = ForwardedHeaders.All;
+
+            // We trust all hosts, networks and proxies, so that this debugger can work across
+            //
+            // all supported hosting models (App Services, Container Apps, Constainer Instances...)
+            options.AllowedHosts.Clear();
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
         });
 
         return builder.Build();
@@ -64,7 +72,7 @@ internal static class HostingExtensions
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
         // Capture the raw incoming request,before UseForwardedHeaders modifies it.
-        app.UseCaptureRawRequestDetails();
+        app.UseRawRequestCapture();
 
         app.UseForwardedHeaders();
 
