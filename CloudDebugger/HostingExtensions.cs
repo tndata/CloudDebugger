@@ -1,6 +1,7 @@
 ﻿using CloudDebugger.Features.WebHooks;
 using CloudDebugger.Infrastructure;
 using CloudDebugger.Infrastructure.OpenTelemetry;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace CloudDebugger;
 
@@ -14,8 +15,22 @@ internal static class HostingExtensions
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
-    public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
+    public static WebApplication ConfigureServices(this WebApplicationBuilder builder, string[] args)
     {
+        builder.Configuration
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+        .AddEnvironmentVariables()
+        .AddCommandLine(args);
+
+        builder.WebHost.ConfigureKestrel((context, options) =>
+        {
+            options.Configure(context.Configuration.GetSection("Kestrel"));
+        });
+
+        builder.WebHost.UseIIS();
+        builder.WebHost.UseKestrelHttpsConfiguration();
+
         builder.Services.AddSingleton<IWebHookLog, WebHookLog>();
 
         builder.Services.AddSignalR();  //Used by the advanced webhooks
@@ -32,6 +47,11 @@ internal static class HostingExtensions
 
         builder.AddCORS();
 
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedPrefix;
+        });
+
         return builder.Build();
     }
 
@@ -43,8 +63,11 @@ internal static class HostingExtensions
     /// <returns></returns>
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
+        app.UseForwardedHeaders();
+
         // Custom middleware to capture the request body, used by the UseMyHttpLogging module   
         app.UseRequestBodyCapture();
+
         app.UseMyHttpLogging();
 
         app.UseStaticFiles();

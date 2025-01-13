@@ -36,10 +36,11 @@ try
 {
     Banners.DisplayPreStartupBanner();
 
-    var builder = WebApplication.CreateBuilder(args);
+    // We use CreateSlimBuilder to be able to better customize the request pipeline.
+    var builder = WebApplication.CreateSlimBuilder(args);
 
     var app = builder
-      .ConfigureServices()
+      .ConfigureServices(args)
       .ConfigurePipeline();
 
     await app.StartAsync();
