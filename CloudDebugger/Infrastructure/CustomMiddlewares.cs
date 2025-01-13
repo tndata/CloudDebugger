@@ -37,4 +37,48 @@ public static class CustomMiddlewares
             await next();
         });
     }
+
+    public const string RawRequestDetailsKey = "RawRequestDetails";
+
+    /// <summary>
+    /// Captures the raw request information (scheme, host, path, query, and RawTarget)
+    /// and stores it in HttpContext.Items[RawRequestDetailsKey].
+    /// </summary>
+    public static IApplicationBuilder UseCaptureRawRequestDetails(this IApplicationBuilder app)
+    {
+        return app.Use(async (context, next) =>
+        {
+            // Reconstruct URL as it appears before ForwardedHeaders middleware
+            var rawUrl = $"{context.Request.Scheme}://{context.Request.Host}" +
+                         $"{context.Request.PathBase}{context.Request.Path}{context.Request.QueryString}";
+
+            // Capture all request headers
+            var headers = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString());
+
+            // Store these in HttpContext.Items so they can be retrieved later
+            context.Items[RawRequestDetailsKey] = new RawRequestDetails
+            {
+                RawUrl = rawUrl,
+                RawIncomingHeaders = headers
+            };
+
+            await next.Invoke();
+        });
+    }
+
+    /// <summary>
+    /// A simple model to hold the raw request details.
+    /// </summary>
+    internal class RawRequestDetails
+    {
+        /// <summary>
+        ///  “friendly” reconstruction of the entire URL, including scheme and host
+        /// </summary>
+        public string? RawUrl { get; set; }
+
+        /// <summary>
+        /// All request headers as received by the application and before ForwardedHeaders makes any modifications.
+        /// </summary>
+        public Dictionary<string, string>? RawIncomingHeaders { get; set; }
+    }
 }

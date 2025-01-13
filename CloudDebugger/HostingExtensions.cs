@@ -63,6 +63,9 @@ internal static class HostingExtensions
     /// <returns></returns>
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
+        // Capture the raw incoming request,before UseForwardedHeaders modifies it.
+        app.UseCaptureRawRequestDetails();
+
         app.UseForwardedHeaders();
 
         // Custom middleware to capture the request body, used by the UseMyHttpLogging module   
