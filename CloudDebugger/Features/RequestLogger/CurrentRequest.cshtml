@@ -41,6 +41,17 @@ This tool provides detailed insights into the current HTTP(s) request.
         <td class="col-md-2">Received scheme</td>
         <td class="col-md-10">@Context.Request.Scheme</td>
     </tr>
+    <tr>
+        <td class="col-md-2">Client IP Address</td>
+        <td class="col-md-10">@Context.Connection.RemoteIpAddress.ToString()</td>
+    </tr>
+    @if (rawRequest != null && rawRequest.RemoteIpAddress != Context.Connection.RemoteIpAddress.ToString())
+    {
+        <tr>
+            <td class="col-md-2">Incoming Client IP Address</td>
+            <td class="col-md-10">@Context.Connection.RemoteIpAddress.ToString()</td>
+        </tr>
+    }
 </table>
 
 <br />

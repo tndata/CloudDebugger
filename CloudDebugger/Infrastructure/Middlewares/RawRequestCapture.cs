@@ -46,8 +46,11 @@ public class RawRequestCaptureMiddleware
         var rawUrl = $"{context.Request.Scheme}://{context.Request.Host}" +
                      $"{context.Request.PathBase}{context.Request.Path}{context.Request.QueryString}";
 
+        var remoteIP = context.Connection.RemoteIpAddress?.ToString() ?? "[unknown]";
+
         _logger.LogDebug("######################################################");
         _logger.LogDebug("rawUrl: {RawUrl}", rawUrl);
+        _logger.LogDebug("RemoteIP: {RemoteIP}", remoteIP);
 
         // Capture all request headers
         var headers = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString());
@@ -61,6 +64,7 @@ public class RawRequestCaptureMiddleware
         context.Items[RawRequestDetailsKey] = new RawRequestDetails
         {
             RawUrl = rawUrl,
+            RemoteIpAddress = remoteIP,
             RawIncomingHeaders = headers
         };
     }
@@ -76,6 +80,11 @@ internal class RawRequestDetails
     ///  “friendly” reconstruction of the entire URL, including scheme and host
     /// </summary>
     public string? RawUrl { get; set; }
+
+    /// <summary>
+    ///  The client IP address
+    /// </summary>
+    public string? RemoteIpAddress { get; set; }
 
     /// <summary>
     /// All request headers as received by the application and before ForwardedHeaders makes any modifications.
