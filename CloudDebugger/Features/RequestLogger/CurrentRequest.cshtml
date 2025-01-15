@@ -29,7 +29,7 @@ This tool provides detailed insights into the current HTTP(s) request.
     @if (rawRequest != null && rawRequest.RawUrl != displayUrl)
     {
         <tr>
-            <td class="col-md-2">Raw incoming URL</td>
+            <td class="col-md-2">Raw Request URL</td>
             <td class="col-md-10">@rawRequest.RawUrl</td>
         </tr>
     }
@@ -43,14 +43,14 @@ This tool provides detailed insights into the current HTTP(s) request.
     </tr>
     <tr>
         <td class="col-md-2">Client IP Address</td>
-        <td class="col-md-10">@Context.Connection.RemoteIpAddress.ToString()</td>
+        <td class="col-md-10">@Context.Connection.RemoteIpAddress?.ToString()</td>
     </tr>
     @if (rawRequest != null && rawRequest.RemoteIpAddress != Context.Connection.RemoteIpAddress.ToString())
     {
         <tr>
-            <td class="col-md-2">Incoming Client IP Address</td>
-            <td class="col-md-10">@Context.Connection.RemoteIpAddress.ToString()</td>
-        </tr>
+            <td class="col-md-2">Raw Client IP Address</td>
+            <td class="col-md-10">@rawRequest.RemoteIpAddress</td>
+        </tr> 
     }
 </table>
 

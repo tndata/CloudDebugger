@@ -74,12 +74,12 @@ internal static class HostingExtensions
         // Capture the raw incoming request,before UseForwardedHeaders modifies it.
         app.UseRawRequestCapture();
 
-        app.UseForwardedHeaders();
-
         // Custom middleware to capture the request body, used by the UseMyHttpLogging module   
         app.UseRequestBodyCapture();
 
         app.UseMyHttpLogging();
+
+        app.UseForwardedHeaders();
 
         app.UseStaticFiles();
 
