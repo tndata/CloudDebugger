@@ -45,11 +45,11 @@ This tool provides detailed insights into the current HTTP(s) request.
         <td class="col-md-2">Client IP Address</td>
         <td class="col-md-10">@Context.Connection.RemoteIpAddress?.ToString()</td>
     </tr>
-    @if (rawRequest != null && rawRequest.RemoteIpAddress != Context.Connection.RemoteIpAddress.ToString())
+    @if (rawRequest != null && rawRequest.RemoteIpAddress != Context.Connection.RemoteIpAddress?.ToString())
     {
         <tr>
             <td class="col-md-2">Raw Client IP Address</td>
-            <td class="col-md-10">@rawRequest.RemoteIpAddress</td>
+            <td class="col-md-10">@rawRequest.RemoteIpAddress ?? "Unknown"</td>
         </tr> 
     }
 </table>
