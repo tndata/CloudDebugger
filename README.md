@@ -17,9 +17,10 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 
 ## Features and tools
 
-### HTTP Request tools
-* [Current Request Viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
+### HTTP Request and API Tools
 * [Calling External APIs](https://github.com/tndata/CloudDebugger/wiki/CallingAPIs)
+* [Current Request Viewer](https://github.com/tndata/CloudDebugger/wiki/CurrentRequestViewer)
+* [Forwarded Headers Configuration](https://github.com/tndata/CloudDebugger/wiki/ForwardedHeadersConfiguration)
 * [Load Testing](https://github.com/tndata/CloudDebugger/wiki/LoadTesting)
 * [Request Logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 * [Request Sender](https://github.com/tndata/CloudDebugger/wiki/RequestSender)

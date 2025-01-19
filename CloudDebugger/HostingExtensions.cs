@@ -12,7 +12,7 @@ namespace CloudDebugger;
 internal static class HostingExtensions
 {
     /// <summary>
-    /// Add and Configure the ASP.NET Core services
+    /// Configure the ASP.NET Core services
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
@@ -65,7 +65,8 @@ internal static class HostingExtensions
 
 
     /// <summary>
-    /// Add and configure the request pipeline. Right now we display DeveloperExceptions in the browser. In the future we might want to add app.UseExceptionHandler("/Home/Error"); in production.
+    /// Configure the request pipeline. Right now we display DeveloperExceptions in the browser. 
+    /// In the future we might want to add app.UseExceptionHandler("/Home/Error"); in production.
     /// </summary>
     /// <param name="app"></param>
     /// <returns></returns>
@@ -74,7 +75,7 @@ internal static class HostingExtensions
         // Capture the raw incoming request,before UseForwardedHeaders modifies it.
         app.UseRawRequestCapture();
 
-        // Custom middleware to capture the request body, used by the UseMyHttpLogging module   
+        // Custom middleware to capture the request body, used by the custom UseMyHttpLogging module   
         app.UseRequestBodyCapture();
 
         app.UseMyHttpLogging();

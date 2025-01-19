@@ -1,0 +1,184 @@
+﻿@model ForwardedHeadersOptions
+@{
+    ViewData["Title"] = "Cloud Debugger - Forwarded Headers Configuration";
+}
+
+<h3>Forwarded Headers Configuration</h3>
+This tool will display the current configuration of the Forwarded Headers middleware.
+<br>
+<a href="/RequestLogger">Back</a>
+<br />
+<br />
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-2">Option</th>
+            <th class="col-md-4">Value</th>
+            <th class="col-md-6">Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>ForwardedHeaders</td>
+            <td>
+                <ul>
+                    @foreach (var value in Enum.GetValues(typeof(Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders)))
+                    {
+                        var flag = (Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders)value;
+                        if (Model.ForwardedHeaders.HasFlag(flag) && flag != Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.None)
+                        {
+                            <li>@flag</li>
+                        }
+                    }
+                </ul>
+            </td>
+            <td>
+                ForwardedHeaders specifies which of the forwarded headers (such as X-Forwarded-For or X-Forwarded-Proto) should be processed, allowing you to control
+                the handling of specific forwarded information.
+            </td>
+        </tr>
+        <tr>
+            <td>AllowedHosts</td>
+            <td>
+
+                @if (Model.AllowedHosts.Any())
+                {
+                    <ul>
+                        @foreach (var host in Model.AllowedHosts)
+                        {
+                            <li>@host</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    @:None...
+                }
+
+            </td>
+            <td>
+                AllowedHosts defines a list of hostnames that are permitted in forwarded headers, helping to ensure that only requests with trusted
+                host values are accepted.
+
+            </td>
+        </tr>
+        <tr>
+            <td>KnownNetworks</td>
+            <td>
+
+                @if (Model.KnownNetworks.Any())
+                {
+                    <ul>
+                        @foreach (var host in Model.KnownNetworks)
+                        {
+                            <li>@host</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    @:None...
+                }
+
+            </td>
+            <td>
+                KnownNetworks allows you to specify trusted IP address ranges (using CIDR notation)
+                from which forwarded headers are accepted, ensuring that only traffic from these ranges is trusted when processing forwarded requests.
+            </td>
+        </tr>
+        <tr>
+            <td>KnownProxies</td>
+            <td>
+                @if (Model.KnownProxies.Any())
+                {
+                    <ul>
+                        @foreach (var host in Model.KnownProxies)
+                        {
+                            <li>@host</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    @:None...
+                }
+            </td>
+            <td>
+                This value represents the list of known proxy IP addresses.
+            </td>
+        </tr>
+        <tr>
+            <td>ForwardLimit</td>
+            <td>@Model.ForwardLimit </td>
+            <td>ForwardLimit sets the maximum number of proxy hops to process in forwarded headers, preventing excessive or potentially untrusted forwarding chains.</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+
+<br>
+<h4>Header Names Configuration</h4>
+<p>
+    The following table lists the names of the headers used in the Forwarded Headers middleware configuration.
+    These headers can be customized to support proxies or scenarios that require you to use non-standard header names.
+</p>
+
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-2">Header Name</th>
+            <th class="col-md-10">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>OriginalForHeaderName</td>
+            <td>@Model.OriginalForHeaderName</td>
+        </tr>
+        <tr>
+            <td>OriginalHostHeaderName</td>
+            <td>@Model.OriginalHostHeaderName</td>
+        </tr>
+        <tr>
+            <td>OriginalProtoHeaderName</td>
+            <td>@Model.OriginalProtoHeaderName</td>
+        </tr>
+        <tr>
+            <td>OriginalPrefixHeaderName</td>
+            <td>@Model.OriginalPrefixHeaderName</td>
+        </tr>
+        <tr>
+            <td>ForwardedForHeaderName</td>
+            <td>@Model.ForwardedForHeaderName</td>
+        </tr>
+        <tr>
+            <td>ForwardedHostHeaderName</td>
+            <td>@Model.ForwardedHostHeaderName</td>
+        </tr>
+        <tr>
+            <td>ForwardedProtoHeaderName</td>
+            <td>@Model.ForwardedProtoHeaderName</td>
+        </tr>
+        <tr>
+            <td>ForwardedPrefixHeaderName</td>
+            <td>@Model.ForwardedPrefixHeaderName</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<br>
+<br>
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/ForwardedHeadersConfiguration">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer">Configure ASP.NET Core to work with proxy servers and load balancers</a></li>
+</ul>
