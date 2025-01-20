@@ -74,7 +74,7 @@ public class RawRequestCaptureMiddleware
 /// <summary>
 /// A simple model to hold the raw request details.
 /// </summary>
-internal class RawRequestDetails
+public class RawRequestDetails
 {
     /// <summary>
     ///  “friendly” reconstruction of the entire URL, including scheme and host

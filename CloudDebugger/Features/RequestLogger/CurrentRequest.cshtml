@@ -1,15 +1,10 @@
-﻿@using Microsoft.AspNetCore.Http.Extensions
+﻿@model CloudDebugger.Features.RequestLogger.CurrentRequestModel
+@using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Server.Kestrel.Core.Features
 @using System.Net.Security
 @using CloudDebugger.Infrastructure.Middlewares
 @{
     ViewData["Title"] = "Cloud Debugger - Request headers";
-
-    // Get details about the incoming request before it is modified by the middlewares
-    // (including ForwardedHeaders middleware)
-    var rawRequest = Context.Items["RawRequestDetails"] as RawRequestDetails;
-
-    var displayUrl = Context.Request.GetDisplayUrl();
 }
 
 <h3>Current HTTP(s) request details</h3>
@@ -24,13 +19,13 @@ This tool provides detailed insights into the current HTTP(s) request.
 <table class="table table-bordered">
     <tr>
         <td class="col-md-2">Request URL</td>
-        <td class="col-md-10">@displayUrl</td>
+        <td class="col-md-10">@Model.FinalDisplayUrl</td>
     </tr>
-    @if (rawRequest != null && rawRequest.RawUrl != displayUrl)
+    @if (Model.RawRequest != null && Model.RawRequest.RawUrl != Model.FinalDisplayUrl)
     {
         <tr>
             <td class="col-md-2">Raw Request URL</td>
-            <td class="col-md-10">@rawRequest.RawUrl</td>
+            <td class="col-md-10">@Model.RawRequest.RawUrl</td>
         </tr>
     }
     <tr>
@@ -45,11 +40,11 @@ This tool provides detailed insights into the current HTTP(s) request.
         <td class="col-md-2">Client IP Address</td>
         <td class="col-md-10">@Context.Connection.RemoteIpAddress?.ToString()</td>
     </tr>
-    @if (rawRequest != null && rawRequest.RemoteIpAddress != Context.Connection.RemoteIpAddress?.ToString())
+    @if (Model.RawRequest != null && Model.RawRequest.RemoteIpAddress != Context.Connection.RemoteIpAddress?.ToString())
     {
         <tr>
             <td class="col-md-2">Raw Client IP Address</td>
-            <td class="col-md-10">@(rawRequest.RemoteIpAddress ?? "Unknown")</td>
+            <td class="col-md-10">@(Model.RawRequest.RemoteIpAddress ?? "Unknown")</td>
         </tr> 
     }
 </table>
@@ -122,7 +117,8 @@ This tool provides detailed insights into the current HTTP(s) request.
     }
 }
 
-<h4>Request headers</h4>
+<br />
+<h4>Request Headers</h4>
 These are the headers that our controllers and views receive.
 
 <table class="table table-bordered">
@@ -142,13 +138,13 @@ These are the headers that our controllers and views receive.
 <br />
 <br />
 
-@if (rawRequest != null && rawRequest.RawIncomingHeaders != null)
+@if (Model.RawRequest != null && Model.RawRequest.RawIncomingHeaders != null)
 {
     <h4>Raw Request headers</h4>
     @:These are the raw incoming request headers, before any middleware has modified or added more headers.
 
     <table class="table table-bordered">
-        @foreach (var head in rawRequest.RawIncomingHeaders.OrderBy(h => h.Key).ToList())
+        @foreach (var head in Model.RawRequest.RawIncomingHeaders.OrderBy(h => h.Key).ToList())
         {
             <tr>
                 <td class="col-md-2">@head.Key</td>
@@ -157,7 +153,7 @@ These are the headers that our controllers and views receive.
         }
     </table>
 
-    var rawRequestHeaders = rawRequest.RawIncomingHeaders;
+    var rawRequestHeaders = Model.RawRequest.RawIncomingHeaders;
     var finalRequestHeaders = Context.Request.Headers;
     var allKeys = rawRequestHeaders.Keys.Union(finalRequestHeaders.Keys).OrderBy(k => k);
     bool DifferencesFound = false;
@@ -197,7 +193,6 @@ These are the headers that our controllers and views receive.
         }
     </table>
 }
-
 
 <br>
 <br>

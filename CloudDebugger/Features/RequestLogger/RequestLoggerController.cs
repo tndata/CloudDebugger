@@ -1,3 +1,5 @@
+using CloudDebugger.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.MyHttpLogging;
 using Microsoft.Extensions.Options;
@@ -31,7 +33,15 @@ public class RequestLoggerController : Controller
 
     public IActionResult CurrentRequest()
     {
-        return View();
+        var model = new CurrentRequestModel();
+
+        // Get details about the incoming request before it is modified by the middlewares
+        // These values are captured by a custom Middleware
+        model.RawRequest = HttpContext.Items["RawRequestDetails"] as RawRequestDetails;
+
+        model.FinalDisplayUrl = HttpContext.Request.GetDisplayUrl();
+
+        return View(model);
     }
 
     public IActionResult RequestList()
