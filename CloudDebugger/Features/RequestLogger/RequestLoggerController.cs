@@ -33,13 +33,14 @@ public class RequestLoggerController : Controller
 
     public IActionResult CurrentRequest()
     {
-        var model = new CurrentRequestModel();
+        var model = new CurrentRequestModel
+        {
+            // Get details about the incoming request before it is modified by the middlewares
+            // These values are captured by a custom Middleware
+            RawRequest = HttpContext.Items["RawRequestDetails"] as RawRequestDetails,
 
-        // Get details about the incoming request before it is modified by the middlewares
-        // These values are captured by a custom Middleware
-        model.RawRequest = HttpContext.Items["RawRequestDetails"] as RawRequestDetails;
-
-        model.FinalDisplayUrl = HttpContext.Request.GetDisplayUrl();
+            FinalDisplayUrl = HttpContext.Request.GetDisplayUrl()
+        };
 
         return View(model);
     }

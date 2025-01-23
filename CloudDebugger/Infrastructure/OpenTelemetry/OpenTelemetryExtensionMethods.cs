@@ -144,10 +144,12 @@ public static class OpenTelemetryExtensionMethods
         builder.Logging.AddFilter("Default", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("System.Net", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger", LogLevel.Trace);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore", LogLevel.Debug);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore", LogLevel.Warning);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.Mvc", LogLevel.Warning);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.Hosting.Lifetime", LogLevel.Debug);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger.Infrastructure.Middlewares", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.HttpOverrides", LogLevel.Debug);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger.Infrastructure.Middlewares", LogLevel.Warning);
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
     }
 
@@ -176,14 +178,5 @@ public static class OpenTelemetryExtensionMethods
                             o.EnableLiveMetrics = true;
                             o.SamplingRatio = 1.0f;         //The default value is 1.0F, indicating that all telemetry items are sampled.
                         });
-
-
-        builder.Logging.AddFilter("Default", LogLevel.Debug);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger", LogLevel.Trace);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore", LogLevel.Information);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.Hosting.Lifetime", LogLevel.Information);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger.Infrastructure.Middlewares", LogLevel.Information);
-        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.HttpOverrides", LogLevel.Debug);
-        //builder.Logging.SetMinimumLevel(LogLevel.Information);
     }
 }
