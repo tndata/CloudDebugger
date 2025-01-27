@@ -19,7 +19,7 @@
 		<PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />
 		<PackageReference Include="Azure.Storage.Queues" Version="12.21.0" />
 		<PackageReference Include="Flurl.Http" Version="4.0.2" />
-		<PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.2.0" />
+		<PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.2.1" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.1" />
