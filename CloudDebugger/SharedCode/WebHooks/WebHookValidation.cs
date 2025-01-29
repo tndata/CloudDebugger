@@ -55,17 +55,26 @@ public static class WebHookValidation
     /// <exception cref="NotImplementedException"></exception>
     internal static void CheckIfCloudEventValidationRequest(HttpContext httpContext, Action<WebHookLogEntry> LogEventHandler, WebHookLogEntry logEntry, ILogger logger)
     {
-
         logEntry.RequestHeaders.TryGetValue("WebHook-Request-Callback", out string? callbackUrl);
         logEntry.RequestHeaders.TryGetValue("WebHook-Request-Origin", out string? callbackorigin);
 
+        // Check for lower-case headers, sometimes EventGrid uses lower-case headers. For example when using a Container App... :-(
+        if (string.IsNullOrEmpty(callbackUrl))
+        {
+            logEntry.RequestHeaders.TryGetValue("webhook-request-callback", out callbackUrl);
+        }
+        if (string.IsNullOrEmpty(callbackorigin))
+        {
+            logEntry.RequestHeaders.TryGetValue("webhook-request-origin", out callbackorigin);
+        }
+
         if (!string.IsNullOrEmpty(callbackUrl))
         {
-            //Respond with the correct headers and body
+            // Respond with the correct headers and body
             httpContext.Response.Headers.Append("WebHook-Request-Origin", "eventgrid.azure.net");
             httpContext.Response.Headers.Append("WebHook-Allowed-Rate", "120");
 
-            logger.LogInformation("Received CLoudEvent  validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
+            logger.LogInformation("Received CloudEvent validation request with callbackUrl '{CallbackUrl}' and callbackorigin '{CallbackOrigin}'", callbackUrl, callbackorigin);
 
             SendCallBackRequest(logEntry.HookId, LogEventHandler, callbackUrl, "Event Grid Cloud events webhook confirmation request.");
         }

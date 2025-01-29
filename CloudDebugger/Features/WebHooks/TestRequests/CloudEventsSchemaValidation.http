@@ -103,3 +103,24 @@ x-k8se-protocol: http1
 x-ms-containerapp-name: clouddebugger
 x-ms-containerapp-revision-name: clouddebugger--69zn5vw
 x-request-id: 092cfd9a-3ab2-4765-8548-91f86c5ea1df
+
+
+
+
+###
+
+#Sample Event Grid Cloud event validation request that failed in Azure (Lower-case headers)
+OPTIONS {{hostname}}/hook{{hookId}}
+Content-Length: 0
+webhook-request-callback: https://rp-swedencentral.eventgrid.azure.net:553/eventsubscriptions/cloudevent-linux-container-app/validate?id=DDAD8472-2717-4624-8661-210F29029BB2&t=2025-01-29T18:57:11.1296364Z&apiVersion=2024-12-15-preview&token=%2fnvnFmnrE5MGmBCutflYlZTU1Ux9f7JakOtnRNyyYUQ%3d
+webhook-request-origin: eventgrid.azure.net
+x-arr-ssl: true
+x-envoy-expected-rq-timeout-ms: 1800000
+x-envoy-external-address: 51.12.47.151
+x-k8se-app-kind: web
+x-k8se-app-name: ca-clouddebugger--9bn4egg
+x-k8se-app-namespace: k8se-apps
+x-k8se-protocol: http1
+x-ms-containerapp-name: ca-clouddebugger
+x-ms-containerapp-revision-name: ca-clouddebugger--9bn4egg
+x-request-id: 796c0195-690a-4aa8-95ba-705655383419

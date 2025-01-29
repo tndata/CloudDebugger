@@ -53,7 +53,6 @@ internal static class HostingExtensions
             options.ForwardedHeaders = ForwardedHeaders.All;
 
             // We trust all hosts, networks and proxies, so that this debugger can work across
-            //
             // all supported hosting models (App Services, Container Apps, Constainer Instances...)
             options.AllowedHosts.Clear();
             options.KnownNetworks.Clear();
