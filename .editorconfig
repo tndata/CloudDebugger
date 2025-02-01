@@ -237,6 +237,7 @@ dotnet_diagnostic.CA1845.severity = none
 # S1854: Unused assignments should be removed
 dotnet_diagnostic.S1854.severity = none
 csharp_prefer_static_anonymous_function = true:suggestion
+csharp_prefer_system_threading_lock = true:suggestion
 
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
