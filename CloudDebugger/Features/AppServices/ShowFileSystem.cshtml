@@ -1,120 +1,135 @@
-﻿@model CloudDebugger.Features.AppServices.ShowFilesModel
-@{
-    ViewData["Title"] = "App Services File System Viewer";
+﻿@model CloudDebugger.Features.AppServices.ShowFilesModel  
+@{  
+  ViewData["Title"] = "App Services File System Viewer";  
+}  
+
+<h3>App Services - App Services File System Viewer</h3>  
+This tool will show the content of the most essential directories in an App Service. See also the more generic <a href="/FileSystem/index">File explorer tool</a>.  
+<a href="/AppServices">Back</a>  
+<br />  
+<br />  
+
+<h4>App Service details</h4>  
+<table class="table">  
+  <tr>  
+      <td class="col-md-2">Operating System</td>  
+      <td class="col-md-10">@Model.OperatingSystem</td>  
+  </tr>  
+  <tr>  
+      <td class="col-md-2">Home Directory</td>  
+      <td class="col-md-10">@Model.HomeDirectory</td>  
+  </tr>  
+  <tr>  
+      <td class="col-md-2">Temp Directory</td>  
+      <td class="col-md-10">@Model.TempDirectory</td>  
+  </tr>  
+  <tr>  
+      <td class="col-md-2">Application Directory</td>  
+      <td class="col-md-10">@Model.AppDirectory</td>  
+  </tr>  
+</table>  
+
+<br />  
+<br />  
+
+<table class="table table-bordered">  
+  <thead>  
+      <tr>  
+          <th><b>Home Directory</b></th>  
+          <th><b>Application directory</b></th>  
+          <th><b>Temp directory</b></th>  
+      </tr>  
+  </thead>  
+  <tbody>  
+      <tr>  
+          <td class="col-md-4">  
+              <table class="table">  
+                  <tr>  
+                      <td>
+@if (Model?.HomeDirFolders?.Any() == true)
+{
+    <b>  
+    <pre>  
+    @foreach (var dir in Model.HomeDirFolders)  
+    {  
+        @dir@Html.Raw("\r\n")  
+    }  
+    </pre>  
+    </b>  
 }
 
-<h3>App Services - App Services File System Viewer</h3>
-This tool will show the content of the most essential directories in an App Service. See also the more generic <a href="/FileSystem/index">File explorer tool</a>.
-<a href="/AppServices">Back</a>
-<br />
-<br />
+@if (Model?.HomeDirFiles?.Any() == true)
+{ 
+    <pre>  
+    @foreach (var file in Model.HomeDirFiles)  
+    {  
+        @file@Html.Raw("\r\n")   
+    }  
+    </pre>  
+}
+                      </td>  
+                  </tr>  
+              </table>  
+          </td>  
+          <td class="col-md-4">  
+              <table class="table">  
+                  <tr>  
+                      <td>  
 
-<h4>App Service details</h4>
-<table class="table">
-    <tr>
-        <td class="col-md-2">Operating System</td>
-        <td class="col-md-10">@Model.OperatingSystem</td>
-    </tr>
-    <tr>
-        <td class="col-md-2">Home Directory</td>
-        <td class="col-md-10">@Model.HomeDirectory</td>
-    </tr>
-    <tr>
-        <td class="col-md-2">Temp Directory</td>
-        <td class="col-md-10">@Model.TempDirectory</td>
-    </tr>
-    <tr>
-        <td class="col-md-2">Application Directory</td>
-        <td class="col-md-10">@Model.AppDirectory</td>
-    </tr>
+@if (Model?.AppDirFolders?.Any() == true)
+{  
+    <b>  
+    <pre>  
+    @foreach (var dir in Model.AppDirFolders)  
+    {  
+        @dir@Html.Raw("\r\n")    
+    } 
+    </pre>
+    </b>
+}
+
+@if (Model?.AppDirFiles?.Any() == true)
+{
+    <pre>  
+    @foreach (var file in Model.AppDirFiles)  
+    {  
+        @file@Html.Raw("\r\n")  
+    }  
+    </pre>
+}
+                      </td>  
+                  </tr>  
+              </table>  
+          </td>  
+          <td class="col-md-4">  
+              <table class="table">  
+                  <tr>  
+                      <td>
+@if (Model?.TempDirFolders?.Any() == true) 
+{  
+    <b>  
+    <pre>  
+    @foreach (var dir in Model.TempDirFolders)
+    {  
+        @dir@Html.Raw("\r\n")    
+    } 
+    </pre>
+    </b>
+}
+
+@if (Model?.TempDirFiles?.Any() == true)
+{ 
+     <pre>  
+    @foreach (var file in Model.TempDirFiles)  
+    {  
+       @file@Html.Raw("\r\n")   
+    }  
+    </pre>
+}
+                        </td>
+                    </tr>  
+              </table>  
+          </td>  
+      </tr>  
+  </tbody>  
 </table>
-
-<br />
-<br />
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th><b>Home Directory</b></th>
-            <th><b>Application directory</b></th>
-            <th><b>Temp directory</b></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="col-md-4">
-                <table class="table">
-                    <tr>
-                        <td>
-                            <b>
-<pre>
-@foreach (var dir in Model.HomeDirFolders)
-{
-@(dir + "\r\n")
-}
-</pre>
-</b>
-<pre>
-@foreach (var file in Model.HomeDirFiles)
-{
-@(file + "\r\n")
-}
-</pre>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td class="col-md-4">
-                <table class="table">
-                    <tr>
-                        <td>
-                            <b>
-<pre>
-@foreach (var dir in Model.AppDirFolders)
-{
-@(dir + "\r\n")
-}
-</pre>
-</b>
-<pre>
-@foreach (var file in Model.AppDirFiles)
-{
-@(file + "\r\n")
-}
-</pre>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td class="col-md-4">
-                <table class="table">
-                    <tr>
-                        <td>
-                            <b>
-<pre>
-@foreach (var dir in Model.TempDirFolders)
-{
-@(dir + "\r\n")
-}
-</pre>
-                            </b>
-                            <pre>
-@foreach (var file in Model.TempDirFiles)
-{
-@(file + "\r\n")
-}
-</pre>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-
-
-
-
-
-

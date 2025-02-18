@@ -160,7 +160,7 @@ public class AppServicesController : Controller
             {
                 string name = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
 
-                result.Add($"\\{name}");
+                result.Add($"{Path.DirectorySeparatorChar}{name}");
                 if (count++ > MaxNumberOfDirectories)
                 {
                     result.Add($"...Displays the first {MaxNumberOfDirectories} directories....");
