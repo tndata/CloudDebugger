@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Cloud Debugger - Disk Free Space";
+}
+
+<h5>File System - Disk Free Space</h5>
+This tool will display the free disk space for each drive.
+<a href="/FileSystemExplorer">Back</a>
+
+<br>
+<br>
+
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>Drive Name</th>
+            <th>Volume Label</th>
+            <th>Drive Format</th>
+            <th>Drive Type</th>
+            <th>Total Size</th>
+            <th>Total Free Space</th>
+            <th>Available Free Space</th>
+            <th>Root Directory</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (DriveInfo drive in DriveInfo.GetDrives())
+        {
+            if (drive.IsReady)
+            {
+                try
+                {
+                    <tr>
+                        <td>@drive.Name</td>
+                        <td>@drive.VolumeLabel</td>
+                        <td>@drive.DriveFormat</td>
+                        <td>@drive.DriveType</td>
+                        <td class="col-md-1 text-right">@(drive.TotalSize / (1024 * 1024 * 1024)) GB</td>
+                        <td class="col-md-1 text-right">@(drive.TotalFreeSpace / (1024 * 1024 * 1024)) GB</td>
+                        <td class="col-md-1 text-right">@(drive.AvailableFreeSpace / (1024 * 1024 * 1024)) GB</td>
+                        <td>@drive.RootDirectory</td>
+                    </tr>
+                }
+                catch (Exception ex)
+                {
+                    <tr>
+                        <td colspan="8">Error: @ex.Message</td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>

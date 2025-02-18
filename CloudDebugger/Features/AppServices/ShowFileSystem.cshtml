@@ -4,29 +4,29 @@
 }  
 
 <h3>App Services - App Services File System Viewer</h3>  
-This tool will show the content of the most essential directories in an App Service. See also the more generic <a href="/FileSystem/index">File explorer tool</a>.  
+This tool will show the content of the most essential directories in an App Service. See also the more generic <a href="/FileSystemExplorer/index">File explorer tool</a>.  
 <a href="/AppServices">Back</a>  
 <br />  
 <br />  
 
 <h4>App Service details</h4>  
 <table class="table">  
-  <tr>  
+   <tr>  
       <td class="col-md-2">Operating System</td>  
       <td class="col-md-10">@Model.OperatingSystem</td>  
-  </tr>  
-  <tr>  
+   </tr>  
+   <tr>  
       <td class="col-md-2">Home Directory</td>  
       <td class="col-md-10">@Model.HomeDirectory</td>  
-  </tr>  
-  <tr>  
+   </tr>
+   <tr>
+       <td class="col-md-2">Application Directory</td>
+       <td class="col-md-10">@Model.AppDirectory</td>
+   </tr>
+   <tr>
       <td class="col-md-2">Temp Directory</td>  
       <td class="col-md-10">@Model.TempDirectory</td>  
-  </tr>  
-  <tr>  
-      <td class="col-md-2">Application Directory</td>  
-      <td class="col-md-10">@Model.AppDirectory</td>  
-  </tr>  
+   </tr>  
 </table>  
 
 <br />  
@@ -48,24 +48,18 @@ This tool will show the content of the most essential directories in an App Serv
                       <td>
 @if (Model?.HomeDirFolders?.Any() == true)
 {
-    <b>  
-    <pre>  
-    @foreach (var dir in Model.HomeDirFolders)  
-    {  
-        @dir@Html.Raw("\r\n")  
-    }  
-    </pre>  
-    </b>  
+<b><pre>@foreach (var dir in Model.HomeDirFolders)  
+{  
+@dir@Html.Raw("\r\n")  
+}</pre></b>  
 }
 
 @if (Model?.HomeDirFiles?.Any() == true)
 { 
-    <pre>  
-    @foreach (var file in Model.HomeDirFiles)  
-    {  
-        @file@Html.Raw("\r\n")   
-    }  
-    </pre>  
+<pre>@foreach (var file in Model.HomeDirFiles)  
+{  
+@file@Html.Raw("\r\n")   
+}</pre>  
 }
                       </td>  
                   </tr>  
@@ -78,24 +72,18 @@ This tool will show the content of the most essential directories in an App Serv
 
 @if (Model?.AppDirFolders?.Any() == true)
 {  
-    <b>  
-    <pre>  
-    @foreach (var dir in Model.AppDirFolders)  
-    {  
-        @dir@Html.Raw("\r\n")    
-    } 
-    </pre>
-    </b>
+<b><pre>@foreach (var dir in Model.AppDirFolders)  
+{  
+@dir@Html.Raw("\r\n")    
+}</pre></b>
 }
 
 @if (Model?.AppDirFiles?.Any() == true)
 {
-    <pre>  
-    @foreach (var file in Model.AppDirFiles)  
-    {  
-        @file@Html.Raw("\r\n")  
-    }  
-    </pre>
+<pre>@foreach (var file in Model.AppDirFiles)  
+{  
+@file@Html.Raw("\r\n")  
+}</pre>
 }
                       </td>  
                   </tr>  
@@ -107,24 +95,18 @@ This tool will show the content of the most essential directories in an App Serv
                       <td>
 @if (Model?.TempDirFolders?.Any() == true) 
 {  
-    <b>  
-    <pre>  
-    @foreach (var dir in Model.TempDirFolders)
-    {  
-        @dir@Html.Raw("\r\n")    
-    } 
-    </pre>
-    </b>
+<b><pre>@foreach (var dir in Model.TempDirFolders)
+{  
+@dir@Html.Raw("\r\n")    
+}</pre></b>
 }
 
 @if (Model?.TempDirFiles?.Any() == true)
 { 
-     <pre>  
-    @foreach (var file in Model.TempDirFiles)  
-    {  
-       @file@Html.Raw("\r\n")   
-    }  
-    </pre>
+<pre>@foreach (var file in Model.TempDirFiles)  
+{  
+@file@Html.Raw("\r\n")   
+}</pre>
 }
                         </td>
                     </tr>  

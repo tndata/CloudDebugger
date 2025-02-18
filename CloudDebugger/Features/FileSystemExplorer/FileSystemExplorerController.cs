@@ -19,6 +19,11 @@ public class FileSystemExplorerController : Controller
         return View();
     }
 
+    public IActionResult DiskFreeSpace()
+    {
+        return View();
+    }
+
     public IActionResult ReadWriteFiles()
     {
         var model = GetDefaultModel();
