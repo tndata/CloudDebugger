@@ -25,15 +25,11 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Request Logger](https://github.com/tndata/CloudDebugger/wiki/RequestLogger)
 * [Request Sender](https://github.com/tndata/CloudDebugger/wiki/RequestSender)
 
-### App Services
-* [App Service File System](https://github.com/tndata/CloudDebugger/wiki/AppServices)
-* [Local Cache](https://github.com/tndata/CloudDebugger/wiki/AppServices)
-
 ### Storage tools
 * [Blob Storage Tools](https://github.com/tndata/CloudDebugger/wiki/BlobStorage)
-* [File System Explorer](https://github.com/tndata/CloudDebugger/wiki/FileSystem)
+* [File System Tools](https://github.com/tndata/CloudDebugger/wiki/FileSystem)
 * [Redis Explorer](https://github.com/tndata/CloudDebugger/wiki/RedisExplorer)
-
+ 
 ### Identity tools
 * [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
 * [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)

@@ -15,11 +15,6 @@ public class AppServicesController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
-    {
-        return View();
-    }
-
     /// <summary>
     /// References
     /// https://learn.microsoft.com/en-us/azure/app-service/reference-app-settings

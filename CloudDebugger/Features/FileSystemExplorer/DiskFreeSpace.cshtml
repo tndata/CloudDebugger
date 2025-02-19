@@ -1,10 +1,22 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@{
     ViewData["Title"] = "Cloud Debugger - Disk Free Space";
 }
 
 <h5>File System - Disk Free Space</h5>
-This tool will display the free disk space for each drive.
+This tool will display the free disk space for each drive. <a href="/FileSystemExplorer/DiskFreeSpace?ShowAll">Show all drives</a>.
 <a href="/FileSystemExplorer">Back</a>
+
+@{
+    var drives = DriveInfo.GetDrives().AsEnumerable();
+
+    drives = drives.Where(d => d.IsReady);
+
+    if (!Context.Request.Query.ContainsKey("showall"))
+    {
+        drives = drives.Where(drive => (drive.DriveType == DriveType.Fixed || drive.DriveType == DriveType.Network) && drive.TotalSize > 0);
+    }
+}
 
 <br>
 <br>
@@ -23,29 +35,26 @@ This tool will display the free disk space for each drive.
         </tr>
     </thead>
     <tbody>
-        @foreach (DriveInfo drive in DriveInfo.GetDrives())
+        @foreach (DriveInfo drive in drives)
         {
-            if (drive.IsReady)
+            try
             {
-                try
-                {
-                    <tr>
-                        <td>@drive.Name</td>
-                        <td>@drive.VolumeLabel</td>
-                        <td>@drive.DriveFormat</td>
-                        <td>@drive.DriveType</td>
-                        <td class="col-md-1 text-right">@(drive.TotalSize / (1024 * 1024 * 1024)) GB</td>
-                        <td class="col-md-1 text-right">@(drive.TotalFreeSpace / (1024 * 1024 * 1024)) GB</td>
-                        <td class="col-md-1 text-right">@(drive.AvailableFreeSpace / (1024 * 1024 * 1024)) GB</td>
-                        <td>@drive.RootDirectory</td>
-                    </tr>
-                }
-                catch (Exception ex)
-                {
-                    <tr>
-                        <td colspan="8">Error: @ex.Message</td>
-                    </tr>
-                }
+                <tr>
+                    <td>@drive.Name</td>
+                    <td>@drive.VolumeLabel</td>
+                    <td>@drive.DriveFormat</td>
+                    <td>@drive.DriveType</td>
+                    <td class="col-md-1 text-right">@(drive.TotalSize / (1024 * 1024 * 1024)) GB</td>
+                    <td class="col-md-1 text-right">@(drive.TotalFreeSpace / (1024 * 1024 * 1024)) GB</td>
+                    <td class="col-md-1 text-right">@(drive.AvailableFreeSpace / (1024 * 1024 * 1024)) GB</td>
+                    <td>@drive.RootDirectory</td>
+                </tr>
+            }
+            catch (Exception ex)
+            {
+                <tr>
+                    <td colspan="8">Error: @ex.Message</td>
+                </tr>
             }
         }
     </tbody>
