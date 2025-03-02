@@ -127,22 +127,45 @@ public class BlobStorageEditorController : Controller
         {
             var container = client.GetBlobContainerClient(containerName);
 
-            var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
-
-            // Always add an root element to the list, for easier navigation.
-            result.Add(("/", ""));
-
-            foreach (var blob in blobs)
+            if (model.HierarchicalNamespaceEnabled)
             {
-                // Is it a folder?
-                if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
+                var blobs = container.GetBlobsByHierarchy(traits: BlobTraits.Metadata, states: BlobStates.None, delimiter: "/", prefix: model.Path).ToList();
+
+                result.Add(("/", ""));
+
+                foreach (var blob in blobs)
                 {
-                    result.Add(("/" + blob.Name, ""));
+                    // Is it a folder?
+                    if (blob.IsPrefix)
+                    {
+                        result.Add(("/" + blob.Prefix, ""));
+                    }
+                    else
+                    {
+                        var blobSize = blob.Blob.Properties.ContentLength ?? 0;
+                        result.Add((blob.Blob.Name, blobSize.ToString()));
+                    }
                 }
-                else
+            }
+            else
+            {
+                var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
+
+                // Always add an root element to the list, for easier navigation.
+                result.Add(("/", ""));
+
+                foreach (var blob in blobs)
                 {
-                    var blobSize = blob.Properties.ContentLength ?? 0;
-                    result.Add((blob.Name, blobSize.ToString()));
+                    // Is it a folder?
+                    if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
+                    {
+                        result.Add(("/" + blob.Name, ""));
+                    }
+                    else
+                    {
+                        var blobSize = blob.Properties.ContentLength ?? 0;
+                        result.Add((blob.Name, blobSize.ToString()));
+                    }
                 }
             }
         }

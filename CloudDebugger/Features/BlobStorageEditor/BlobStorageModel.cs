@@ -23,6 +23,12 @@ public class BlobStorageModel
     public string? ContainerName { get; set; }
 
     /// <summary>
+    /// True if we should use the hierarchical namespace feature of the blob storage.
+    /// (ie using the GetBlobsByHierarchyAsync method instead of the GetBlobs SDK method).
+    /// </summary>
+    public bool HierarchicalNamespaceEnabled { get; set; }
+
+    /// <summary>
     /// True if we want to access the blob storage anonymously
     /// </summary>
     [Required]
@@ -32,7 +38,7 @@ public class BlobStorageModel
     /// <summary>
     /// Blob Path
     /// </summary>
-    public string? Path { get; set; } = "";
+    public string? Path { get; set; }
 
     /// <summary>
     /// Blob Name
