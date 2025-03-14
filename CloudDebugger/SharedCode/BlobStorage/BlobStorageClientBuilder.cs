@@ -55,13 +55,13 @@ public static class BlobStorageClientBuilder
 
             if (string.IsNullOrEmpty(clientId))
             {
-                var message = "Tried to authenticate using system-assigned managed identity";
+                var message = "Tried to authenticate using DefaultAzureCredential";
                 var client = new BlobServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), blobOptions);
                 return (client, message);
             }
             else
             {
-                var message = $"Tried to authenticate using-assigned managed identity, ClientID={clientId}";
+                var message = $"Tried to authenticate using DefaultAzureCredential, ClientID={clientId}";
                 defaultCredentialOptions.ManagedIdentityClientId = clientId;
                 var client = new BlobServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), blobOptions);
                 return (client, message);
