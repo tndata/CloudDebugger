@@ -7,7 +7,7 @@ namespace CloudDebugger.Features.ConnectionStrings;
 /// 
 /// * Lists all the connection strings found by ASP.NET Core
 /// 
-/// * Documentatioin
+/// * Documentation
 ///   https://github.com/tndata/CloudDebugger/wiki/ConnectionStrings 
 /// </summary>
 public class ConnectionStringsController : Controller
