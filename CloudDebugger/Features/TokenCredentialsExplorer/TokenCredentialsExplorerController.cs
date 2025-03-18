@@ -24,7 +24,7 @@ public class TokenCredentialsExplorerController : Controller
 
         if (credential == 0 && clientId == null)
         {
-            clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? "KALLE!";
+            clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
         }
 
         var model = new TokenCredentialsExplorerModel()
