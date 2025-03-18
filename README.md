@@ -34,7 +34,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 * [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
 * [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
 * [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
-* [Token Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
+* [TokenCredentials Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 ### Diagnostics and system information
 * [App Configuration](https://github.com/tndata/CloudDebugger/wiki/Configuration)
