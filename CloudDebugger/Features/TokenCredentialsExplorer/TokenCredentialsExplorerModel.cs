@@ -10,6 +10,11 @@ public class TokenCredentialsExplorerModel
     public AccessToken AccessToken { get; set; }
 
     /// <summary>
+    /// Optional ClientID, to be used for example if you have muliple user-assigned Managed Identities.
+    /// </summary>
+    public string? ClientId { get; set; }
+
+    /// <summary>
     /// Optional message to display next to the selected token credential details
     /// </summary>
     public string? CredentialMessage { get; set; }

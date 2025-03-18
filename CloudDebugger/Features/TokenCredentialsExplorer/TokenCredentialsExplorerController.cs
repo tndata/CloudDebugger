@@ -17,14 +17,20 @@ public class TokenCredentialsExplorerController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index(int credential = 0)
+    public IActionResult Index(int credential = 0, string? clientId = null)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+        if (credential == 0 && clientId == null)
+        {
+            clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? "KALLE!";
+        }
+
         var model = new TokenCredentialsExplorerModel()
         {
-            CurrentCredentialIndex = credential
+            CurrentCredentialIndex = credential,
+            ClientId = clientId
         };
 
         var result = new List<string>();
@@ -35,7 +41,7 @@ public class TokenCredentialsExplorerController : Controller
         CredentialResult? cred = null;
         try
         {
-            cred = CreateTokenCredentialInstance(credential);
+            cred = CreateTokenCredentialInstance(credential, clientId);
 
             if (cred != null && cred.Credential != null)
             {
@@ -70,7 +76,7 @@ public class TokenCredentialsExplorerController : Controller
         return View(model);
     }
 
-    private static CredentialResult? CreateTokenCredentialInstance(int credential)
+    private static CredentialResult? CreateTokenCredentialInstance(int credential, string? clientId)
     {
 
         return credential switch
@@ -83,11 +89,11 @@ public class TokenCredentialsExplorerController : Controller
             6 => CreateClientAssertionCredential(),
             7 => CreateClientCertificateCredential(),
             8 => CreateClientSecretCredential(),
-            9 => CreateDefaultAzureCredential(),
+            9 => CreateDefaultAzureCredential(clientId),
             10 => CreateDeviceCodeCredential(),
             11 => CreateEnvironmentCredential(),
             12 => CreateInteractiveBrowserCredential(),
-            13 => CreateManagedIdentityCredential(),
+            13 => CreateManagedIdentityCredential(clientId),
             14 => CreateOnBehalfOfCredential(),
             15 => CreateSharedTokenCacheCredential(),
             16 => CreateUsernamePasswordCredential(),
@@ -182,10 +188,11 @@ public class TokenCredentialsExplorerController : Controller
         throw new NotImplementedException();
     }
 
-    private static CredentialResult CreateDefaultAzureCredential()
+    private static CredentialResult CreateDefaultAzureCredential(string? clientId)
     {
         var options = new DefaultAzureCredentialOptions
         {
+
             Diagnostics =
                         {
                             IsLoggingEnabled = true,
@@ -195,8 +202,12 @@ public class TokenCredentialsExplorerController : Controller
                             IsLoggingContentEnabled=true,
                             IsDistributedTracingEnabled=true,
                             IsTelemetryEnabled=true
-                        },
+                        }
         };
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            options.ManagedIdentityClientId = clientId;
+        }
 
         //We use our custom hacked version for improved insights
         var credential = new MyDefaultAzureCredential(options);
@@ -251,10 +262,8 @@ public class TokenCredentialsExplorerController : Controller
         return new() { Credential = credential, Message = "This credential is designed for non-browser-based applications, such as console, desktop, or mobile apps, and will not work in browser-based applications." };
     }
 
-    private static CredentialResult CreateManagedIdentityCredential()
+    private static CredentialResult CreateManagedIdentityCredential(string? clientId)
     {
-        var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
-
         if (!string.IsNullOrEmpty(clientId))
         {
             // User-assigned managed identity  
@@ -272,7 +281,7 @@ public class TokenCredentialsExplorerController : Controller
                         }
             });
 
-            return new() { Credential = credential, Message = "This credential works only within Azure. For a user-assigned managed identity, the AZURE_CLIENT_ID environment variable must be set with the Client ID. If not provided, the system-assigned managed identity is used." };
+            return new() { Credential = credential, Message = "This credential works only within Azure. You may need to provide an optional ClientId." };
         }
         else
         {
