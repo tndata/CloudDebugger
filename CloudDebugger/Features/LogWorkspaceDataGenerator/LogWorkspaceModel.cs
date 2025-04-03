@@ -5,9 +5,6 @@ namespace CloudDebugger.Features.LogWorkspaceDataGenerator;
 public class LogWorkspaceModel
 {
     [Required]
-    public string? LogMessage { get; set; }
-
-    [Required]
     /// <summary>
     /// The name of the table to write to in Log Analytics workspace
     /// </summary>

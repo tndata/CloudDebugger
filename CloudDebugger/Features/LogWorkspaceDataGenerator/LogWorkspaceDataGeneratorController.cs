@@ -24,7 +24,6 @@ public class LogWorkspaceDataGeneratorController : Controller
     {
         var model = new LogWorkspaceModel()
         {
-            LogMessage = "This is my custom message",
             LogType = "MyCustomerData",
             WorkspaceId = HttpContext.Session.GetString(workspaceId),
             WorkspaceKey = HttpContext.Session.GetString(workspaceKey)
