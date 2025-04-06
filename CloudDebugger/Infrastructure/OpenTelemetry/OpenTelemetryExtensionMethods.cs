@@ -8,6 +8,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace CloudDebugger.Infrastructure.OpenTelemetry;
 
@@ -75,8 +76,10 @@ public static class OpenTelemetryExtensionMethods
         ICollection<Metric> exportedMetricItems = OpenTelemetryObserver.MetricItemsLog;
         ICollection<LogRecord> exportedLogItems = OpenTelemetryObserver.LogItemsLog;
 
+        var serviceName = GetServiceName();
+
         builder.Services.AddOpenTelemetry()
-            .ConfigureResource(r => r.AddService("CloudDebugger"))
+            .ConfigureResource(r => r.AddService(serviceName))
             .WithLogging(logging =>
             {
                 logging.AddProcessor(new SimpleLogRecordExportProcessor(new CustomConsoleExporter()));
@@ -85,9 +88,9 @@ public static class OpenTelemetryExtensionMethods
             .WithMetrics(metrics =>
             {
                 metrics.AddInMemoryExporter(exportedMetricItems, o =>
-                       {
-                           o.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000;
-                       })
+                {
+                    o.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000;
+                })
                        .AddPrometheusExporter();
 
                 //Custom Histogram with fixed custom bucket sizes
@@ -155,6 +158,45 @@ public static class OpenTelemetryExtensionMethods
 
 
     /// <summary>
+    /// Try to get the name of this service (App Service, Container Instance or Container App)
+    /// We do this to try to improve the service name in Application Insights or Jaeger.
+    /// </summary>
+    /// <returns></returns>
+    private static string GetServiceName()
+    {
+        //Running as App Service?
+        var serviceName = Environment.GetEnvironmentVariable("APPSETTING_WEBSITE_SITE_NAME");
+        if (serviceName is not null)
+            return serviceName;
+
+        //Running as Container Instance?
+        var isACI = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true" &&
+                    Environment.GetEnvironmentVariable("Fabric_ApplicationName") != null;
+        if (isACI)
+        {
+            return "Azure Container Instance";
+        }
+
+        // Running as a Container App?
+        serviceName = Environment.GetEnvironmentVariable("CONTAINER_APP_REPLICA_NAME");
+        if (serviceName is not null)
+        {
+            return serviceName; //For example 'ca-clouddebugger--6iru8hr-7f5846586f-s2v5h'
+        }
+
+        // Default service name 
+        //Use a generic service name for OTEL
+        serviceName = "CloudDebugger-Linux";
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            serviceName = "CloudDebugger-Windows";
+        }
+
+        return serviceName;
+    }
+
+
+    /// <summary>
     /// Important, UseMyAzureMonitor will crash with an exception if the connection string is missing :-(
     /// </summary>
     /// <param name="builder"></param>
@@ -165,6 +207,8 @@ public static class OpenTelemetryExtensionMethods
 
         Log.Information("Application Insights enabled.");
         Log.Information($"ConnectionString: {connectionString}");
+
+
 
         builder.Services.AddOpenTelemetry()
                         .UseAzureMonitor(o =>

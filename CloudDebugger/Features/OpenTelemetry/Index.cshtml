@@ -6,7 +6,8 @@
 Tools related to OpenTelemetry.
 <br />
 <br />
-
+<br />
+<h4>Generate metrics and traces</h4>
 <a href="/OpenTelemetry/SimpleTrace">Create a simple trace</a>
 <br />
 <a href="/OpenTelemetry/ComplexTrace">Create a complex trace</a>
@@ -34,6 +35,32 @@ Tools related to OpenTelemetry.
 <br />
 <br />
 <br />
+<h4>OpenTelemetry configuration variables</h4>
+Set these variables to enable Application Insights or to export data to a general OTEL endpoint like Jaeger.  
+@{
+    var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING") ?? "[Not set]";
+    var otlpServer = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "[Not set]";
+    
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th class="col-md-2">Environment Variable</th>
+                <th class="col-md-10">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="col-md-2">APPLICATIONINSIGHTS_CONNECTION_STRING</td>
+                <td class="col-md-10">@connectionString</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">OTEL_EXPORTER_OTLP_ENDPOINT</td>
+                <td class="col-md-10">@otlpServer</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
 <br />
 
 
