@@ -146,14 +146,18 @@ public static class OpenTelemetryExtensionMethods
 
         builder.Logging.AddFilter("Default", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("System.Net", LogLevel.Debug);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("System.Net.Http.HttpClient", LogLevel.Information);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger", LogLevel.Trace);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore", LogLevel.Warning);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.Mvc", LogLevel.Warning);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Information);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.Server.Kestrel", LogLevel.Information);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.Hosting.Lifetime", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.HttpOverrides", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger.Infrastructure.Middlewares", LogLevel.Warning);
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
     }
 
 
