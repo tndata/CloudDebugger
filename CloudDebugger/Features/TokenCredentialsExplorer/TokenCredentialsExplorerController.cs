@@ -255,7 +255,7 @@ public class TokenCredentialsExplorerController : Controller
                             IsAccountIdentifierLoggingEnabled=true,
                             IsLoggingContentEnabled=true,
                             IsDistributedTracingEnabled=true,
-                IsTelemetryEnabled=true
+                            IsTelemetryEnabled=true
                         }
         });
 
