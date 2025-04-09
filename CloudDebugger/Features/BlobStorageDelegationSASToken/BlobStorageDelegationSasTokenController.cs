@@ -71,6 +71,8 @@ public class BlobStorageDelegationSasTokenController : Controller
             var userDelegationKey = client.GetUserDelegationKey(startsOn, expiresOn);
             model.DelegationKey = userDelegationKey;
 
+            model.CorrelationId = Guid.NewGuid().ToString();
+
             // Step #4, Define the permissions for the SAS token
             var sasBuilder = new BlobSasBuilder()
             {
@@ -78,7 +80,8 @@ public class BlobStorageDelegationSasTokenController : Controller
                 BlobName = blobName,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow,
-                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
+                CorrelationId = model.CorrelationId
             };
 
             // Step #5, Specify the necessary permissions

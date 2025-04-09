@@ -34,6 +34,15 @@ public class UserDelegationModel
     public string? BlobUrl { get; set; }
 
     /// <summary>
+    /// The CorrelationId field in BlobSasBuilder lets you attach a custom ID to the SAS token so that its 
+    /// usage can be traced in Azure Storage logs and matched with your own audit records.
+    /// See https://learn.microsoft.com/en-us/rest/api/storageservices/create-user-delegation-sas
+    /// </summary>
+    public string? CorrelationId { get; set; }
+
+
+
+    /// <summary>
     /// The delegation key received from Entra ID to sign the SAS token
     /// </summary>
     public UserDelegationKey? DelegationKey { get; set; }

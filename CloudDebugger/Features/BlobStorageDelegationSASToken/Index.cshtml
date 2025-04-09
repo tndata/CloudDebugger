@@ -152,6 +152,13 @@ To get this to work, the following requirements must be met:
                 @Model.DelegationKey.Value (The key as a base64 string.)
             </td>
         </tr>
+        <tr>
+            <td class="col-md-2">CorrelationId</td>
+            <td class="col-md-10">
+                @Model.CorrelationId
+                <br>This ID is included in the SAS token and can be used to trace requests in Azure Storage logs and link them to your own audit records.
+            </td>
+        </tr>
     </table>
 }
 
