@@ -20,6 +20,12 @@
         <tr>
             <td>
                 <pre>
+
+int UserId = 1234;
+string UserName = "John Doe";
+string IpAddress = "123.012.194.254";
+DateTime ExpireDate = DateTime.UtcNow.AddDays(30);
+
 log.LogWarning($"The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}");
                 </pre>
             </td>
@@ -31,6 +37,11 @@ log.LogWarning($"The user {UserName} with id {UserId} has an IP address of {IpAd
         <tr>
             <td>
                 <pre>
+int UserId = 1234;
+string UserName = "John Doe";
+string IpAddress = "123.012.194.254";
+DateTime ExpireDate = DateTime.UtcNow.AddDays(30);
+
 log.LogWarning("The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}", 
                UserName, UserId, IpAddress, ExpireDate);
                 </pre>
