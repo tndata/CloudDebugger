@@ -117,4 +117,59 @@ public class LoggingController : Controller
         var log = loggerFactory.CreateLogger(logCategory ?? typeof(LoggingController).FullName!);
         log.Log(logLevel, "This message was written with the {LogLevel} log level. {Message}", logLevel, filteredMessage);
     }
+
+
+
+    public IActionResult StructuredLogging()
+    {
+        return View(new StructuredLoggingModel());
+    }
+
+
+    /// <summary>
+    /// Unstructured logging vs. Structured logging example.
+    /// Shows the difference between using string formatting and structured message templates.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public IActionResult StructuredLogging(StructuredLoggingModel model)
+    {
+        try
+        {
+            model.Message = "";
+            model.Exception = "";
+
+            if (ModelState.IsValid)
+            {
+
+                int UserId = 1234;
+                string UserName = "John Doe";
+                string IpAddress = "123.012.194.254";
+                DateTime ExpireDate = DateTime.UtcNow.AddDays(30);
+
+                var log = loggerFactory.CreateLogger(typeof(LoggingController).FullName!);
+
+
+                // Unstructured logging — values are part of the message string.
+                // Tools can't easily extract them.
+#pragma warning disable S2629, CA2254 // Disable specific warnings for this line
+                log.LogWarning($"The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}");
+
+                // This is how to do it!
+                // Structured logging — values are passed separately.
+                // This allows tools to extract and query them.
+                log.LogWarning("The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}", UserName, UserId, IpAddress, ExpireDate);
+
+
+                model.Message = "Log messages written successfully!";
+            }
+        }
+        catch (Exception exc)
+        {
+            model.Exception = exc.ToString();
+        }
+
+        return View(model);
+    }
 }

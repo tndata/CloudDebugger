@@ -1,0 +1,69 @@
+﻿@model CloudDebugger.Features.Logging.StructuredLoggingModel
+@{
+    ViewData["Title"] = "Cloud Debugger - Unstructured vs. Structured Logging";
+}
+
+<h3>Unstructured vs. Structured Logging</h3>
+
+<p>
+    This tool writes two log entries using different approaches.
+    One uses string interpolation (unstructured logging), and the other uses structured logging with message templates.
+    After you run it, you can compare the result in your <a href="https://localhost:5001/OpenTelemetryLogViewer/ViewLogs" target="_blank">log viewer</a> or in Log Analytics Workspaces.
+</p>
+
+<form asp-controller="Logging" asp-action="StructuredLogging" method="post">
+
+    <table class="table">
+        <tr>
+            <td><h4>Unstructured logging</h4></td>
+        </tr>
+        <tr>
+            <td>
+                <pre>
+log.LogWarning($"The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}");
+                </pre>
+            </td>
+        </tr>
+
+        <tr>
+            <td><h4>Structured logging</h4></td>
+        </tr>
+        <tr>
+            <td>
+                <pre>
+log.LogWarning("The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}", 
+               UserName, UserId, IpAddress, ExpireDate);
+                </pre>
+            </td>
+        </tr>
+    </table>
+
+    <div class="form-group mt-3">
+        <input type="submit" class="btn btn-primary" value="Write both to the log" />
+    </div>
+
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Exception))
+    {
+        <div class="alert alert-danger" role="alert">
+            <pre>@Model.Exception</pre>
+        </div>
+    }
+
+    @if (!String.IsNullOrWhiteSpace(Model?.Message))
+    {
+        <b>@Model.Message</b>
+    }
+
+</form>
+
+<br>
+<br>
+<br>
+
+<h5>Resources</h5>
+<ul>
+    <li><a href="https://github.com/tndata/CloudDebugger/wiki/Logging" target="_blank">Documentation</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging" target="_blank">Logging in .NET Core and ASP.NET Core</a></li>
+</ul>
+
