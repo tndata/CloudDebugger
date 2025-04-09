@@ -15,18 +15,18 @@
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Messaging.EventGrid" Version="4.30.0" />
-		<PackageReference Include="Azure.Messaging.EventHubs" Version="5.11.6" />
+		<PackageReference Include="Azure.Messaging.EventHubs" Version="5.12.0" />
 		<PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />
 		<PackageReference Include="Azure.Storage.Queues" Version="12.22.0" />
 		<PackageReference Include="Flurl.Http" Version="4.0.2" />
 		<PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.2.1" />
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.4" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.2" />
 		<PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.11.2" />
 		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.2" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.10.0-beta.1" />
-		<PackageReference Include="System.Formats.Asn1" Version="9.0.3" />
+		<PackageReference Include="System.Formats.Asn1" Version="9.0.4" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
 		<PackageReference Include="Azure.Storage.Blobs.ChangeFeed" Version="12.0.0-preview.49" />
 	</ItemGroup>

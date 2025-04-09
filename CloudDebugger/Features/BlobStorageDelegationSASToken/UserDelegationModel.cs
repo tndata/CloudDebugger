@@ -40,8 +40,6 @@ public class UserDelegationModel
     /// </summary>
     public string? CorrelationId { get; set; }
 
-
-
     /// <summary>
     /// The delegation key received from Entra ID to sign the SAS token
     /// </summary>
