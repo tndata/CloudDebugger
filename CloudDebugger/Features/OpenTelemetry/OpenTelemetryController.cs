@@ -246,7 +246,6 @@ public class OpenTelemetryController : Controller
                         activity.SetTag("custom.month", DateTime.UtcNow.Month);
 
                         var traceId = Activity.Current?.TraceId.ToString() ?? "[Unknown]";
-
                         model.Message = $"Activity and custom event sent to OpenTelemetry. TraceID={traceId}";
                     }
                     else
