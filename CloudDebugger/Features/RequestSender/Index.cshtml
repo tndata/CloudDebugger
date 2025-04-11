@@ -79,6 +79,13 @@ This tool allows you to send HTTP requests to a URL and see the response.
                     <pre style="white-space: pre-wrap; word-break: break-word;">@Model.ResponseBody</pre>
                 </td>
             </tr>
+            @if (System.Diagnostics.Activity.Current?.TraceId != null)
+            {
+                <tr>
+                    <td class="col-md-2">TraceID</td>
+                    <td class="col-md-10">@System.Diagnostics.Activity.Current.TraceId.ToString()</td>
+                </tr>
+            }
         </table>
     }
 
