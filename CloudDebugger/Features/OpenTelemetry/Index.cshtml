@@ -1,4 +1,5 @@
-﻿@{
+﻿@using CloudDebugger.Infrastructure.OpenTelemetry
+@{
     ViewData["Title"] = "Cloud Debugger - OpenTelemetry Tools";
 }
 
@@ -44,7 +45,7 @@ Set these variables to enable Application Insights or to export data to a genera
     <table class="table table-striped table-bordered">
         <thead class="thead-dark">
             <tr>
-                <th class="col-md-2">Environment Variable</th>
+                <th class="col-md-2">OpenTelemetry Configuration</th>
                 <th class="col-md-10">Value</th>
             </tr>
         </thead>
@@ -56,6 +57,14 @@ Set these variables to enable Application Insights or to export data to a genera
             <tr>
                 <td class="col-md-2">OTEL_EXPORTER_OTLP_ENDPOINT</td>
                 <td class="col-md-10">@otlpServer</td>
+            </tr>  
+            <tr>
+                <td class="col-md-2">Service Name</td>
+                <td class="col-md-10">@OpenTelemetryExtensionMethods.GetServiceName()</td>
+            </tr>
+            <tr>
+                <td class="col-md-2">Instance Name</td>
+                <td class="col-md-10">@OpenTelemetryExtensionMethods.GetInstanceId()</td>
             </tr>
         </tbody>
     </table>

@@ -77,9 +77,17 @@ public static class OpenTelemetryExtensionMethods
         ICollection<LogRecord> exportedLogItems = OpenTelemetryObserver.LogItemsLog;
 
         var serviceName = GetServiceName();
+        var instanceId = GetInstanceId();
+
+        var serviceInstanceId = $"{serviceName}";
+        if (!serviceInstanceId.Contains(serviceName))
+        {
+            //If the service name is not in the instance id, we will add it. To make it more human-readable.
+            serviceInstanceId = $"{serviceName}-{serviceInstanceId}";
+        }
 
         builder.Services.AddOpenTelemetry()
-            .ConfigureResource(r => r.AddService(serviceName))
+            .ConfigureResource(r => r.AddService(serviceName, serviceInstanceId: serviceInstanceId))
             .WithLogging(logging =>
             {
                 logging.AddProcessor(new SimpleLogRecordExportProcessor(new CustomConsoleExporter()));
@@ -157,7 +165,6 @@ public static class OpenTelemetryExtensionMethods
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.HttpOverrides", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger.Infrastructure.Middlewares", LogLevel.Warning);
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
-
     }
 
 
@@ -166,7 +173,7 @@ public static class OpenTelemetryExtensionMethods
     /// We do this to try to improve the service name in Application Insights or Jaeger.
     /// </summary>
     /// <returns></returns>
-    private static string GetServiceName()
+    public static string GetServiceName()
     {
         //Running as App Service?
         var serviceName = Environment.GetEnvironmentVariable("APPSETTING_WEBSITE_SITE_NAME");
@@ -182,7 +189,7 @@ public static class OpenTelemetryExtensionMethods
         }
 
         // Running as a Container App?
-        serviceName = Environment.GetEnvironmentVariable("CONTAINER_APP_REPLICA_NAME");
+        serviceName = Environment.GetEnvironmentVariable("CONTAINER_APP_NAME");
         if (serviceName is not null)
         {
             return serviceName; //For example 'ca-clouddebugger--6iru8hr-7f5846586f-s2v5h'
@@ -197,6 +204,27 @@ public static class OpenTelemetryExtensionMethods
         }
 
         return serviceName;
+    }
+
+    /// <summary>
+    /// Try to get the name of this service Instance
+    /// </summary>
+    /// <returns></returns>
+    public static string GetInstanceId()
+    {
+        // App Service
+        var websiteId = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
+        if (!string.IsNullOrEmpty(websiteId))
+            return websiteId;
+
+        // Container Apps
+        var containerAppId = Environment.GetEnvironmentVariable("CONTAINER_APP_REPLICA_NAME");
+        if (!string.IsNullOrEmpty(containerAppId))
+            return containerAppId;
+
+        // Container Instances or fallback
+        var machineName = Environment.MachineName;
+        return machineName;
     }
 
 
