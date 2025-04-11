@@ -3,6 +3,7 @@
 public class ViewTracesModel
 {
     public List<TraceEntry>? Entries { get; set; }
+    public string? TraceId { get; set; }
 }
 
 public class TraceEntry

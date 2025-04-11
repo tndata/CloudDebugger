@@ -23,11 +23,12 @@ public class OpenTelemetryTracesViewerController : Controller
     {
     }
 
-    public IActionResult ViewTraces()
+    public IActionResult ViewTraces(string? TraceId = null)
     {
         var model = new ViewTracesModel()
         {
-            Entries = RenderTraceData(OpenTelemetryObserver.TraceItemsLog)
+            Entries = RenderTraceData(OpenTelemetryObserver.TraceItemsLog, TraceId),
+            TraceId = TraceId,
         };
 
         return View(model);
@@ -49,7 +50,7 @@ public class OpenTelemetryTracesViewerController : Controller
     /// </summary>
     /// <param name="traceLog"></param>
     /// <returns></returns>
-    private static List<TraceEntry> RenderTraceData(ICollection<Activity> traceLog)
+    private static List<TraceEntry> RenderTraceData(ICollection<Activity> traceLog, string? traceId)
     {
         var result = new List<TraceEntry>();
 
@@ -80,7 +81,7 @@ public class OpenTelemetryTracesViewerController : Controller
 
             RenderTraceLinks(entry, sb);
 
-            if (!IgnoreEntry(entry))
+            if (!IgnoreEntry(entry, traceId))
             {
                 result.Add(new TraceEntry()
                 {
@@ -170,8 +171,8 @@ public class OpenTelemetryTracesViewerController : Controller
     /// 
     /// </summary>
     /// <param name="entry"></param>
-    /// <returns></returns>
-    private static bool IgnoreEntry(Activity entry)
+    /// <returns>Return True if we should ignore this entry</returns>
+    private static bool IgnoreEntry(Activity entry, string? traceId)
     {
         var fullUrl = entry.Tags.FirstOrDefault(tag => tag.Key == "url.full").Value;
 
@@ -186,6 +187,14 @@ public class OpenTelemetryTracesViewerController : Controller
             if (urlPath.StartsWith("/_framework"))
                 return true;
             if (urlPath.StartsWith("/OpenTelemetry"))
+                return true;
+        }
+
+
+        // If a traceId is provided by th user, then we only show traces with this ID
+        if (!string.IsNullOrEmpty(traceId))
+        {
+            if (entry.TraceId.ToString() != traceId.Trim())
                 return true;
         }
 
