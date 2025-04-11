@@ -245,7 +245,9 @@ public class OpenTelemetryController : Controller
                         activity.SetTag("custom.today", DateTime.UtcNow.Day);
                         activity.SetTag("custom.month", DateTime.UtcNow.Month);
 
-                        model.Message = "Activity and custom event sent to OpenTelemetry.";
+                        var traceId = Activity.Current?.TraceId.ToString() ?? "[Unknown]";
+
+                        model.Message = $"Activity and custom event sent to OpenTelemetry. TraceID={traceId}";
                     }
                     else
                     {
@@ -303,7 +305,10 @@ public class OpenTelemetryController : Controller
                         await DoWork4();
                         await DoWork5(model);
                     }
-                    model.Message = "Complex trace sent to OpenTelemetry";
+
+                    var traceId = Activity.Current?.TraceId.ToString() ?? "[Unknown]";
+
+                    model.Message = $"Complex trace sent to OpenTelemetry. TraceID={traceId}";
                 }
             }
         }
