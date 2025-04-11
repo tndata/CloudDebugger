@@ -188,6 +188,10 @@ public class OpenTelemetryTracesViewerController : Controller
                 return true;
             if (urlPath.StartsWith("/OpenTelemetry"))
                 return true;
+            if (urlPath.StartsWith("/lib"))
+                return true;
+            if (urlPath.StartsWith("/js"))
+                return true;
         }
 
 
