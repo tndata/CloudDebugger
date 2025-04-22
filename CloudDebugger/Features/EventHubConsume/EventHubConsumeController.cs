@@ -121,7 +121,7 @@ public class EventHubConsumeController : Controller
         long sequenceNumber = @event.Data.SequenceNumber;
         entry.EventDetails.Add($"SequenceNumber: {sequenceNumber}");
 
-        entry.Offset = @event.Data.Offset;
+        entry.Offset = @event.Data.OffsetString;
 
         var properties = @event.Data.Properties;
         foreach (var property in properties)

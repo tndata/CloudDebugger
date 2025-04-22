@@ -129,50 +129,59 @@ public class BlobStorageEditorController : Controller
 
             if (model.HierarchicalNamespaceEnabled)
             {
-                var blobs = container.GetBlobsByHierarchy(traits: BlobTraits.Metadata, states: BlobStates.None, delimiter: "/", prefix: model.Path).ToList();
-
-                result.Add(("/", ""));
-
-                foreach (var blob in blobs)
-                {
-                    // Is it a folder?
-                    if (blob.IsPrefix)
-                    {
-                        result.Add(("/" + blob.Prefix, ""));
-                    }
-                    else
-                    {
-                        var blobSize = blob.Blob.Properties.ContentLength ?? 0;
-                        result.Add((blob.Blob.Name, blobSize.ToString()));
-                    }
-                }
+                GetAllBlobsInHierachialBlogStorage(model, result, container);
             }
             else
             {
-                var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
-
-                // Always add an root element to the list, for easier navigation.
-                result.Add(("/", ""));
-
-                foreach (var blob in blobs)
-                {
-                    // Is it a folder?
-                    if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
-                    {
-                        result.Add(("/" + blob.Name, ""));
-                    }
-                    else
-                    {
-                        var blobSize = blob.Properties.ContentLength ?? 0;
-                        result.Add((blob.Name, blobSize.ToString()));
-                    }
-                }
+                GetBlogsInNormalStorageAccount(model, result, container);
             }
         }
 
         return result;
     }
 
+    private static void GetBlogsInNormalStorageAccount(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container)
+    {
+        var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
+
+        // Always add an root element to the list, for easier navigation.
+        result.Add(("/", ""));
+
+        foreach (var blob in blobs)
+        {
+            // Is it a folder?
+            if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
+            {
+                result.Add(("/" + blob.Name, ""));
+            }
+            else
+            {
+                var blobSize = blob.Properties.ContentLength ?? 0;
+                result.Add((blob.Name, blobSize.ToString()));
+            }
+        }
+    }
+
+    private static void GetAllBlobsInHierachialBlogStorage(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container)
+    {
+        var blobs = container.GetBlobsByHierarchy(traits: BlobTraits.Metadata, states: BlobStates.None, delimiter: "/", prefix: model.Path).ToList();
+
+        result.Add(("/", ""));
+
+        foreach (var blob in blobs)
+        {
+            // Is it a folder?
+            if (blob.IsPrefix)
+            {
+                result.Add(("/" + blob.Prefix, ""));
+            }
+            else
+            {
+                var blobSize = blob.Blob.Properties.ContentLength ?? 0;
+                result.Add((blob.Blob.Name, blobSize.ToString()));
+            }
+        }
+    }
 
     private static (BlobDetails? blobDetails, string? blobContent) LoadBlob(BlobStorageModel model, BlobServiceClient client)
     {

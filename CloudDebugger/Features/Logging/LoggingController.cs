@@ -153,12 +153,13 @@ public class LoggingController : Controller
 
                 // Unstructured logging — values are part of the message string.
                 // Tools can't easily extract them.
-#pragma warning disable S2629, CA2254 // Disable specific warnings for this line
+#pragma warning disable S6664, S2629, CA2254 // Disable specific warnings for this line
                 log.LogWarning($"The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}");
 
                 // This is how to do it!
                 // Structured logging — values are passed separately.
                 // This allows tools to extract and query them.
+#pragma warning disable S6664
                 log.LogWarning("The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}", UserName, UserId, IpAddress, ExpireDate);
 
 

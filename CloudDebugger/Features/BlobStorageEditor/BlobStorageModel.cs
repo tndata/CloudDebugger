@@ -26,6 +26,7 @@ public class BlobStorageModel
     /// True if we should use the hierarchical namespace feature of the blob storage.
     /// (ie using the GetBlobsByHierarchyAsync method instead of the GetBlobs SDK method).
     /// </summary>
+    [JsonRequired]
     public bool HierarchicalNamespaceEnabled { get; set; }
 
     /// <summary>

@@ -42,7 +42,7 @@ public class WebHookLog : IWebHookLog
         //Return a new list to avoid any enumeration errors
         lock (lockObj)
         {
-            return new List<WebHookLogEntry>(Log);
+            return new(Log);
         }
     }
 

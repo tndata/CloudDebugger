@@ -79,11 +79,11 @@ public static class OpenTelemetryExtensionMethods
         var serviceName = GetServiceName();
         var instanceId = GetInstanceId();
 
-        var serviceInstanceId = $"{serviceName}";
+        var serviceInstanceId = $"{instanceId}";
         if (!serviceInstanceId.Contains(serviceName))
         {
             //If the service name is not in the instance id, we will add it. To make it more human-readable.
-            serviceInstanceId = $"{serviceName}-{serviceInstanceId}";
+            serviceInstanceId = $"{serviceName}-{instanceId}";
         }
 
         builder.Services.AddOpenTelemetry()

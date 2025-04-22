@@ -180,28 +180,29 @@ public class OpenTelemetryTracesViewerController : Controller
             return true;
 
         var urlPath = entry.Tags.FirstOrDefault(tag => tag.Key == "url.path").Value;
-        if (!string.IsNullOrEmpty(urlPath))
-        {
-            if (urlPath.StartsWith("/_vs"))
-                return true;
-            if (urlPath.StartsWith("/_framework"))
-                return true;
-            if (urlPath.StartsWith("/OpenTelemetry"))
-                return true;
-            if (urlPath.StartsWith("/lib"))
-                return true;
-            if (urlPath.StartsWith("/js"))
-                return true;
-        }
-
+        if (IsIgnoredPath(urlPath))
+            return true;
 
         // If a traceId is provided by th user, then we only show traces with this ID
-        if (!string.IsNullOrEmpty(traceId))
-        {
-            if (entry.TraceId.ToString() != traceId.Trim())
-                return true;
-        }
+        if (!string.IsNullOrEmpty(traceId) && entry.TraceId.ToString() != traceId.Trim())
+            return true;
 
         return false;
+    }
+
+    private static bool IsIgnoredPath(string? path)
+    {
+        if (string.IsNullOrEmpty(path)) return false;
+
+        var ignoredPrefixes = new[]
+        {
+        "/_vs",
+        "/_framework",
+        "/OpenTelemetry",
+        "/lib",
+        "/js"
+    };
+
+        return Array.Exists(ignoredPrefixes, prefix => path.StartsWith(prefix));
     }
 }
