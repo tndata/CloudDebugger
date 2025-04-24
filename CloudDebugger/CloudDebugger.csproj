@@ -4,7 +4,6 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PlatformTarget>x64</PlatformTarget>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
 		<ResourceLanguages>en</ResourceLanguages>
