@@ -11,13 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Core" Version="1.45.0" />
+		<PackageReference Include="Azure.Core" Version="1.46.1" />
 		<PackageReference Include="System.Memory" Version="4.6.3" />
-		<PackageReference Include="System.Text.Json" Version="9.0.4" />
+		<PackageReference Include="System.Text.Json" Version="9.0.5" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
-		<PackageReference Include="Microsoft.Identity.Client" Version="4.70.1" />
-		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.70.1" />
-		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.72.0" />
+		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.72.0" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.5" />
 	</ItemGroup>
 
 </Project>
