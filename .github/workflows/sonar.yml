@@ -25,12 +25,10 @@ jobs:
         run: dotnet build
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          # Additional properties can be set here
-          projectBaseDir: .
           args: >
             -Dsonar.projectKey=tndata_CloudDebugger
             -Dsonar.organization=tndata
