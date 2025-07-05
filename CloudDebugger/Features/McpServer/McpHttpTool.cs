@@ -20,27 +20,27 @@ public static class McpHttpTools
 
     [McpServerTool(Name = "http_get")]
     [Description("Make an HTTP GET request to the specified URL and return the response")]
-    public static async Task<object> HttpGet(string url)
+    public static async Task<object> HttpGet(string targetUrl)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(url))
+            if (string.IsNullOrWhiteSpace(targetUrl))
             {
                 return new
                 {
                     success = false,
                     error = "URL cannot be empty",
-                    url
+                    targetUrl
                 };
             }
 
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            if (!Uri.TryCreate(targetUrl, UriKind.Absolute, out var uri))
             {
                 return new
                 {
                     success = false,
                     error = "Invalid URL format",
-                    url
+                    targetUrl
                 };
             }
 
@@ -56,7 +56,7 @@ public static class McpHttpTools
             return new
             {
                 success = true,
-                url,
+                targetUrl,
                 status_code = (int)response.StatusCode,
                 status_text = response.StatusCode.ToString(),
                 is_success = response.IsSuccessStatusCode,
@@ -75,7 +75,7 @@ public static class McpHttpTools
             {
                 success = false,
                 error = $"HTTP request failed: {ex.Message}",
-                url,
+                targetUrl,
                 exception_type = "HttpRequestException"
             };
         }
@@ -85,7 +85,7 @@ public static class McpHttpTools
             {
                 success = false,
                 error = "Request timed out after 30 seconds",
-                url,
+                targetUrl,
                 exception_type = "TimeoutException"
             };
         }
@@ -95,7 +95,7 @@ public static class McpHttpTools
             {
                 success = false,
                 error = "Request was cancelled",
-                url = url,
+                targetUrl,
                 exception_type = "TaskCanceledException"
             };
         }
@@ -105,7 +105,7 @@ public static class McpHttpTools
             {
                 success = false,
                 error = $"Invalid URL format: {ex.Message}",
-                url,
+                targetUrl,
                 exception_type = "UriFormatException"
             };
         }
@@ -115,7 +115,7 @@ public static class McpHttpTools
             {
                 success = false,
                 error = $"Unexpected error: {ex.Message}",
-                url,
+                targetUrl,
                 exception_type = ex.GetType().Name
             };
         }

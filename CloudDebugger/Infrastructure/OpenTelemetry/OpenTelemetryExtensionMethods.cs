@@ -48,7 +48,7 @@ public static class OpenTelemetryExtensionMethods
         builder.Logging.ClearProviders();
 
         //Configure OpenTelemetry with the default setup
-        ConfigurDefaultOpenTelemetry(builder);
+        ConfigureDefaultOpenTelemetry(builder);
 
         var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
         if (!string.IsNullOrEmpty(connectionString))
@@ -65,7 +65,7 @@ public static class OpenTelemetryExtensionMethods
     /// https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md
     /// </summary>
     /// <param name="builder"></param>
-    private static void ConfigurDefaultOpenTelemetry(WebApplicationBuilder builder)
+    private static void ConfigureDefaultOpenTelemetry(WebApplicationBuilder builder)
     {
         Log.Information("Configuring and using Default OpenTelemetrySupport (Console and in-memory exporter)");
 
