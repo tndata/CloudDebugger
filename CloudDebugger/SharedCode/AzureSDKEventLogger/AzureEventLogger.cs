@@ -3,6 +3,9 @@ using System.Text;
 
 namespace CloudDebugger.SharedCode.AzureSdkEventLogger;
 
+#pragma warning disable IDE0306
+#pragma warning disable IDE0028
+
 /// <summary>
 /// Logger for all the events from the Azure SDK
 /// </summary>
@@ -19,6 +22,7 @@ public static class AzureEventLogger
         {
             lock (lockObj)
             {
+
                 return new List<EventLogEntry>(log);
             }
         }
@@ -27,8 +31,8 @@ public static class AzureEventLogger
     /// <summary>
     /// We don't render the message, as its part of the payload.
     /// </summary>
-    /// <param name="evnt"></param>
-    public static void AddEventToLog(EventWrittenEventArgs evnt)
+    /// <param name="event"></param>
+    public static void AddEventToLog(EventWrittenEventArgs @event)
     {
         var sb = new StringBuilder();
 
@@ -36,23 +40,23 @@ public static class AzureEventLogger
 
         sb.AppendLine();
         sb.AppendLine();
-        sb.AppendLine($"ActivityId: {evnt.ActivityId}");        //The activity ID on the thread that the event was written to.
-        sb.AppendLine($"EventID: {evnt.EventId}");              //The event identifier.
-        sb.AppendLine($"EventName: {evnt.EventName}");          //The name of the event.
-        sb.AppendLine($"EventSource: {evnt.EventSource.Name}");
-        sb.AppendLine($"Keywords: {evnt.Keywords}");            //The keywords for the event.
-        sb.AppendLine($"Level: {evnt.Level}");                  //The level of the event.
-        sb.AppendLine($"Message: {evnt.Message}");
-        sb.AppendLine($"Opcode: {evnt.Opcode}");                //The operation code for the event.
+        sb.AppendLine($"ActivityId: {@event.ActivityId}");        //The activity ID on the thread that the event was written to.
+        sb.AppendLine($"EventID: {@event.EventId}");              //The event identifier.
+        sb.AppendLine($"EventName: {@event.EventName}");          //The name of the event.
+        sb.AppendLine($"EventSource: {@event.EventSource.Name}");
+        sb.AppendLine($"Keywords: {@event.Keywords}");            //The keywords for the event.
+        sb.AppendLine($"Level: {@event.Level}");                  //The level of the event.
+        sb.AppendLine($"Message: {@event.Message}");
+        sb.AppendLine($"Opcode: {@event.Opcode}");                //The operation code for the event.
 
         sb.AppendLine();
 
-        if (evnt.Payload != null)
+        if (@event.Payload != null)
         {
             sb.AppendLine("Payload");
-            for (int i = 0; i < evnt.Payload.Count; i++)
+            for (int i = 0; i < @event.Payload.Count; i++)
             {
-                sb.AppendLine($" - {evnt.PayloadNames?[i] ?? "Null"}: {evnt.Payload[i] ?? "Null"}");
+                sb.AppendLine($" - {@event.PayloadNames?[i] ?? "Null"}: {@event.Payload[i] ?? "Null"}");
             }
         }
 
@@ -64,8 +68,8 @@ public static class AzureEventLogger
             log.Add(new EventLogEntry()
             {
                 EntryTime = DateTime.UtcNow,
-                Event = evnt,
-                EventType = evnt.EventSource.Name.ToString(),
+                Event = @event,
+                EventType = @event.EventSource.Name.ToString(),
                 Message = sb.ToString()
             });
 

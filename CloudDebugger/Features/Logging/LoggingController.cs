@@ -159,7 +159,6 @@ public class LoggingController : Controller
                 // This is how to do it!
                 // Structured logging — values are passed separately.
                 // This allows tools to extract and query them.
-#pragma warning disable S6664
                 log.LogWarning("The user {UserName} with id {UserId} has an IP address of {IpAddress} and an expiration date of {ExpireDate}", UserName, UserId, IpAddress, ExpireDate);
 
 

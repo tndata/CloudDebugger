@@ -53,11 +53,18 @@ internal static class HostingExtensions
             options.ForwardedHeaders = ForwardedHeaders.All;
 
             // We trust all hosts, networks and proxies, so that this debugger can work across
-            // all supported hosting models (App Services, Container Apps, Constainer Instances...)
+            // all supported hosting models (App Services, Container Apps, container Instances...)
             options.AllowedHosts.Clear();
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
+
+        builder.Services
+            .AddMcpServer()
+            .WithHttpTransport()
+            .WithPromptsFromAssembly()
+            .WithResourcesFromAssembly()
+            .WithToolsFromAssembly();
 
         return builder.Build();
     }
@@ -100,9 +107,12 @@ internal static class HostingExtensions
 
         app.MapHub<WebHookHub>("/WebHookHub");
 
+        app.MapGroup("/mcp").MapMcp();
+
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
         return app;
     }

@@ -2,8 +2,11 @@
 
 namespace CloudDebugger.Features.WebHooks;
 
+#pragma warning disable IDE0306
+#pragma warning disable IDE0028
+
 /// <summary>
-/// WebHooks logging class. It will rememeber the last 100 webhook requests in the log.
+/// WebHooks logging class. It will remember the last 100 webhook requests in the log.
 /// </summary>
 public class WebHookLog : IWebHookLog
 {
@@ -37,6 +40,7 @@ public class WebHookLog : IWebHookLog
         }
     }
 
+
     public List<WebHookLogEntry> GetAllLogEntries()
     {
         //Return a new list to avoid any enumeration errors
@@ -45,7 +49,6 @@ public class WebHookLog : IWebHookLog
             return new(Log);
         }
     }
-
 
     public List<WebHookLogEntry> GetLogEntriesForWebHook(int hookId)
     {

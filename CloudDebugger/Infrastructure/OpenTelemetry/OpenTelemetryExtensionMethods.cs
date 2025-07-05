@@ -164,6 +164,7 @@ public static class OpenTelemetryExtensionMethods
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.Hosting.Lifetime", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.HttpOverrides", LogLevel.Debug);
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("CloudDebugger.Infrastructure.Middlewares", LogLevel.Warning);
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("ModelContextProtocol", LogLevel.Debug);
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
     }
 
