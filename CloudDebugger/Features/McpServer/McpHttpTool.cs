@@ -20,32 +20,12 @@ public static class McpHttpTools
 
     [McpServerTool(Name = "http_get")]
     [Description("Make an HTTP GET request to the specified URL and return the response")]
-    public static async Task<object> HttpGet(string targetUrl)
+    public static async Task<object> HttpGet(Uri targetUrl)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(targetUrl))
-            {
-                return new
-                {
-                    success = false,
-                    error = "URL cannot be empty",
-                    targetUrl
-                };
-            }
-
-            if (!Uri.TryCreate(targetUrl, UriKind.Absolute, out var uri))
-            {
-                return new
-                {
-                    success = false,
-                    error = "Invalid URL format",
-                    targetUrl
-                };
-            }
-
             var startTime = DateTime.UtcNow;
-            var response = await _http.GetAsync(uri);
+            var response = await _http.GetAsync(targetUrl);
             var endTime = DateTime.UtcNow;
             var duration = endTime - startTime;
 
