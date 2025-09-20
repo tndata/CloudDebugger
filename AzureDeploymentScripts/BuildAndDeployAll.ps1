@@ -13,3 +13,5 @@ Write-Host "Deploying CloudDebugger to Azure App Services (Linux, Windows, Linux
 .\BuildDeploy-Container-Linux-ContainerInstance.ps1
 
 .\BuildDeploy-Container-Linux-ContainerApps.ps1
+
+.\GetUrlToAllDeployments.ps1
