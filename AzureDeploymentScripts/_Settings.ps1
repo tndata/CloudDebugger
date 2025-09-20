@@ -5,6 +5,8 @@
 ##########################################################################################
 # General Azure deployment settings
 
+. .\_Helpers.ps1
+
 # resource group name
 $rgname = 'rg-CloudDebugger'
 
@@ -28,8 +30,8 @@ $AppServiceName_win = 'as-CloudDebugger-Windows'
 $AppServiceName_container_linux = 'as-CloudDebugger-Linux-Container'
 
 
-# Azure Container Registry name
-$ACRName = 'tncontaineregistry'
+# Generate a unique and stable Azure Container Registry name for this user/machine
+$ACRName = GetUniqueRegistryName('tncontaineregistry')
 
 # CloudDebugger container image name
 $imageName = 'clouddebugger'
@@ -43,3 +45,7 @@ $containerInstanceName = "clouddebugger"
 
 # Log Analytics workspace
 $workspaceName = "log-CloudDebugger"
+
+
+
+

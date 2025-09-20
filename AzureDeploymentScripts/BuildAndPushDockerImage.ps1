@@ -21,9 +21,23 @@ Write-Host "Resource group created, id: ${resId}"
 
 # Step 2: Create Azure Container Registry
 Write-Host "`n`nCreating Azure Container Registry named '${ACRName}'."
-$acr = az acr create --resource-group $rgname --name $ACRName --sku Basic --admin-enabled true | ConvertFrom-Json
+
+$acrOutput = az acr create --resource-group $rgname --name $ACRName --sku Basic --admin-enabled true 2>&1
+if ($LASTEXITCODE -ne 0) {
+    if ($acrOutput -match "AlreadyInUse") {
+        Write-Host "ERROR: The registry name '${ACRName}' is already in use. Please choose a different name." -ForegroundColor Red
+    } else {
+        Write-Host "ERROR: Failed to create Azure Container Registry." -ForegroundColor Red
+        Write-Host $acrOutput -ForegroundColor Yellow
+    }
+    exit 1
+}
+# If successful, parse and continue
+$acr = $acrOutput | ConvertFrom-Json
 $acrid = $acr.id
 Write-Host "Azure Container Registry created, id: ${acrid}"
+
+
 
 # Step 3: Login to the Azure Container Registry
 Write-Host "`n`nLogging into Azure Container Registry '${ACRName}'."
