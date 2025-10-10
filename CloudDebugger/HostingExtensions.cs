@@ -42,6 +42,10 @@ internal static class HostingExtensions
 
         builder.AddConfigureHttpLogging();
 
+        //Enable logging to file system in Azure App Services
+        //Only used in Azure App Services
+        builder.Logging.AddAzureWebAppDiagnostics();
+
         builder.ConfigureControllersAndViews();
 
         builder.AddSession();
