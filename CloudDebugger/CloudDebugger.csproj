@@ -24,7 +24,7 @@
 		<PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.3.0-preview.4" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.13.0" />
-		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.10.0-beta.1" />
 		<PackageReference Include="System.Formats.Asn1" Version="9.0.9" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.26.0-beta.1" />
