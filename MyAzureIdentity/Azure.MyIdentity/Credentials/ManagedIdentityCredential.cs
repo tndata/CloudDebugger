@@ -46,7 +46,7 @@ namespace Azure.MyIdentity
                 sb.AppendLine(" - clientId=" + _clientId.ToString());
             }
 
-            sb.AppendLine(" - logAccountDetails=" + _logAccountDetails.ToString());
+            sb.AppendLine(" - LogAccountDetails=" + _logAccountDetails.ToString());
             sb.AppendLine("");
 
             if (Client != null)

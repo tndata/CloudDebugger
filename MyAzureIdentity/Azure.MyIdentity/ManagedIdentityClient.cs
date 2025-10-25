@@ -37,7 +37,7 @@ namespace Azure.MyIdentity
             var sb = new StringBuilder();
             sb.AppendLine("ManagedIdentityClient");
             if (_identitySource != null)
-                sb.AppendLine($" - _identitySource = {_identitySource.ToString()}");
+                sb.AppendLine($" - IidentitySource = {_identitySource.ToString()}");
 
             if (_options != null)
             {
