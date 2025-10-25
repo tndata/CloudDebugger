@@ -234,7 +234,7 @@ public class EventGridController : Controller
             }
 
             return new EventGridPublisherClient(new Uri(topicEndpoint),
-                                                  new MyDefaultAzureCredential(defaultCredentialOptions));
+                                                  new DefaultAzureCredential(defaultCredentialOptions));
         }
         else
         {

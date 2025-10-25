@@ -52,7 +52,7 @@ public class DefaultAzureCredentialsController : Controller
 
             // Using a customization we have made to the MyDefaultAzureCredential class,
             // that exposes an internal log of what happens under the hood inside MyDefaultAzureCredential
-            model.MyDefaultAzureCredentialLog = MyDefaultAzureCredential.LogText.ToString();
+            model.MyDefaultAzureCredentialLog = DefaultAzureCredential.LogText.ToString();
 
             // Using a customization we have made to the MyDefaultAzureCredential class,
             // that exposes the active token credentials used.
@@ -73,7 +73,7 @@ public class DefaultAzureCredentialsController : Controller
     }
 
 
-    private static AccessToken GetAccessToken(MyDefaultAzureCredential credential)
+    private static AccessToken GetAccessToken(DefaultAzureCredential credential)
     {
         var tokenRequestContext = new TokenRequestContext(scopes);
 
@@ -82,7 +82,7 @@ public class DefaultAzureCredentialsController : Controller
         return token;
     }
 
-    private static MyDefaultAzureCredential CreateMyDefaultAzureCredentialInstance()
+    private static DefaultAzureCredential CreateMyDefaultAzureCredentialInstance()
     {
         var options = new DefaultAzureCredentialOptions
         {
@@ -98,7 +98,7 @@ public class DefaultAzureCredentialsController : Controller
                         },
         };
 
-        var cred = new MyDefaultAzureCredential(options);
+        var cred = new DefaultAzureCredential(options);
 
         return cred;
     }

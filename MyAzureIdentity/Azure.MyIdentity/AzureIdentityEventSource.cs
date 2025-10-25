@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Text;
 using Azure.Core;
 using Azure.Core.Diagnostics;
+using Microsoft.IdentityModel.Abstractions;
 
 namespace Azure.MyIdentity
 {
@@ -397,7 +398,7 @@ namespace Azure.MyIdentity
             }
         }
 
-        [Event(ServiceFabricManagedIdentityRuntimeConfigurationNotSupportedEvent, Level = EventLevel.Warning, Message =ServiceFabricManagedIdentityRuntimeConfigurationNotSupportedMessage)]
+        [Event(ServiceFabricManagedIdentityRuntimeConfigurationNotSupportedEvent, Level = EventLevel.Warning, Message = ServiceFabricManagedIdentityRuntimeConfigurationNotSupportedMessage)]
         public void ServiceFabricManagedIdentityRuntimeConfigurationNotSupported()
         {
             if (IsEnabled(EventLevel.Warning, EventKeywords.All))

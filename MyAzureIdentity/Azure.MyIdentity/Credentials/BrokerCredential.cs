@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Core.Pipeline;
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -14,6 +15,20 @@ namespace Azure.MyIdentity
         private const string Troubleshooting = "See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/brokercredential/troubleshoot";
 
         private readonly bool _isBrokerOptionsEnabled;
+
+
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("BrokerCredential");
+            sb.AppendLine($" - _isBrokerOptionsEnabled = {_isBrokerOptionsEnabled}");
+            sb.AppendLine("");
+            return sb.ToString();
+        }
 
         public BrokerCredential(DevelopmentBrokerOptions options)
             : base(CredentialOptionsMapper.GetBrokerOptions(out bool isBrokerEnabled, options) ?? CredentialOptionsMapper.CreateFallbackOptions(options))

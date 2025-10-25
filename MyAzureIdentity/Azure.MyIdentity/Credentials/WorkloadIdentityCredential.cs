@@ -2,7 +2,13 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
+using Microsoft.Identity.Client;
+using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -19,6 +25,9 @@ namespace Azure.MyIdentity
         internal MsalConfidentialClient Client => _clientAssertionCredential?.Client;
         internal string[] AdditionallyAllowedTenantIds => _clientAssertionCredential?.AdditionallyAllowedTenantIds;
 
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -28,10 +37,17 @@ namespace Azure.MyIdentity
             {
                 sb.AppendLine(" - " + _clientAssertionCredential.ToString());
             }
+
+            if (Client != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== MsalConfidentialClient Log ===");
+                sb.AppendLine(Client.GetLog());
+            }
+
+
             return sb.ToString();
         }
-
-
 
 
         /// <summary>

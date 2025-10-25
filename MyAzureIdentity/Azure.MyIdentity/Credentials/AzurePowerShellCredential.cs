@@ -2,9 +2,15 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
+using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Azure.MyIdentity
@@ -40,10 +46,15 @@ namespace Azure.MyIdentity
         internal const string AzurePowerShellTimeoutError = "Azure PowerShell authentication timed out.";
         internal const string ClaimsChallengeLoginFormat = "Azure PowerShell authentication requires multi-factor authentication or additional claims. Please run '{0}' to re-authenticate with the required claims. After completing login, retry the operation.";
 
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("AzurePowerShellCredential");
+            sb.AppendLine($" - DefaultWorkingDir = {DefaultWorkingDir}");
             sb.AppendLine($" - logPII = {_logPII}");
             sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");
             sb.AppendLine($" - TenantId = {TenantId}");
@@ -300,7 +311,7 @@ if ($token.Token -is [System.Security.SecureString]) {{
     }}
     $customToken | Add-Member -MemberType NoteProperty -Name Token -Value $plainToken
 }} else {{
-$customToken | Add-Member -MemberType NoteProperty -Name Token -Value $token.Token
+    $customToken | Add-Member -MemberType NoteProperty -Name Token -Value $token.Token
 }}
 $customToken | Add-Member -MemberType NoteProperty -Name ExpiresOn -Value $token.ExpiresOn.UtcDateTime.Ticks
 

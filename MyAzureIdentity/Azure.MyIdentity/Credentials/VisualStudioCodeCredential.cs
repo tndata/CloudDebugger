@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
-using Microsoft.Identity.Client;
-using System.Runtime.InteropServices;
+using Azure.Core.Pipeline;
+using System;
 using System.Text;
-using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -23,27 +24,22 @@ namespace Azure.MyIdentity
     public class VisualStudioCodeCredential : InteractiveBrowserCredential
     {
         private const string CredentialsSection = "VS Code Azure";
-        private const string ClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";
-        private readonly IVisualStudioCodeAdapter _vscAdapter;
-        private readonly IFileSystemService _fileSystem;
-        private readonly CredentialPipeline _pipeline;
-        internal string TenantId { get; }
-        internal string[] AdditionallyAllowedTenantIds { get; }
-        private const string _commonTenant = "common";
         private const string Troubleshooting = "See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/vscodecredential/troubleshoot";
-        internal MsalPublicClient Client { get; }
-        internal TenantIdResolverBase TenantIdResolver { get; }
 
+        private readonly bool _isBrokerOptionsEnabled;
+
+
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("VisualStudioCodeCredential");
             sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - _isBrokerOptionsEnabled = {_isBrokerOptionsEnabled}");
             return sb.ToString();
         }
-
-        private readonly bool _isBrokerOptionsEnabled;
-
         /// <summary>
         /// Creates a new instance of the <see cref="VisualStudioCodeCredential"/>.
         /// </summary>

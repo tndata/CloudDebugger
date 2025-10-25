@@ -2,8 +2,12 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using System;
 using System.Buffers;
+using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -13,7 +17,14 @@ namespace Azure.MyIdentity
         private ClientAssertionCredential _clientAssertionCredential;
         private static readonly int DefaultBufferSize = 4096;
 
+        // HACK: Add this property for logging
+        public static string Log { get; private set; } = "";
 
+
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -22,11 +33,6 @@ namespace Azure.MyIdentity
             sb.AppendLine(base.ToString());
             return sb.ToString();
         }
-
-
-        public static string TryCreateLog = "";
-
-
 
         private TokenExchangeManagedIdentitySource(CredentialPipeline pipeline, string tenantId, string clientId, string tokenFilePath)
             : base(pipeline)
@@ -37,23 +43,30 @@ namespace Azure.MyIdentity
 
         public static ManagedIdentitySource TryCreate(ManagedIdentityClientOptions options)
         {
+            // HACK: Log the parameters
+            var log = new StringBuilder();
+
             string tokenFilePath = EnvironmentVariables.AzureFederatedTokenFile;
             string tenantId = EnvironmentVariables.TenantId;
-            string clientId = options.ClientId ?? EnvironmentVariables.ClientId;
+            string clientId = options.ManagedIdentityId?._userAssignedId ?? EnvironmentVariables.ClientId;
 
-            var sb = new StringBuilder();
-            sb.AppendLine($"TokenExchangeManagedIdentitySource");
-            sb.AppendLine($" - tokenFilePath={tokenFilePath}");
-            sb.AppendLine($" - tenantId={tenantId}");
-            sb.AppendLine($" - clientId={clientId}");
-            TryCreateLog = sb.ToString();
-
+            // HACK: Log the parameters
+            log.AppendLine($"TokenExchangeManagedIdentitySource.TryCreate called");
+            log.AppendLine($"   - AzureFederatedTokenFile: {tokenFilePath ?? "Not set"}");
+            log.AppendLine($"   - TenantId: {tenantId ?? "Not set"}");
+            log.AppendLine($"   - ClientId: {clientId ?? "Not set"}");
+            log.AppendLine($"   - ExcludeTokenExchangeManagedIdentitySource: {options.ExcludeTokenExchangeManagedIdentitySource}");
 
             if (options.ExcludeTokenExchangeManagedIdentitySource || string.IsNullOrEmpty(tokenFilePath) || string.IsNullOrEmpty(tenantId) || string.IsNullOrEmpty(clientId))
             {
+                log.AppendLine("   - TokenExchangeManagedIdentitySource not available");
+                Log = log.ToString();
+
                 AzureIdentityEventSource.Singleton.ManagedIdentitySourceAttempted("TokenExchangeManagedIdentitySource", false);
                 return default;
             }
+            log.AppendLine("   - TokenExchangeManagedIdentitySource is available");
+            Log = log.ToString();
 
             AzureIdentityEventSource.Singleton.ManagedIdentitySourceAttempted("TokenExchangeManagedIdentitySource", true);
             return new TokenExchangeManagedIdentitySource(options.Pipeline, tenantId, clientId, tokenFilePath);

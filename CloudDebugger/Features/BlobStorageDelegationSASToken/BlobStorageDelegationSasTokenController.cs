@@ -59,7 +59,7 @@ public class BlobStorageDelegationSasTokenController : Controller
             var blobStorageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
 
             // Step #1, get an authentication token from Entra ID
-            var credentials = new MyDefaultAzureCredential();
+            var credentials = new DefaultAzureCredential();
 
             // Step #2, get a BlobServiceClient with these credentials
             var client = new BlobServiceClient(blobStorageUri, credentials);

@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Azure.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using Azure.Core;
 
 namespace Azure.MyIdentity
 {
@@ -37,7 +38,7 @@ namespace Azure.MyIdentity
         /// the <see cref="DiagnosticsOptions.IsLoggingContentEnabled"/> property must be set to <c>true</c>.
         /// Setting this property to `true` equates to passing 'true' for the enablePiiLogging parameter to the 'WithLogging' method on the MSAL client builder.
         /// </summary>
-        public bool IsUnsafeSupportLoggingEnabled { get; } = true;      //Hack:;, set to always TRUE
+        public bool IsUnsafeSupportLoggingEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets whether this credential is part of a chained credential.
@@ -54,7 +55,7 @@ namespace Azure.MyIdentity
             // copy TokenCredentialOptions Properties
             clone.AuthorityHost = AuthorityHost;
 
-            //clone.IsUnsafeSupportLoggingEnabled = IsUnsafeSupportLoggingEnabled; //Hack: Removed this line
+            clone.IsUnsafeSupportLoggingEnabled = IsUnsafeSupportLoggingEnabled;
 
             // copy TokenCredentialDiagnosticsOptions specific options
             clone.Diagnostics.IsAccountIdentifierLoggingEnabled = Diagnostics.IsAccountIdentifierLoggingEnabled;

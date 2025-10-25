@@ -5,6 +5,9 @@ using System.Diagnostics;
 
 namespace CloudDebugger.Features.CredentialsCaching;
 
+/// <summary>
+/// Using the hacked "DefaultAzureCredential" version in the included MyIdentity library,
+/// </summary>
 public class CredentialsCachingController : Controller
 {
     private readonly ILogger<CredentialsCachingController> _logger;
@@ -42,7 +45,7 @@ public class CredentialsCachingController : Controller
 
 
     /// <summary>
-    /// Call new MyDefaultAzureCredential() 10 times in a row on the same instance, 
+    /// Call new DefaultAzureCredential() 10 times in a row on the same instance, 
     /// is the token the same? Same execution time?
     /// </summary>
     /// <returns></returns>
@@ -51,7 +54,7 @@ public class CredentialsCachingController : Controller
         var result = new List<string>();
 
         //We reuse the same instance
-        var cred = CreateMyDefaultAzureCredentialInstance();
+        var cred = CreateDefaultAzureCredentialInstance();
 
         var totalTimeSw = new Stopwatch();
         totalTimeSw.Start();
@@ -83,7 +86,7 @@ public class CredentialsCachingController : Controller
 
 
     /// <summary>
-    /// Call new MyDefaultAzureCredential() 10 times in a row a new instance each time, 
+    /// Call new DefaultAzureCredential() 10 times in a row a new instance each time, 
     /// is the token the same? Same execution time?
     /// </summary>
     private static (List<string> log, string AccessToken) GetTokensUsingMultipleInstances()
@@ -93,7 +96,7 @@ public class CredentialsCachingController : Controller
         var totalTimeSw = new Stopwatch();
         totalTimeSw.Start();
 
-        MyDefaultAzureCredential? cred = null;
+        DefaultAzureCredential? cred = null;
 
         AccessToken token = new();
         for (int i = 0; i < 10; i++)
@@ -102,7 +105,7 @@ public class CredentialsCachingController : Controller
             sw.Start();
 
             //We create a new instance each time
-            cred = CreateMyDefaultAzureCredentialInstance();
+            cred = CreateDefaultAzureCredentialInstance();
             token = GetAccessToken(cred);
             var hash = token.Token.GetHashCode();
 
@@ -124,7 +127,7 @@ public class CredentialsCachingController : Controller
     }
 
 
-    private static AccessToken GetAccessToken(MyDefaultAzureCredential credential)
+    private static AccessToken GetAccessToken(DefaultAzureCredential credential)
     {
         var tokenRequestContext = new TokenRequestContext(scopes);
 
@@ -133,7 +136,7 @@ public class CredentialsCachingController : Controller
         return token;
     }
 
-    private static MyDefaultAzureCredential CreateMyDefaultAzureCredentialInstance()
+    private static DefaultAzureCredential CreateDefaultAzureCredentialInstance()
     {
         var options = new DefaultAzureCredentialOptions
         {
@@ -149,7 +152,7 @@ public class CredentialsCachingController : Controller
                         },
         };
 
-        var cred = new MyDefaultAzureCredential(options);
+        var cred = new DefaultAzureCredential(options);
 
         return cred;
     }

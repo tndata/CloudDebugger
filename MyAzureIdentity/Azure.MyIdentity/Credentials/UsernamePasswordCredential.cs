@@ -2,8 +2,14 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
+using System;
+using System.ComponentModel;
+using System.Security;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -37,8 +43,12 @@ namespace Azure.MyIdentity
             if (string.IsNullOrEmpty(_password) == false)
                 password = _password.Length <= 5 ? _password : _password.Substring(0, 5) + "******";
 
+            /// <summary>
+            /// Hack: Custom Code for debugging purposes.
+            /// </summary>
+            /// <returns></returns>
             var sb = new StringBuilder();
-            sb.AppendLine($"ClientSecretCredential");
+            sb.AppendLine($"UsernamePasswordCredential");
             sb.AppendLine($" - TenantId = {_tenantId}");
             sb.AppendLine($" - ClientId = {_clientId}");
             sb.AppendLine($" - Password = {password}");

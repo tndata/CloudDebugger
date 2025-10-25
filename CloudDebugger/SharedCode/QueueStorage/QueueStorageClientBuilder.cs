@@ -56,14 +56,14 @@ public static class QueueStorageClientBuilder
             if (string.IsNullOrEmpty(clientId))
             {
                 message = "Tried to authenticate using system-assigned managed identity";
-                var client = new QueueServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), queueOptions);
+                var client = new QueueServiceClient(storageUri, new DefaultAzureCredential(defaultCredentialOptions), queueOptions);
                 return (client, message);
             }
             else
             {
                 message = $"Tried to authenticate using-assigned managed identity, ClientID={clientId}";
                 defaultCredentialOptions.ManagedIdentityClientId = clientId;
-                var client = new QueueServiceClient(storageUri, new MyDefaultAzureCredential(defaultCredentialOptions), queueOptions);
+                var client = new QueueServiceClient(storageUri, new DefaultAzureCredential(defaultCredentialOptions), queueOptions);
                 return (client, message);
             }
         }

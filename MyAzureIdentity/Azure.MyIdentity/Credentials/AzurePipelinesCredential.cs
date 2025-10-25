@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
+using System;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -27,6 +28,34 @@ namespace Azure.MyIdentity
         internal CredentialPipeline Pipeline { get; }
         internal TenantIdResolverBase TenantIdResolver { get; }
         private const string OIDC_API_VERSION = "7.1";
+
+
+
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("AzureDeveloperCliCredential");
+            sb.AppendLine($" - SystemAccessToken = {SystemAccessToken}");
+            sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - ServiceConnectionId = {ServiceConnectionId}");
+            sb.AppendLine($" - OIDC_API_VERSION = {OIDC_API_VERSION}");
+            sb.AppendLine("");
+
+            if (Client != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== MsalConfidentialClient Log ===");
+                sb.AppendLine(Client.GetLog());
+            }
+
+            return sb.ToString();
+        }
+
+
 
         /// <summary>
         /// Protected constructor for <see href="https://aka.ms/azsdk/net/mocking">mocking</see>.

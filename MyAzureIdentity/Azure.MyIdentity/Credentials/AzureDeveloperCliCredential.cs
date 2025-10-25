@@ -2,11 +2,18 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
+using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -43,11 +50,15 @@ namespace Azure.MyIdentity
         internal TenantIdResolverBase TenantIdResolver { get; }
 
 
-
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("AzureDeveloperCliCredential");
+            sb.AppendLine($" - DefaultWorkingDir = {DefaultWorkingDir}");
             sb.AppendLine($" - logPII = {_logPII}");
             sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");
             sb.AppendLine($" - TenantId = {TenantId}");
@@ -55,7 +66,6 @@ namespace Azure.MyIdentity
             sb.AppendLine("");
             return sb.ToString();
         }
-
 
 
         /// <summary>
@@ -85,7 +95,6 @@ namespace Azure.MyIdentity
             ProcessTimeout = options?.ProcessTimeout ?? TimeSpan.FromSeconds(13);
             _isChainedCredential = options?.IsChainedCredential ?? false;
         }
-
 
         /// <summary>
         /// Obtains an access token from Azure Developer CLI credential, using this access token to authenticate. This method called by Azure SDK clients.

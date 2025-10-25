@@ -210,7 +210,7 @@ public class TokenCredentialsExplorerController : Controller
         }
 
         //We use our custom hacked version for improved insights
-        var credential = new MyDefaultAzureCredential(options);
+        var credential = new DefaultAzureCredential(options);
 
         return new() { Credential = credential, Message = "" };
     }

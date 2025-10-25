@@ -1,9 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Azure.Core;
+using Azure.Core.Diagnostics;
+using Azure.Core.Pipeline;
+using Microsoft.Identity.Client;
+
 namespace Azure.MyIdentity
 {
-
     /// <summary>
     /// Options used to configure the <see cref="AuthorizationCodeCredential"/>.
     /// </summary>

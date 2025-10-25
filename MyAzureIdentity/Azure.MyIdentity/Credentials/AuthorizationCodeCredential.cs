@@ -2,9 +2,13 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
+using System;
 using System.ComponentModel;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -26,9 +30,12 @@ namespace Azure.MyIdentity
         internal TenantIdResolverBase TenantIdResolver { get; }
 
 
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
-
             var sb = new StringBuilder();
             sb.AppendLine("AuthorizationCodeCredential");
             sb.AppendLine($" - authCode = {_authCode}");
@@ -37,18 +44,26 @@ namespace Azure.MyIdentity
             sb.AppendLine($" - redirectUri = {_redirectUri}");
             sb.AppendLine($" - tenantId = {_tenantId}");
             sb.AppendLine("");
+
+            if (Client != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== MsalConfidentialClient Log ===");
+                sb.AppendLine(Client.GetLog());
+            }
+
             return sb.ToString();
         }
 
         /// <summary>
-        /// Protected constructor for mocking.
+        /// Protected constructor for <see href="https://aka.ms/azsdk/net/mocking">mocking</see>.
         /// </summary>
         protected AuthorizationCodeCredential()
         {
         }
 
         /// <summary>
-        /// Creates an instance of the ClientSecretCredential with the details needed to authenticate against Microsoft Entra ID with a prefetched authorization code.
+        /// Creates an instance of the AuthorizationCodeCredential with the details needed to authenticate against Microsoft Entra ID with a prefetched authorization code.
         /// </summary>
         /// <param name="tenantId">The Microsoft Entra tenant (directory) ID of the service principal.</param>
         /// <param name="clientId">The client (application) ID of the service principal</param>
@@ -61,7 +76,7 @@ namespace Azure.MyIdentity
         }
 
         /// <summary>
-        /// Creates an instance of the ClientSecretCredential with the details needed to authenticate against Microsoft Entra ID with a prefetched authorization code.
+        /// Creates an instance of the AuthorizationCodeCredential with the details needed to authenticate against Microsoft Entra ID with a prefetched authorization code.
         /// </summary>
         /// <param name="tenantId">The Microsoft Entra tenant (directory) ID of the service principal.</param>
         /// <param name="clientId">The client (application) ID of the service principal</param>
@@ -78,7 +93,7 @@ namespace Azure.MyIdentity
         { }
 
         /// <summary>
-        /// Creates an instance of the ClientSecretCredential with the details needed to authenticate against Microsoft Entra ID with a prefetched authorization code.
+        /// Creates an instance of the AuthorizationCodeCredential with the details needed to authenticate against Microsoft Entra ID with a prefetched authorization code.
         /// </summary>
         /// <param name="tenantId">The Microsoft Entra tenant (directory) ID of the service principal.</param>
         /// <param name="clientId">The client (application) ID of the service principal</param>
@@ -120,26 +135,30 @@ namespace Azure.MyIdentity
         }
 
         /// <summary>
-        /// Obtains a token from Microsoft Entra ID, using the specified authorization code to authenticate. Acquired tokens
-        /// are cached by the credential instance. Token lifetime and refreshing is handled automatically. Where possible, reuse credential
-        /// instances to optimize cache effectiveness.
+        /// Obtains a token from Microsoft Entra ID, using the specified authorization code to authenticate. Acquired tokens are
+        /// <see href="https://aka.ms/azsdk/net/identity/token-cache">cached</see> by the credential instance. Token lifetime and
+        /// refreshing is handled automatically. Where possible, <see href="https://aka.ms/azsdk/net/identity/credential-reuse">reuse credential instances</see>
+        /// to optimize cache effectiveness.
         /// </summary>
         /// <param name="requestContext">The details of the authentication request.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <returns>An <see cref="AccessToken"/> which can be used to authenticate service client calls.</returns>
+        /// <exception cref="AuthenticationFailedException">Thrown when the authentication failed.</exception>
         public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
         {
             return GetTokenImplAsync(false, requestContext, cancellationToken).EnsureCompleted();
         }
 
         /// <summary>
-        /// Obtains a token from Microsoft Entra ID, using the specified authorization code to authenticate. Acquired tokens
-        /// are cached by the credential instance. Token lifetime and refreshing is handled automatically. Where possible, reuse credential
-        /// instances to optimize cache effectiveness.
+        /// Obtains a token from Microsoft Entra ID, using the specified authorization code to authenticate. Acquired tokens are
+        /// <see href="https://aka.ms/azsdk/net/identity/token-cache">cached</see> by the credential instance. Token lifetime and
+        /// refreshing is handled automatically. Where possible, <see href="https://aka.ms/azsdk/net/identity/credential-reuse">reuse credential instances</see>
+        /// to optimize cache effectiveness.
         /// </summary>
         /// <param name="requestContext">The details of the authentication request.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <returns>An <see cref="AccessToken"/> which can be used to authenticate service client calls.</returns>
+        /// <exception cref="AuthenticationFailedException">Thrown when the authentication failed.</exception>
         public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
         {
             return await GetTokenImplAsync(true, requestContext, cancellationToken).ConfigureAwait(false);
@@ -149,7 +168,7 @@ namespace Azure.MyIdentity
         {
             using CredentialDiagnosticScope scope = _pipeline.StartGetTokenScope($"{nameof(AuthorizationCodeCredential)}.{nameof(GetToken)}", requestContext);
 
-            AccessToken token = new();
+            AccessToken token;
             string tenantId = null;
             try
             {
@@ -157,14 +176,14 @@ namespace Azure.MyIdentity
 
                 if (_record is null)
                 {
-                    token = await AcquireTokenWithCode(async, requestContext, token, tenantId, cancellationToken).ConfigureAwait(false);
+                    token = await AcquireTokenWithCode(async, requestContext, tenantId, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
                     AuthenticationResult result = await Client
                         .AcquireTokenSilentAsync(requestContext.Scopes, (AuthenticationAccount)_record, tenantId, _redirectUri, requestContext.Claims, requestContext.IsCaeEnabled, async, cancellationToken)
                         .ConfigureAwait(false);
-                    token = new AccessToken(result.AccessToken, result.ExpiresOn);
+                    token = result.ToAccessToken();
                 }
 
                 return scope.Succeeded(token);
@@ -181,7 +200,7 @@ namespace Azure.MyIdentity
 
             try
             {
-                token = await AcquireTokenWithCode(async, requestContext, token, tenantId, cancellationToken).ConfigureAwait(false);
+                token = await AcquireTokenWithCode(async, requestContext, tenantId, cancellationToken).ConfigureAwait(false);
                 return scope.Succeeded(token);
             }
             catch (Exception e)
@@ -190,14 +209,21 @@ namespace Azure.MyIdentity
             }
         }
 
-        private async Task<AccessToken> AcquireTokenWithCode(bool async, TokenRequestContext requestContext, AccessToken token, string tenantId, CancellationToken cancellationToken)
+        private async Task<AccessToken> AcquireTokenWithCode(bool async, TokenRequestContext requestContext, string tenantId, CancellationToken cancellationToken)
         {
             AuthenticationResult result = await Client
-                                    .AcquireTokenByAuthorizationCodeAsync(requestContext.Scopes, _authCode, tenantId, _redirectUri, requestContext.Claims, requestContext.IsCaeEnabled, async, cancellationToken)
+                                    .AcquireTokenByAuthorizationCodeAsync(
+                                        scopes: requestContext.Scopes,
+                                        code: _authCode,
+                                        tenantId: tenantId,
+                                        redirectUri: _redirectUri,
+                                        claims: requestContext.Claims,
+                                        enableCae: requestContext.IsCaeEnabled,
+                                        async,
+                                        cancellationToken)
                                     .ConfigureAwait(false);
             _record = new AuthenticationRecord(result, _clientId);
-            token = new AccessToken(result.AccessToken, result.ExpiresOn);
-            return token;
+            return result.ToAccessToken();
         }
     }
 }

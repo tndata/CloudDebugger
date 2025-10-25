@@ -2,11 +2,17 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -31,11 +37,20 @@ namespace Azure.MyIdentity
         internal TimeSpan ProcessTimeout { get; private set; }
         internal TenantIdResolverBase TenantIdResolver { get; }
 
+
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("VisualStudioCredential");
             sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - logPII = {_logPII}");
+            sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");
+            sb.AppendLine($" - isChainedCredential = {_isChainedCredential}");
+            sb.AppendLine($" - ProcessTimeout = {ProcessTimeout}");
+            sb.AppendLine($" - TokenProviderFilePath = {TokenProviderFilePath}");
             return sb.ToString();
         }
 

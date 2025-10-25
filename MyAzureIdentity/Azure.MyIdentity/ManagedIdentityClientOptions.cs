@@ -10,10 +10,6 @@ namespace Azure.MyIdentity
     {
         public TokenCredentialOptions Options { get; set; }
 
-        public string ClientId { get; set; }
-
-        public ResourceIdentifier ResourceIdentifier { get; set; }
-
         public ManagedIdentityId ManagedIdentityId { get; set; } = ManagedIdentityId.SystemAssigned;
 
         public bool PreserveTransport { get; set; }

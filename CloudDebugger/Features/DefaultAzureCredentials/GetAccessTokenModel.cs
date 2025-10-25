@@ -16,9 +16,9 @@ public class GetAccessTokenModel
     public List<TokenCredential>? CredentialSources { get; set; }
 
     /// <summary>
-    /// MyDefaultAzureCredential is the customized version of DefaultAzureCredential that includes various logging and debugging features.
+    /// MyAzureIdentity.DefaultAzureCredential is the customized version of DefaultAzureCredential that includes various logging and debugging features.
     /// </summary>
-    public MyDefaultAzureCredential? MyDefaultAzureCredential { get; set; }
+    public DefaultAzureCredential? MyDefaultAzureCredential { get; set; }
 
     /// <summary>
     /// The received access token.

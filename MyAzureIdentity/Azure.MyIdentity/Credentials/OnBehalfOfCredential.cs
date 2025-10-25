@@ -2,9 +2,13 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
+using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -22,7 +26,10 @@ namespace Azure.MyIdentity
         internal readonly string[] AdditionallyAllowedTenantIds;
         internal TenantIdResolverBase TenantIdResolver { get; }
 
-
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var secret = "NULL";
@@ -33,16 +40,24 @@ namespace Azure.MyIdentity
             var sb = new StringBuilder();
             sb.AppendLine("OnBehalfOfCredential");
             sb.AppendLine($" - tenantId = {_tenantId}");
+            sb.AppendLine($" - _clientId = {_clientId}");
             sb.AppendLine($" - clientSecret = {secret}");
             sb.AppendLine("");
+
+            if (Client != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== MsalConfidentialClient Log ===");
+                sb.AppendLine(Client.GetLog());
+            }
+
             return sb.ToString();
         }
 
 
 
-
         /// <summary>
-        /// Protected constructor for mocking.
+        /// Protected constructor for <see href="https://aka.ms/azsdk/net/mocking">mocking</see>.
         /// </summary>
         protected OnBehalfOfCredential()
         { }

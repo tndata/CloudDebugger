@@ -2,10 +2,16 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
@@ -33,13 +39,17 @@ namespace Azure.MyIdentity
         internal bool UseOperatingSystemAccount { get; }
 
 
-
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.AppendLine("SharedTokenCacheCredential");
             sb.AppendLine($" - TenantId = {TenantId}");
             sb.AppendLine($" - Username = {Username}");
+            sb.AppendLine($" - _skipTenantValidation = {_skipTenantValidation}");
             sb.AppendLine(" - " + _record.ToString());
             sb.AppendLine("");
             return sb.ToString();
@@ -146,6 +156,7 @@ namespace Azure.MyIdentity
                     account,
                     tenantId,
                     requestContext.IsCaeEnabled,
+                    requestContext,
                     async,
                     cancellationToken).ConfigureAwait(false);
 

@@ -3,14 +3,11 @@
 
 using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Core;
+using System;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace Azure.MyIdentity
 {

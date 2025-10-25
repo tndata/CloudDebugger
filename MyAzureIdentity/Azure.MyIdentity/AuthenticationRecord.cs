@@ -1,9 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Identity.Client;
-using System.Text;
+using System;
+using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Azure.Core.Pipeline;
+using Microsoft.Identity.Client;
 
 namespace Azure.MyIdentity
 {
@@ -27,25 +31,6 @@ namespace Azure.MyIdentity
         private static readonly JsonEncodedText s_tenantIdPropertyNameBytes = JsonEncodedText.Encode(TenantIdPropertyName);
         private static readonly JsonEncodedText s_clientIdPropertyNameBytes = JsonEncodedText.Encode(ClientIdPropertyName);
         private static readonly JsonEncodedText s_versionPropertyNameBytes = JsonEncodedText.Encode(VersionPropertyName);
-
-
-        public override string ToString()
-        {
-
-            var sb = new StringBuilder();
-            sb.AppendLine($"AuthenticationRecord");
-            sb.AppendLine($" - s_usernamePropertyNameBytes = {Username}");
-            sb.AppendLine($" - s_authorityPropertyNameBytes = {Authority}");
-            sb.AppendLine($" - s_homeAccountIdPropertyNameBytes = {HomeAccountId}");
-            sb.AppendLine($" - s_tenantIdPropertyNameBytes = {TenantId}");
-            sb.AppendLine($" - s_clientIdPropertyNameBytes = {ClientId}");
-            sb.AppendLine($" - s_versionPropertyNameBytes = {Version}");
-            sb.AppendLine("");
-            return sb.ToString();
-        }
-
-
-
 
         internal AuthenticationRecord()
         {

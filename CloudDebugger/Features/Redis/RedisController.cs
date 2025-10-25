@@ -188,7 +188,7 @@ public class RedisController : Controller
         else
         {
             // Connect using managed identity
-            var configurationOptions = await ConfigurationOptions.Parse($"{connectionString}:6380").ConfigureForAzureWithTokenCredentialAsync(new MyDefaultAzureCredential());
+            var configurationOptions = await ConfigurationOptions.Parse($"{connectionString}:6380").ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential());
 
             var connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(configurationOptions);
 
