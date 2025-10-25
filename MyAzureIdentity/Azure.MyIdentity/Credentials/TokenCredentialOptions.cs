@@ -46,10 +46,10 @@ namespace Azure.MyIdentity
 
         internal TenantIdResolverBase TenantIdResolver { get; set; } = TenantIdResolverBase.Default;
 
-        internal virtual T Clone<T>()
-            where T : TokenCredentialOptions, new()
+        internal virtual T Clone<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T>()
+            where T : TokenCredentialOptions
         {
-            T clone = new T();
+            T clone = (T)Activator.CreateInstance(typeof(T), true);
 
             // copy TokenCredentialOptions Properties
             clone.AuthorityHost = AuthorityHost;
@@ -67,6 +67,9 @@ namespace Azure.MyIdentity
 
             // copy ISupportsAdditionallyAllowedTenants
             CloneIfImplemented<ISupportsAdditionallyAllowedTenants>(this, clone, (o, c) => CloneListItems(o.AdditionallyAllowedTenants, c.AdditionallyAllowedTenants));
+
+            // copy ISupportsTenantId
+            CloneIfImplemented<ISupportsTenantId>(this, clone, (o, c) => c.TenantId = o.TenantId);
 
             // copy base ClientOptions properties, this would be replaced by a similar method on the base class
 

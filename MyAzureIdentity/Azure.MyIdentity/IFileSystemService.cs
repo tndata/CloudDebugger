@@ -7,5 +7,6 @@ namespace Azure.MyIdentity
     {
         bool FileExists(string path);
         string ReadAllText(string path);
+        FileStream GetFileStream(string path);
     }
 }

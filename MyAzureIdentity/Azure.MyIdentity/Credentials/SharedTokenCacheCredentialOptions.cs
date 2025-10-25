@@ -8,7 +8,7 @@ namespace Azure.MyIdentity
     /// <summary>
     /// Options to configure the <see cref="SharedTokenCacheCredential"/> authentication.
     /// </summary>
-    public class SharedTokenCacheCredentialOptions : TokenCredentialOptions, ISupportsTokenCachePersistenceOptions, ISupportsDisableInstanceDiscovery
+    public class SharedTokenCacheCredentialOptions : TokenCredentialOptions, ISupportsTokenCachePersistenceOptions, ISupportsDisableInstanceDiscovery, ISupportsTenantId
     {
         private string _tenantId;
         private TokenCachePersistenceOptions _tokenCachePersistenceOptions;

@@ -1,22 +1,26 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Azure.MyIdentity
 {
     /// <summary>
-    /// Options used to configure the <see cref="ClientAssertionCredential"/>.
+    /// Options used to configure the <see cref="AzurePipelinesCredential"/>.
     /// </summary>
-    public class ClientAssertionCredentialOptions : TokenCredentialOptions, ISupportsDisableInstanceDiscovery, ISupportsAdditionallyAllowedTenants, ISupportsTokenCachePersistenceOptions
+    public class AzurePipelinesCredentialOptions : TokenCredentialOptions, ISupportsDisableInstanceDiscovery, ISupportsAdditionallyAllowedTenants, ISupportsTokenCachePersistenceOptions
     {
         internal CredentialPipeline Pipeline { get; set; }
 
         internal MsalConfidentialClient MsalClient { get; set; }
 
         /// <summary>
-        /// For multi-tenant applications, specifies additional tenants for which the credential may acquire tokens. Add the wildcard value "*" to allow the credential to acquire tokens for any tenant in which the application is installed.
+        /// The URI of the OIDC request endpoint.
         /// </summary>
+        internal string OidcRequestUri { get; set; } = Environment.GetEnvironmentVariable("SYSTEM_OIDCREQUESTURI");
+
+        /// <inheritdoc/>
         public IList<string> AdditionallyAllowedTenants { get; internal set; } = new List<string>();
 
         /// <inheritdoc/>

@@ -12,6 +12,8 @@ namespace Azure.MyIdentity
     ///  credential will fail to get a token throwing an <see cref="AuthenticationFailedException"/>. Also, this credential requires a high degree of
     ///  trust and is not recommended outside of prototyping when more secure credentials can be used.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This credential is deprecated because it doesn't support multifactor authentication (MFA). See https://aka.ms/azsdk/identity/mfa for details about MFA enforcement for Microsoft Entra ID and migration guidance.")]
     public class UsernamePasswordCredential : TokenCredential
     {
         private const string NoDefaultScopeMessage = "Authenticating in this environment requires specifying a TokenRequestContext.";
@@ -109,6 +111,10 @@ namespace Azure.MyIdentity
             _username = username;
             _password = password;
             _clientId = clientId;
+            if (options is UsernamePasswordCredentialOptions usernamePasswordOptions && usernamePasswordOptions.AuthenticationRecord != null)
+            {
+                _record = usernamePasswordOptions.AuthenticationRecord;
+            }
             _pipeline = pipeline ?? CredentialPipeline.GetInstance(options);
             DefaultScope = AzureAuthorityHosts.GetDefaultScope(options?.AuthorityHost ?? AzureAuthorityHosts.GetDefault());
             Client = client ?? new MsalPublicClient(_pipeline, tenantId, clientId, null, options);
@@ -174,28 +180,30 @@ namespace Azure.MyIdentity
         }
 
         /// <summary>
-        /// Obtains a token for a user account, authenticating them using the given username and password. Note: This will fail with an
-        /// <see cref="AuthenticationFailedException"/> if the specified user account has MFA enabled. Acquired tokens are cached by the
-        /// credential instance. Token lifetime and refreshing is handled automatically. Where possible, reuse credential instances to
-        /// optimize cache effectiveness.
+        /// Obtains a token for a user account, authenticating them using the provided username and password. Acquired tokens are
+        /// <see href="https://aka.ms/azsdk/net/identity/token-cache">cached</see> by the credential instance. Token lifetime and
+        /// refreshing is handled automatically. Where possible, <see href="https://aka.ms/azsdk/net/identity/credential-reuse">reuse credential instances</see>
+        /// to optimize cache effectiveness.
         /// </summary>
         /// <param name="requestContext">The details of the authentication request.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <returns>An <see cref="AccessToken"/> which can be used to authenticate service client calls.</returns>
+        /// <exception cref="AuthenticationFailedException">Thrown when the authentication failed, particularly if the specified user account has MFA enabled.</exception>
         public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
         {
             return GetTokenImplAsync(false, requestContext, cancellationToken).EnsureCompleted();
         }
 
         /// <summary>
-        /// Obtains a token for a user account, authenticating them using the given username and password. Note: This will fail with an
-        /// <see cref="AuthenticationFailedException"/> if the specified user account has MFA enabled. Acquired tokens are cached by the
-        /// credential instance. Token lifetime and refreshing is handled automatically. Where possible, reuse credential instances to
-        /// optimize cache effectiveness.
+        /// Obtains a token for a user account, authenticating them using the provided username and password. Acquired tokens are
+        /// <see href="https://aka.ms/azsdk/net/identity/token-cache">cached</see> by the credential instance. Token lifetime and
+        /// refreshing is handled automatically. Where possible, <see href="https://aka.ms/azsdk/net/identity/credential-reuse">reuse credential instances</see>
+        /// to optimize cache effectiveness.
         /// </summary>
         /// <param name="requestContext">The details of the authentication request.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <returns>An <see cref="AccessToken"/> which can be used to authenticate service client calls.</returns>
+        /// <exception cref="AuthenticationFailedException">Thrown when the authentication failed, particularly if the specified user account has MFA enabled.</exception>
         public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken = default)
         {
             return await GetTokenImplAsync(true, requestContext, cancellationToken).ConfigureAwait(false);
@@ -232,9 +240,17 @@ namespace Azure.MyIdentity
                     var tenantId = TenantIdResolver.Resolve(_tenantId, requestContext, AdditionallyAllowedTenantIds);
                     try
                     {
-                        result = await Client.AcquireTokenSilentAsync(requestContext.Scopes, requestContext.Claims, _record, tenantId, requestContext.IsCaeEnabled, async, cancellationToken)
+                        result = await Client.AcquireTokenSilentAsync(
+                            requestContext.Scopes,
+                            requestContext.Claims,
+                            _record,
+                            tenantId,
+                            requestContext.IsCaeEnabled,
+                            requestContext,
+                            async,
+                            cancellationToken)
                             .ConfigureAwait(false);
-                        return scope.Succeeded(new AccessToken(result.AccessToken, result.ExpiresOn));
+                        return scope.Succeeded(result.ToAccessToken());
                     }
                     catch (MsalUiRequiredException msalEx)
                     {
@@ -243,7 +259,7 @@ namespace Azure.MyIdentity
                     }
                 }
                 result = await AuthenticateImplAsync(async, requestContext, cancellationToken).ConfigureAwait(false);
-                return scope.Succeeded(new AccessToken(result.AccessToken, result.ExpiresOn));
+                return scope.Succeeded(result.ToAccessToken());
             }
             catch (Exception e)
             {

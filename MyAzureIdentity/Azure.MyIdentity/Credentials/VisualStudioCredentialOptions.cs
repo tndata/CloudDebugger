@@ -9,7 +9,7 @@ namespace Azure.MyIdentity
     /// <summary>
     /// Options for configuring the <see cref="VisualStudioCredential"/>.
     /// </summary>
-    public class VisualStudioCredentialOptions : TokenCredentialOptions, ISupportsAdditionallyAllowedTenants
+    public class VisualStudioCredentialOptions : TokenCredentialOptions, ISupportsAdditionallyAllowedTenants, ISupportsTenantId
     {
         private string _tenantId;
 

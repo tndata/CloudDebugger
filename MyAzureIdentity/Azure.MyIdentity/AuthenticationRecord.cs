@@ -149,7 +149,6 @@ namespace Azure.MyIdentity
             return await DeserializeAsync(stream, true, cancellationToken).ConfigureAwait(false);
         }
 
-
         private async Task SerializeAsync(Stream stream, bool async, CancellationToken cancellationToken)
         {
             using (var json = new Utf8JsonWriter(stream))
