@@ -32,6 +32,7 @@ namespace Azure.MyIdentity
             sb.AppendLine();
             sb.AppendLine("BrokerCredential");
             sb.AppendLine("================");
+            sb.AppendLine("Uses platform authentication brokers (WAM on Windows, Keychain on macOS) for native OS authentication instead of web browser.");
 
             // Configuration status
             sb.AppendLine("Configuration:");
@@ -39,7 +40,7 @@ namespace Azure.MyIdentity
 
             if (!_isBrokerOptionsEnabled)
             {
-                sb.AppendLine($"  Status: ⚠ UNAVAILABLE");
+                sb.AppendLine($"  Status: UNAVAILABLE");
                 sb.AppendLine($"  Reason: Azure.Identity.Broker package not found");
                 sb.AppendLine($"  Install: dotnet add package Azure.Identity.Broker");
                 return sb.ToString();
@@ -95,7 +96,7 @@ namespace Azure.MyIdentity
 
                 if (_options.DisableAutomaticAuthentication)
                 {
-                    sb.AppendLine($"  ⚠ Automatic authentication disabled");
+                    sb.AppendLine($"   Automatic authentication disabled");
                 }
             }
 
@@ -195,10 +196,10 @@ namespace Azure.MyIdentity
                 // Try to extract account information from the token or scope
                 try
                 {
-                    // Check if we can get account info from diagnostic scope
+                    // Try to get account info from the scope using reflection
                     var scopeType = scope.GetType();
                     var accountProp = scopeType.GetProperty("AccountIdentifier",
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
                     if (accountProp != null)
                     {
