@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Core;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Azure.Core;
 
 namespace Azure.MyIdentity
 {
@@ -411,8 +411,11 @@ namespace Azure.MyIdentity
                 // Use Type.GetType and ConstructorInfo because they can be analyzed by the ILLinker and are
                 // AOT friendly.
 
+
+                // HACK: To enable BrokerCredential support, Types are found in the \Azure.Identity.Broker folder. 
+
                 // Try to get the options type
-                var optionsType = Type.GetType("Azure.Identity.Broker.DevelopmentBrokerOptions, Azure.Identity.Broker", throwOnError: false);
+                var optionsType = Type.GetType("Azure.Identity.Broker.DevelopmentBrokerOptions", throwOnError: false);
                 if (optionsType == null)
                     return false;
 

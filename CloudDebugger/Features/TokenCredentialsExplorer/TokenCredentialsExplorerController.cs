@@ -115,10 +115,6 @@ public class TokenCredentialsExplorerController : Controller
 
     }
 
-    /// <summary>
-    /// We ignore this credential, as it makes no sense to use in the CLoud Debugger
-    /// </summary>
-    /// <returns></returns>
     private static CredentialResult CreateBrokerCredential()
     {
         var credential = new BrokerCredential(new DevelopmentBrokerOptions
