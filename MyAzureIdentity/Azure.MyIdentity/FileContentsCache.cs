@@ -14,8 +14,10 @@ namespace Azure.MyIdentity
     internal class FileContentsCache
 #pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
-        private SemaphoreSlim _lock= new SemaphoreSlim(1);
-        private readonly string _tokenFilePath;
+        private SemaphoreSlim _lock = new SemaphoreSlim(1);
+
+        // HACK: Made public
+        public readonly string _tokenFilePath;
         private string _tokenFileContents;
         private DateTimeOffset _refreshOn = DateTimeOffset.MinValue;
         private readonly TimeSpan _refreshInterval;

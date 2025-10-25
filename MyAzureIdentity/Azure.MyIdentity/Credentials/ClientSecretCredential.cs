@@ -52,7 +52,10 @@ namespace Azure.MyIdentity
                 secret = ClientSecret.Length <= 5 ? ClientSecret : ClientSecret.Substring(0, 5) + "******";
 
             var sb = new StringBuilder();
-            sb.AppendLine($"ClientSecretCredential");
+            sb.AppendLine();
+            sb.AppendLine("ClientSecretCredential");
+            sb.AppendLine("======================");
+
             sb.AppendLine($" - TenantId = {TenantId}");
             sb.AppendLine($" - ClientId = {ClientId}");
             sb.AppendLine($" - ClientSecret = {secret}");

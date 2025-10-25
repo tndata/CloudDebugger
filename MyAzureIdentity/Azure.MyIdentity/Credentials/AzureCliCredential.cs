@@ -62,7 +62,9 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"AzureCliCredential");
+            sb.AppendLine();
+            sb.AppendLine("AzureCliCredential");
+            sb.AppendLine("==================");
             sb.AppendLine($" - Path = {_path}");
             sb.AppendLine($" - logPII = {_logPII}");
             sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");

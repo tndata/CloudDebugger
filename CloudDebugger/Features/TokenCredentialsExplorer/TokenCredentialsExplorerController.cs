@@ -58,6 +58,15 @@ public class TokenCredentialsExplorerController : Controller
 
                 result.Add(cred.Credential.ToString() ?? "");
             }
+            else
+            {
+                if (cred != null)
+                {
+                    // Credential creation error
+                    var msg = cred.Message ?? "";
+                    model.ErrorMessage = $"Failed to create credentials:\r\n{msg}";
+                }
+            }
         }
         catch (Exception exc)
         {
@@ -85,7 +94,7 @@ public class TokenCredentialsExplorerController : Controller
             2 => CreateAzureCliCredential(),
             3 => CreateAzureDeveloperCliCredential(),
             4 => CreateAzurePowerShellCredential(),
-            5 => null,
+            5 => CreateAzurePipelinesCredential(),
             6 => CreateClientAssertionCredential(),
             7 => CreateClientCertificateCredential(),
             8 => CreateClientSecretCredential(),
@@ -100,9 +109,83 @@ public class TokenCredentialsExplorerController : Controller
             17 => CreateVisualStudioCodeCredential(),
             18 => CreateVisualStudioCredential(),
             19 => CreateWorkloadIdentityCredential(),
+            20 => CreateBrokerCredential(),
             _ => null
         };
 
+    }
+
+    /// <summary>
+    /// We ignore this credential, as it makes no sense to use in the CLoud Debugger
+    /// </summary>
+    /// <returns></returns>
+    private static CredentialResult CreateBrokerCredential()
+    {
+        var credential = new BrokerCredential(new DevelopmentBrokerOptions
+        {
+            Diagnostics =
+                        {
+                            IsLoggingEnabled = true,
+                            LoggedHeaderNames = { "*" },
+                            LoggedQueryParameters = { "*" },
+                            IsAccountIdentifierLoggingEnabled=true,
+                            IsLoggingContentEnabled=true,
+                            IsDistributedTracingEnabled=true,
+                            IsTelemetryEnabled=true
+                        }
+        });
+
+        return new() { Credential = credential, Message = "" };
+    }
+
+    private static CredentialResult CreateAzurePipelinesCredential()
+    {
+        // Get required parameters from environment variables
+        string tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? "";
+        string clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? "";
+        string serviceConnectionId = Environment.GetEnvironmentVariable("AZURESUBSCRIPTION_SERVICE_CONNECTION_ID") ?? "";
+        string systemAccessToken = Environment.GetEnvironmentVariable("SYSTEM_ACCESSTOKEN") ?? "";
+
+        // Validate required parameters
+        if (string.IsNullOrEmpty(tenantId) ||
+            string.IsNullOrEmpty(clientId) ||
+            string.IsNullOrEmpty(serviceConnectionId) ||
+            string.IsNullOrEmpty(systemAccessToken))
+        {
+            var missing = new System.Collections.Generic.List<string>();
+            if (string.IsNullOrEmpty(tenantId)) missing.Add("AZURE_TENANT_ID");
+            if (string.IsNullOrEmpty(clientId)) missing.Add("AZURE_CLIENT_ID");
+            if (string.IsNullOrEmpty(serviceConnectionId)) missing.Add("AZURESUBSCRIPTION_SERVICE_CONNECTION_ID");
+            if (string.IsNullOrEmpty(systemAccessToken)) missing.Add("SYSTEM_ACCESSTOKEN");
+
+            return new()
+            {
+                Credential = null,
+                Message = $"AzurePipelinesCredential unavailable - missing: {string.Join(", ", missing)}"
+            };
+        }
+
+        var credential = new AzurePipelinesCredential(
+            tenantId,
+            clientId,
+            serviceConnectionId,
+            systemAccessToken,
+            new AzurePipelinesCredentialOptions
+            {
+                Diagnostics =
+                {
+                IsLoggingEnabled = true,
+                LoggedHeaderNames = { "*" },
+                LoggedQueryParameters = { "*" },
+                IsAccountIdentifierLoggingEnabled = true,
+                IsLoggingContentEnabled = true,
+                IsDistributedTracingEnabled = true,
+                IsTelemetryEnabled = true
+                }
+            });
+
+
+        return new() { Credential = credential, Message = "" };
     }
 
     private static CredentialResult CreateAuthorizationCodeCredential()

@@ -40,12 +40,21 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"DeviceCodeCredential");
+            sb.AppendLine();
+            sb.AppendLine("DeviceCodeCredential");
+            sb.AppendLine("====================");
+
             sb.AppendLine($" - ClientId = {ClientId}");
             sb.AppendLine($" - DisableAutomaticAuthentication = {DisableAutomaticAuthentication}");
             sb.AppendLine($" - Record = {Record.ToString()}");
             sb.AppendLine($" - DefaultScope = {DefaultScope}");
-            sb.AppendLine($" - AuthenticationRecord = {Record.ToString()}");
+
+            if (Record != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine(Record.ToString());
+            }
+
             return sb.ToString();
         }
 

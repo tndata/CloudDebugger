@@ -50,7 +50,10 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+
+            sb.AppendLine();
             sb.AppendLine("ChainedTokenCredential");
+            sb.AppendLine("======================");
 
             if (_sources != null)
             {

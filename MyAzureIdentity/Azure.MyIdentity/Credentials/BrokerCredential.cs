@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace Azure.MyIdentity
 {
-    internal class BrokerCredential : InteractiveBrowserCredential
+    // HACK: Marked public for debugging purposes. Only called by DefaultAzureCredentials
+    public class BrokerCredential : InteractiveBrowserCredential
     {
         private const string Troubleshooting = "See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/brokercredential/troubleshoot";
 
@@ -24,7 +25,10 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("BrokerCredential");
+            sb.AppendLine("================");
+
             sb.AppendLine($" - _isBrokerOptionsEnabled = {_isBrokerOptionsEnabled}");
             sb.AppendLine("");
             return sb.ToString();

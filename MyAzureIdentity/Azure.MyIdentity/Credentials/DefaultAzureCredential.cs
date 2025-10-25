@@ -87,6 +87,17 @@ namespace Azure.MyIdentity
         /// </summary>
         internal DefaultAzureCredential() : this(false) { }  //HACK: Made internal for debugging
 
+
+        /// <summary>
+        /// Hack: Custom ToString() method to return the log text
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "\r\nDefaultAzureCredential\r\n======================\r\n\r\n" + LogText.ToString();
+        }
+
+
         /// <summary>
         /// Creates an instance of the DefaultAzureCredential class.
         /// </summary>
@@ -258,9 +269,8 @@ namespace Azure.MyIdentity
                 foundSource = true;
                 try
                 {
-                    LogText.AppendLine($" - Trying: {sources[i].GetType().FullName}");
-                    LogText.AppendLine("");
-                    LogText.AppendLine($" - {sources[i].ToString()}");
+                    LogText.AppendLine($"Trying: {sources[i].GetType().FullName}");
+                    LogText.AppendLine($"{sources[i].ToString()}");
 
 
                     AccessToken token = async
@@ -325,13 +335,5 @@ namespace Azure.MyIdentity
             return options;
         }
 
-        /// <summary>
-        /// Hack: Custom ToString() method to return the log text
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return "DefaultAzureCredential\r\n\r\n" + LogText.ToString();
-        }
     }
 }

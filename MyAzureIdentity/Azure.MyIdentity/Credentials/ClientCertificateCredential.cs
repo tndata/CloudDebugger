@@ -49,7 +49,10 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("ClientCertificateCredential");
+            sb.AppendLine("===========================");
+
             sb.AppendLine($" - TenantId = {TenantId}");
             sb.AppendLine($" - ClientId = {ClientId}");
 

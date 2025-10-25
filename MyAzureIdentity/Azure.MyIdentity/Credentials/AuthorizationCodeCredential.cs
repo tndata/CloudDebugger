@@ -37,7 +37,9 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("AuthorizationCodeCredential");
+            sb.AppendLine("===========================");
             sb.AppendLine($" - authCode = {_authCode}");
             sb.AppendLine($" - clientId = {_clientId}");
             sb.AppendLine($" - record = {_record.ToString()}");

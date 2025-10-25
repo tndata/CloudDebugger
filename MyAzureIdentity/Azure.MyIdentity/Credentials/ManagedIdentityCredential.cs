@@ -37,7 +37,9 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("ManagedIdentityCredential");
+            sb.AppendLine("=========================");
 
             if (_clientId != null)
             {

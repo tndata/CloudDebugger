@@ -73,6 +73,18 @@
                     <br>
                 }
 
+                @if (Model.CurrentCredentialIndex == 5)
+                {
+                    <button type="submit" name="Credential" value="5" class="btn btn-link"><b>AzurePipelinesCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="Credential" value="5" class="btn btn-link">AzurePipelinesCredential</button>
+                    <br>
+                }
+
+
                 @if (Model.CurrentCredentialIndex == 4)
                 {
                     <button type="submit" name="Credential" value="4" class="btn btn-link"><b>AzurePowerShellCredential</b></button>
@@ -83,6 +95,33 @@
                     <button type="submit" name="Credential" value="4" class="btn btn-link">AzurePowerShellCredential</button>
                     <br>
                 }
+
+@* 
+We ignore this credential 
+                @if (Model.CurrentCredentialIndex == 20)
+                {
+                    <button type="submit" name="Credential" value="20" class="btn btn-link"><b>BrokerCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="Credential" value="20" class="btn btn-link">BrokerCredential</button>
+                    <br>
+                }
+ *@
+
+                
+                @if (Model.CurrentCredentialIndex == 13)
+                {
+                    <button type="submit" name="Credential" value="13" class="btn btn-link"><b>ManagedIdentityCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="Credential" value="13" class="btn btn-link">ManagedIdentityCredential</button>
+                    <br>
+                }
+
 
                 @if (Model.CurrentCredentialIndex == 9)
                 {

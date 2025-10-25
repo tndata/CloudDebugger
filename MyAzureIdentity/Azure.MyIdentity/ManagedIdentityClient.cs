@@ -219,31 +219,35 @@ namespace Azure.MyIdentity
 
             // HACK: New version with detailed logging
             log = new StringBuilder();
-            log.AppendLine("Starting ManagedIdentitySource selection");
+            log.AppendLine("=== Selecting Managed Identity Source ===");
 
             // Try TokenExchangeManagedIdentitySource first
-            log.AppendLine(" - Trying TokenExchangeManagedIdentitySource");
+            log.AppendLine("Checking for Token Exchange environment (Kubernetes/Service Fabric)...");
+
             var tokenExchangeSource = TokenExchangeManagedIdentitySource.TryCreate(options);
 
             if (tokenExchangeSource != null)
             {
-                log.AppendLine("Selected TokenExchangeManagedIdentitySource");
+                log.AppendLine("✓ Token Exchange source available - using federated identity");
+
                 if (TokenExchangeManagedIdentitySource.Log != null)
                 {
+                    log.AppendLine("  Details:");
                     log.AppendLine(TokenExchangeManagedIdentitySource.Log);
                 }
                 MyAzureIdentityLog.AddToLog("ManagedIdentityClient", $"SelectManagedIdentitySource\r\n{log.ToString()}");
                 return tokenExchangeSource;
             }
-
             // Fall back to ImdsManagedIdentityProbeSource
-            log.AppendLine(" - TokenExchangeManagedIdentitySource not available");
-            log.AppendLine(" - Creating ImdsManagedIdentityProbeSource");
-            var imdsProbeSource = new ImdsManagedIdentityProbeSource(options, client);
-            log.AppendLine("Selected ImdsManagedIdentityProbeSource");
-            log.AppendLine(imdsProbeSource?.ToString());
+            log.AppendLine("Token Exchange not available (not in Kubernetes/Service Fabric environment)");
+            log.AppendLine("Falling back to IMDS source (Azure VM/App Service/Container Instances)...");
 
-            MyAzureIdentityLog.AddToLog("ManagedIdentityClient", $"SelectManagedIdentitySource\r\n{log.ToString()}");
+            var imdsProbeSource = new ImdsManagedIdentityProbeSource(options, client);
+
+            log.AppendLine("IMDS Probe source created - will auto-detect specific Azure environment");
+            log.AppendLine($"  Source type: {imdsProbeSource?.GetType().Name}");
+
+            MyAzureIdentityLog.AddToLog("ManagedIdentityClient", $"SelectManagedIdentitySource\r\n{log}");
 
             return imdsProbeSource;
 

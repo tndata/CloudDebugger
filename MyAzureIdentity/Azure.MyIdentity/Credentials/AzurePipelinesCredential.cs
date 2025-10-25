@@ -38,7 +38,10 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("AzureDeveloperCliCredential");
+            sb.AppendLine("===========================");
+
             sb.AppendLine($" - SystemAccessToken = {SystemAccessToken}");
             sb.AppendLine($" - TenantId = {TenantId}");
             sb.AppendLine($" - ServiceConnectionId = {ServiceConnectionId}");

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Core.Pipeline;
+using Microsoft.Identity.Client;
 using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core.Pipeline;
-using Microsoft.Identity.Client;
 
 namespace Azure.MyIdentity
 {
@@ -81,6 +81,37 @@ namespace Azure.MyIdentity
 
         internal AccountId AccountId { get; private set; }
         internal string Version { get; private set; } = CurrentVersion;
+
+        /// <summary>
+        /// Hack: Custom Code for debugging purposes.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            var sb = new System.Text.StringBuilder();
+
+            sb.AppendLine("AuthenticationRecord");
+            sb.AppendLine($" - Username: {Username ?? "null"}");
+            sb.AppendLine($" - Authority: {Authority ?? "null"}");
+            sb.AppendLine($" - HomeAccountId: {HomeAccountId ?? "null"}");
+            sb.AppendLine($" - TenantId: {TenantId ?? "null"}");
+            sb.AppendLine($" - ClientId: {ClientId ?? "null"}");
+            sb.AppendLine($" - Version: {Version ?? "null"}");
+
+            if (AccountId != null)
+            {
+                sb.AppendLine($" - AccountId:");
+                sb.AppendLine($"   - Identifier: {AccountId.Identifier ?? "null"}");
+                sb.AppendLine($"   - ObjectId: {AccountId.ObjectId ?? "null"}");
+                sb.AppendLine($"   - tenantId: {AccountId.TenantId ?? "null"}");
+            }
+            else
+            {
+                sb.AppendLine(" - AccountId: null");
+            }
+
+            return sb.ToString();
+        }
 
         /// <summary>
         /// Serializes the <see cref="AuthenticationRecord"/> to the specified <see cref="Stream"/>.

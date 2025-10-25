@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Azure.Core;
@@ -31,10 +31,58 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("WorkloadIdentityCredential");
+            sb.AppendLine("==========================");
+
+            // Show configuration status
+            sb.AppendLine("Configuration:");
+            sb.AppendLine($"  Initialized: {_clientAssertionCredential != null}");
+
+            if (_clientAssertionCredential == null)
+            {
+                sb.AppendLine("### Credential NOT configured - missing required environment variables:");
+                sb.AppendLine("### Required: AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_FEDERATED_TOKEN_FILE");
+            }
+            else
+            {
+                sb.AppendLine("  ✓ Credential configured");
+
+                // Token file information
+                if (_tokenFileCache != null)
+                {
+                    sb.AppendLine($"  Token file path: {_tokenFileCache._tokenFilePath ?? "not set"}");
+                    // Optional: Check if file exists and is readable
+                    try
+                    {
+                        if (System.IO.File.Exists(_tokenFileCache._tokenFilePath))
+                        {
+                            var fileInfo = new System.IO.FileInfo(_tokenFileCache._tokenFilePath);
+                            sb.AppendLine($"  Token file size: {fileInfo.Length} bytes");
+                            sb.AppendLine($"  Last modified: {fileInfo.LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss} UTC");
+                        }
+                        else
+                        {
+                            sb.AppendLine("## Token file does not exist");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        sb.AppendLine($"## Cannot access token file: {ex.Message}");
+                    }
+                }
+
+                // Additional tenant IDs (if any)
+                if (AdditionallyAllowedTenantIds != null && AdditionallyAllowedTenantIds.Length > 0)
+                {
+                    sb.AppendLine($"  Additional allowed tenants: {AdditionallyAllowedTenantIds.Length}");
+                }
+            }
 
             if (_clientAssertionCredential != null)
             {
+                sb.AppendLine();
+                sb.AppendLine("ClientAssertionCredential:");
                 sb.AppendLine(" - " + _clientAssertionCredential.ToString());
             }
 
@@ -44,7 +92,6 @@ namespace Azure.MyIdentity
                 sb.AppendLine("=== MsalConfidentialClient Log ===");
                 sb.AppendLine(Client.GetLog());
             }
-
 
             return sb.ToString();
         }

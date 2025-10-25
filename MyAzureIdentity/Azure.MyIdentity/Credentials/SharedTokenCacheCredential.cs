@@ -46,7 +46,9 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("SharedTokenCacheCredential");
+            sb.AppendLine("==========================");
             sb.AppendLine($" - TenantId = {TenantId}");
             sb.AppendLine($" - Username = {Username}");
             sb.AppendLine($" - _skipTenantValidation = {_skipTenantValidation}");

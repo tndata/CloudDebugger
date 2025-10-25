@@ -135,7 +135,9 @@ namespace Azure.MyIdentity
             if (string.IsNullOrEmpty(clientSecret) == false)
                 safeClientSecret = clientSecret.Length <= 5 ? clientSecret : clientSecret.Substring(0, 5) + "******";
 
+            log.AppendLine();
             log.AppendLine("EnvironmentCredential");
+            log.AppendLine("=====================");
             log.AppendLine($" - tenantId = {tenantId}");
             log.AppendLine($" - clientId = {clientId}");
             log.AppendLine($" - clientSecret = {safeClientSecret}");

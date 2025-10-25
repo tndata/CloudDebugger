@@ -57,7 +57,10 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("AzureDeveloperCliCredential");
+            sb.AppendLine("===========================");
+
             sb.AppendLine($" - DefaultWorkingDir = {DefaultWorkingDir}");
             sb.AppendLine($" - logPII = {_logPII}");
             sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");

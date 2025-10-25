@@ -44,11 +44,13 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("VisualStudioCredential");
+            sb.AppendLine("======================");
             sb.AppendLine($" - TenantId = {TenantId}");
-            sb.AppendLine($" - logPII = {_logPII}");
-            sb.AppendLine($" - logAccountDetails = {_logAccountDetails}");
-            sb.AppendLine($" - isChainedCredential = {_isChainedCredential}");
+            sb.AppendLine($" - LogPII = {_logPII}");
+            sb.AppendLine($" - LogAccountDetails = {_logAccountDetails}");
+            sb.AppendLine($" - IsChainedCredential = {_isChainedCredential}");
             sb.AppendLine($" - ProcessTimeout = {ProcessTimeout}");
             sb.AppendLine($" - TokenProviderFilePath = {TokenProviderFilePath}");
             return sb.ToString();

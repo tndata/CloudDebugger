@@ -35,9 +35,11 @@ namespace Azure.MyIdentity
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine("VisualStudioCodeCredential");
+            sb.AppendLine("==========================");
             sb.AppendLine($" - TenantId = {TenantId}");
-            sb.AppendLine($" - _isBrokerOptionsEnabled = {_isBrokerOptionsEnabled}");
+            sb.AppendLine($" - isBrokerOptionsEnabled = {_isBrokerOptionsEnabled}");
             return sb.ToString();
         }
         /// <summary>

@@ -48,7 +48,9 @@ namespace Azure.MyIdentity
             /// </summary>
             /// <returns></returns>
             var sb = new StringBuilder();
-            sb.AppendLine($"UsernamePasswordCredential");
+            sb.AppendLine();
+            sb.AppendLine("UsernamePasswordCredential");
+            sb.AppendLine("==========================");
             sb.AppendLine($" - TenantId = {_tenantId}");
             sb.AppendLine($" - ClientId = {_clientId}");
             sb.AppendLine($" - Password = {password}");
