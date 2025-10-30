@@ -19,7 +19,7 @@ public class TokenCredentialsExplorerModel
     /// </summary>
     public string? CredentialMessage { get; set; }
     public string? CredentialName { get; set; }
-    public int CurrentCredentialIndex { get; set; }
+    public int CurrentCredentiald { get; set; }
 
 
     public string? ErrorMessage { get; set; }
