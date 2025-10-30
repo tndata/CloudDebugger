@@ -39,11 +39,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-  	<PackageReference Include="Microsoft.Build" Version="17.10.46" />
-	  <Content Update="Features\OpenTelemetry\Histogram.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
+		<PackageReference Include="Microsoft.Build" Version="17.14.28" />
+		<Content Update="Features\OpenTelemetry\Histogram.cshtml">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 	</ItemGroup>
 
 	<!--Set the build date https://stackoverflow.com/a/50607951/68490-->
