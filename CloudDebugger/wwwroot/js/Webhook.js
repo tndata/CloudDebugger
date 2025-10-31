@@ -1,6 +1,6 @@
 ﻿"use strict";
 
-//SignalR connection script, used by the Webhook tool.
+// SignalR connection script, used by the Webhook tool.
 
 let connection = new signalR.HubConnectionBuilder().withUrl("/WebHookHub").build();
 
@@ -29,10 +29,9 @@ connection.on("ReceiveMessage4", function (color, content) {
     li4.textContent = `${content}`;
 });
 
-// Start the SignalR connection
-connection.start().then(function () {
+try {
+    await connection.start();
     // Connection started
-}).catch(function (err) {
-    return console.error(err.toString());
-});
-
+} catch (err) {
+    console.error(err.toString());
+}
