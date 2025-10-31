@@ -250,6 +250,6 @@ public static class CredentialsFactory
         ConfigureDiagnostics(options.Diagnostics);
 
         var credential = new BrokerCredential(options);
-        return new() { Credential = credential, Message = "Uses system authentication broker (WAM on Windows)" };
+        return new() { Credential = credential, Message = "Uses system authentication broker (WAM on Windows). Aimed for desktop computers with UI. Does not work in Azure." };
     }
 }
