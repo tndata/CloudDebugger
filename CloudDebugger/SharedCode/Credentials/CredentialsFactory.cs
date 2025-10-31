@@ -7,7 +7,7 @@ namespace CloudDebugger.SharedCode.Credentials;
 /// credential type identifier.
 /// </summary>
 
-public sealed class CredentialsFactory
+public static class CredentialsFactory
 {
     /// <summary>
     /// Create the TokenCredential instance based on the selected credential Id.

@@ -30,7 +30,7 @@ public class TokenCredentialsExplorerController : Controller
 
         var model = new TokenCredentialsExplorerModel()
         {
-            CurrentCredentiald = credentialId,
+            CurrentCredentialId = credentialId,
             ClientId = clientId
         };
 
@@ -86,13 +86,16 @@ public class TokenCredentialsExplorerController : Controller
         return View(model);
     }
 
-    private static AccessToken GetAccessToken(TokenCredential credential)
+    private static AccessToken GetAccessToken(TokenCredential? credential)
     {
-        var tokenRequestContext = new TokenRequestContext(scopes);
+        if (credential != null)
+        {
+            var tokenRequestContext = new TokenRequestContext(scopes);
 
-        var token = credential.GetToken(tokenRequestContext, default);
+            var token = credential.GetToken(tokenRequestContext, default);
 
-        return token;
+            return token;
+        }
+        return new AccessToken("", DateTimeOffset.MinValue);
     }
 }
-

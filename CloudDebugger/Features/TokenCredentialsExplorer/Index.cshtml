@@ -1,12 +1,13 @@
-﻿<!-- Column 1 start -->
-        @using Azure.MyIdentity
-        @model CloudDebugger.Features.TokenCredentialsExplorer.TokenCredentialsExplorerModel
+﻿@using Azure.MyIdentity
+@model CloudDebugger.Features.TokenCredentialsExplorer.TokenCredentialsExplorerModel
 @{
     ViewData["Title"] = "Cloud Debugger - TokenCredentials Explorer";
 }
 
 <h5>TokenCredentials Explorer</h5>
 This tool will help you explore some of the different TokenCredentials in Azure.
+<br />
+<a href="/DefaultAzureCredentials">Back</a>
 <br />
 <br />
 
@@ -50,9 +51,10 @@ This tool will help you explore some of the different TokenCredentials in Azure.
 
 
                 @* Not all credentials are supported for various reasons *@
+                @*      <a href="Index?Credential=1">AuthorizationCodeCredential</a><br>*@
 
 
-                @if (Model.CurrentCredentiald == 2)
+                @if (Model.CurrentCredentialId == 2)
                 {
                     <button type="submit" name="CredentialId" value="2" class="btn btn-link"><b>AzureCliCredential</b></button>
                     <br>
@@ -63,7 +65,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 3)
+                @if (Model.CurrentCredentialId == 3)
                 {
                     <button type="submit" name="CredentialId" value="3" class="btn btn-link"><b>AzureDeveloperCliCredential</b></button>
                     <br>
@@ -74,7 +76,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 5)
+                @if (Model.CurrentCredentialId == 5)
                 {
                     <button type="submit" name="CredentialId" value="5" class="btn btn-link"><b>AzurePipelinesCredential</b></button>
                     <br>
@@ -85,8 +87,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-
-                @if (Model.CurrentCredentiald == 4)
+                @if (Model.CurrentCredentialId == 4)
                 {
                     <button type="submit" name="CredentialId" value="4" class="btn btn-link"><b>AzurePowerShellCredential</b></button>
                     <br>
@@ -97,8 +98,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-
-                @if (Model.CurrentCredentiald == 20)
+                @if (Model.CurrentCredentialId == 20)
                 {
                     <button type="submit" name="CredentialId" value="20" class="btn btn-link"><b>BrokerCredential</b></button>
                     <br>
@@ -109,8 +109,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-
-                @if (Model.CurrentCredentiald == 9)
+                @if (Model.CurrentCredentialId == 9)
                 {
                     <button type="submit" name="CredentialId" value="9" class="btn btn-link"><b>DefaultAzureCredential</b></button>
                     <br>
@@ -121,7 +120,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
  
-                @if (Model.CurrentCredentiald == 11)
+                @if (Model.CurrentCredentialId == 11)
                 {
                     <button type="submit" name="CredentialId" value="11" class="btn btn-link"><b>EnvironmentCredential</b></button>
                     <br>
@@ -132,7 +131,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 12)
+                @if (Model.CurrentCredentialId == 12)
                 {
                     <button type="submit" name="CredentialId" value="12" class="btn btn-link"><b>InteractiveBrowserCredential</b></button>
                     <br>
@@ -143,7 +142,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 13)
+                @if (Model.CurrentCredentialId == 13)
                 {
                     <button type="submit" name="CredentialId" value="13" class="btn btn-link"><b>ManagedIdentityCredential</b></button>
                     <br>
@@ -154,7 +153,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 17)
+                @if (Model.CurrentCredentialId == 17)
                 {
                     <button type="submit" name="CredentialId" value="17" class="btn btn-link"><b>VisualStudioCodeCredential</b></button>
                     <br>
@@ -165,7 +164,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 18)
+                @if (Model.CurrentCredentialId == 18)
                 {
                     <button type="submit" name="CredentialId" value="18" class="btn btn-link"><b>VisualStudioCredential</b></button>
                     <br>
@@ -176,7 +175,7 @@ This tool will help you explore some of the different TokenCredentials in Azure.
                     <br>
                 }
 
-                @if (Model.CurrentCredentiald == 19)
+                @if (Model.CurrentCredentialId == 19)
                 {
                     <button type="submit" name="CredentialId" value="19" class="btn btn-link"><b>WorkloadIdentityCredential</b></button>
                     <br />

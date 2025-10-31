@@ -1,110 +1,14 @@
-﻿@model CloudDebugger.Features.CredentialsCaching.GetMultipleAccessTokenModel
+﻿@model CloudDebugger.Features.CredentialsCaching.CredentialCachingModel
 @{
     ViewData["Title"] = "Cloud Debugger - Exploring Token Caching";
 }
 
 <h4>Exploring Token Caching</h4>
-This page demonstrates the behavior of access token requests when using different instances of DefaultAzureCredential.
+This page demonstrates the caching behavior of access token requests.
 <br />
 <a href="/DefaultAzureCredentials">Back</a>
 <br />
 <br />
-
-<h5>Using the Same Instance</h5>
-Observe the behavior when GetToken() is called multiple times on the same instance of DefaultAzureCredential.
-<br />
-<pre>
-var credential = new DefaultAzureCredential();
-for (int i = 0; i < 10; i++)
-{
-    token = credential.GetAccessToken(...);
-}
-</pre>
-<br />
-<br />
-<table class="table table-bordered">
-
-    <tr>
-            
-        <th>
-           Results
-        </th>
-
-    </tr>
-
-    @if (Model.SingleInstanceLog != null && Model.SingleInstanceLog.Count > 0)
-    {
-        foreach (var entry in Model.SingleInstanceLog)
-        {
-            <tr>
-                <td>
-                    <pre>@entry</pre>
-                </td>
-            </tr>
-        }
-
-        <tr>
-            <td>Sample access token</td>
-        </tr>
-        <tr>
-            <td id="access_token" style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                @(Model.SingleInstanceAccessToken ?? "No token found")
-            </td>
-        </tr>
-    }
-    else
-    {
-        <tr>
-            <td>No log data found</td>
-        </tr>
-    }
-</table>
-
-<br />
-<br />
-
-<h5>Using a New Instance Each Time</h5>
-Observe the behavior when GetToken() is called multiple times, each time using a new instance of MyDefaultAzureCredential.
-<br />
-<br />
-<pre>
-for (int i = 0; i < 10; i++)
-{
-    var credential = new DefaultAzureCredential();
-    token = credential.GetAccessToken(...);
-}
-</pre>
-
-<table class="table table-bordered">
-    @if (Model.MultipleInstancesLog != null && Model.MultipleInstancesLog.Count > 0)
-    {
-        foreach (var entry in Model.MultipleInstancesLog)
-        {
-            <tr>
-                <td>
-                    <pre>@entry</pre>
-                </td>
-            </tr>
-        }
-        <tr>
-            <td>Sample access token</td>
-        </tr>
-        <tr>
-            <td id="access_token" style="width: 1000px; word-wrap: break-word; display: inline-block; vertical-align: top;">
-                @(Model.MultipleInstanceAccessToken ?? "No token found")
-            </td>
-        </tr>
-    }
-    else
-    {
-        <tr>
-            <td>No log data found</td>
-        </tr>
-    }
-</table>
-
-
-
 
 @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
 {
@@ -118,9 +22,238 @@ for (int i = 0; i < 10; i++)
     <b>@Model.Message</b>
 }
 
+<form method="get" action="/CredentialsCaching/Index">
+    <div class="form-group">
+        <label for="clientId">Client ID (optional):</label>
+        <input type="text" class="form-control" id="clientId" name="clientId" value="@Model.ClientId" size="40" style="width:40ch;" />
+        Only used by DefaultAzureCredentials and ManagedIdentityCredential.
+    </div>
+    <br />
+
+    <table class="table table-bordered">
+        <tr>
+            <th>
+                <h4>Token Credentials</h4>
+            </th>
+            <th>
+                @if (Model.CredentialName != null)
+                {
+                    <h5>@Model.CredentialName</h5>
+                }
+            </th>
+        </tr>
+        <tr>
+            <!-- Column 1 start -->
+            <td class="col-md-3">
+                Select a token credentials to explore.
+                (Might take some time to load)
+                <br /><br />
+
+                @* Not all credentials are supported for various reasons *@
+                @*      <a href="Index?Credential=1">AuthorizationCodeCredential</a><br>*@
+
+                @if (Model.CurrentCredentialId == 2)
+                {
+                    <button type="submit" name="CredentialId" value="2" class="btn btn-link"><b>AzureCliCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="2" class="btn btn-link">AzureCliCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 3)
+                {
+                    <button type="submit" name="CredentialId" value="3" class="btn btn-link"><b>AzureDeveloperCliCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="3" class="btn btn-link">AzureDeveloperCliCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 5)
+                {
+                    <button type="submit" name="CredentialId" value="5" class="btn btn-link"><b>AzurePipelinesCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="5" class="btn btn-link">AzurePipelinesCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 4)
+                {
+                    <button type="submit" name="CredentialId" value="4" class="btn btn-link"><b>AzurePowerShellCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="4" class="btn btn-link">AzurePowerShellCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 20)
+                {
+                    <button type="submit" name="CredentialId" value="20" class="btn btn-link"><b>BrokerCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="20" class="btn btn-link">BrokerCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 9)
+                {
+                    <button type="submit" name="CredentialId" value="9" class="btn btn-link"><b>DefaultAzureCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="9" class="btn btn-link">DefaultAzureCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 11)
+                {
+                    <button type="submit" name="CredentialId" value="11" class="btn btn-link"><b>EnvironmentCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="11" class="btn btn-link">EnvironmentCredential</button>
+                    <br>
+                }
+@* 
+                ** This credentials makes no sense here, as it launches the browser each time**
+                @if (Model.CurrentCredentialId == 12)
+                {
+                    <button type="submit" name="CredentialId" value="12" class="btn btn-link"><b>InteractiveBrowserCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="12" class="btn btn-link">InteractiveBrowserCredential</button>
+                    <br>
+                } *@
+
+                @if (Model.CurrentCredentialId == 13)
+                {
+                    <button type="submit" name="CredentialId" value="13" class="btn btn-link"><b>ManagedIdentityCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="13" class="btn btn-link">ManagedIdentityCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 17)
+                {
+                    <button type="submit" name="CredentialId" value="17" class="btn btn-link"><b>VisualStudioCodeCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="17" class="btn btn-link">VisualStudioCodeCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 18)
+                {
+                    <button type="submit" name="CredentialId" value="18" class="btn btn-link"><b>VisualStudioCredential</b></button>
+                    <br>
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="18" class="btn btn-link">VisualStudioCredential</button>
+                    <br>
+                }
+
+                @if (Model.CurrentCredentialId == 19)
+                {
+                    <button type="submit" name="CredentialId" value="19" class="btn btn-link"><b>WorkloadIdentityCredential</b></button>
+                    <br />
+                }
+                else
+                {
+                    <button type="submit" name="CredentialId" value="19" class="btn btn-link">WorkloadIdentityCredential</button>
+                    <br />
+                }
+            </td>
+            <!-- Column 1 end -->
+            <!-- Column 2 start -->
+            <td class="col-md-9">
+                <table>
+                    <tr>
+                        <th></th>
+                    </tr>
+
+                    @if (Model.CredentialMessage != null)
+                    {
+                        <tr>
+                            <td>
+                                @Model.CredentialMessage<br /><br />
+                            </td>
+                        </tr>
+                    }
+
+                    @if (Model.Log != null && Model.Log.Count > 0)
+                    {
+                        <tr>
+                            <td>
+                                <h6>Results</h6>
+                            </td>
+                        </tr>
+
+                        foreach (var entry in Model.Log)
+                        {
+                            <tr>
+                                <td>
+                                    <pre>@entry</pre>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                    @if (Model.AccessToken.Token != null)
+                    {
+                        <tr>
+                            <td>
+                                <h5>Sample Access Token</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="access_token" style="width: 500px; word-wrap: break-word; display: inline-block; vertical-align: top;">
+                                @(Model.AccessToken.Token ?? "No token found")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @if (Model.UrlToJWTIOSite != null)
+                                {
+                                    <br />
+                                    <br />
+                                    
+                                    @:Explore the access token on <a href="@Model.UrlToJWTIOSite" target="_blank">https://jwt.io</a> or <a href="@Model.UrlToJWTMSSite" target="_blank">https://jwt.ms</a><br />
+                                }
+                            </td>
+                        </tr>
+                    } 
+                </table>
+            </td>
+            <!-- Column 2 end -->
+        </tr>
+    </table>
+</form>
 
 <br />
 <br />
+
 <h5>Resources</h5>
 <ul>
     <li><a href="https://github.com/tndata/CloudDebugger/wiki/TokenCaching">Documentation</a></li>

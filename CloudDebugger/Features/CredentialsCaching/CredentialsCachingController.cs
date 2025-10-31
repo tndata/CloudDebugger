@@ -1,159 +1,194 @@
 using Azure.Core;
-using Azure.MyIdentity;
+using CloudDebugger.SharedCode.Credentials;
+using Flurl;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Text;
 
 namespace CloudDebugger.Features.CredentialsCaching;
 
 /// <summary>
-/// Using the hacked "DefaultAzureCredential" version in the included MyIdentity library,
+//
 /// </summary>
-public class CredentialsCachingController : Controller
+public partial class CredentialsCachingController : Controller
 {
     private readonly ILogger<CredentialsCachingController> _logger;
 
-    private static readonly string[] scopes = ["https://management.azure.com//.default"];
+    private static readonly string[] testScopes = ["https://management.azure.com//.default"];
+
+    // We use this scope to warm up the credential to avoid caching effects of the main scope
+    private static readonly string[] warmUpScopes = ["https://graph.microsoft.com/.default"];
 
     public CredentialsCachingController(ILogger<CredentialsCachingController> logger)
     {
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index(int credentialId = 0, string? clientId = null)
     {
-        var model = new GetMultipleAccessTokenModel();
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
+        if (credentialId == 0 && clientId == null)
+        {
+            clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
+        }
+
+        var model = new CredentialCachingModel()
+        {
+            CurrentCredentialId = credentialId,
+            ClientId = clientId
+        };
+
+        var result = new List<string>();
+        CredentialResult? cred = null;
         try
         {
-            var result1 = GetTokensUsingSingleInstance();
-            model.SingleInstanceLog = result1.log;
-            model.SingleInstanceAccessToken = result1.AccessToken;
+            cred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
 
+            if (cred != null && cred.Credential != null)
+            {
+                model.CredentialMessage = cred.Message;
+                model.CredentialName = cred.Credential.GetType().Name;
 
-            var result2 = GetTokensUsingMultipleInstances();
-            model.MultipleInstancesLog = result2.log;
-            model.MultipleInstanceAccessToken = result2.AccessToken;
+                var log1 = await TestSingleInstance(credentialId, clientId);
+                result.Add(log1);
+
+                var log2 = await TestMultipleInstances(credentialId, clientId);
+                result.Add(log2);
+
+                // Get sample access token
+                var sampleCred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+                if (sampleCred != null)
+                {
+                    model.AccessToken = await GetAccessTokenAsync(sampleCred.Credential, testScopes);
+                    if (model.AccessToken.Token != null)
+                    {
+                        model.UrlToJWTIOSite = new Uri("https://jwt.io").SetFragment("value=" + model.AccessToken.Token);
+                        model.UrlToJWTMSSite = new Uri("https://jwt.ms").SetFragment("access_token=" + model.AccessToken.Token);
+                    }
+                }
+            }
+            else
+            {
+                if (cred != null)
+                {
+                    // Credential creation error
+                    var msg = cred.Message ?? "";
+                    model.ErrorMessage = $"Failed to create credentials:\r\n{msg}";
+                }
+            }
         }
         catch (Exception exc)
         {
+            if (cred != null)
+                result.Add(cred.Credential?.ToString() ?? "");
+
             model.ErrorMessage = $"Exception:\r\n{exc.Message}";
-            _logger.LogError(exc, "Failed to retrieve multiple access token");
+            _logger.LogError(exc, "Failed to retrieve access token");
         }
+
+        model.Log = result;
 
         return View(model);
     }
 
-
-    /// <summary>
-    /// Call new DefaultAzureCredential() 10 times in a row on the same instance, 
-    /// is the token the same? Same execution time?
-    /// </summary>
-    /// <returns></returns>
-    private static (List<string> log, string AccessToken) GetTokensUsingSingleInstance()
+    private static async Task<string> TestSingleInstance(int credentialId, string? clientId)
     {
-        var result = new List<string>();
+        StringBuilder sb = new();
 
-        //We reuse the same instance
-        var cred = CreateDefaultAzureCredentialInstance();
 
-        var totalTimeSw = new Stopwatch();
-        totalTimeSw.Start();
 
-        AccessToken token = new();
+        var credential = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+
+        if (credential == null || credential.Credential == null)
+        {
+            return "Failed to create credential instance. credentialId=" + credentialId;
+        }
+
+        var credName = credential.Credential.GetType().Name;
+
+        sb.AppendLine($"Test 1: Using the Same {credName} Instance");
+        sb.AppendLine($"------------------------------------------------------");
+        sb.AppendLine($"var credential = new {credName}(...);");
+        sb.AppendLine($"for (int i = 0; i < 10; i++)");
+        sb.AppendLine("{");
+        sb.AppendLine($"    token = credential.GetToken(...);");
+        sb.AppendLine("}");
+        sb.AppendLine();
+
+        var tokenCredential = credential.Credential;
+
+        // Warm up with different scope to avoid caching the target scope
+        await GetAccessTokenAsync(tokenCredential, warmUpScopes);
+
         for (int i = 0; i < 10; i++)
         {
-            var sw = new Stopwatch();
-            sw.Start();
+            var sw = Stopwatch.StartNew();
 
-            token = GetAccessToken(cred);
+            var token = await GetAccessTokenAsync(tokenCredential, testScopes);
             var hash = token.Token.GetHashCode();
 
             sw.Stop();
-            result.Add($"Attempt {i} took {(int)sw.Elapsed.TotalMilliseconds}ms - Token.Hashcode={hash}");
+
+            sb.AppendLine($"Attempt {i + 1,2}: {sw.ElapsedMilliseconds,4}ms - Token hash: {hash,12}");
         }
 
-
-
-        totalTimeSw.Stop();
-        result.Add("");
-        result.Add($"Total time {totalTimeSw.Elapsed.TotalSeconds} sec");
-
-        var selectedCredential = cred.SelectedTokenCredential;
-        result.Add("Selected TokenCredential: " + selectedCredential?.GetType().Name);
-
-        return (result, token.Token);
+        return sb.ToString();
     }
 
 
-    /// <summary>
-    /// Call new DefaultAzureCredential() 10 times in a row a new instance each time, 
-    /// is the token the same? Same execution time?
-    /// </summary>
-    private static (List<string> log, string AccessToken) GetTokensUsingMultipleInstances()
+    private static async Task<string> TestMultipleInstances(int credentialId, string? clientId)
     {
-        var result = new List<string>();
+        StringBuilder sb = new();
 
-        var totalTimeSw = new Stopwatch();
-        totalTimeSw.Start();
+        var warmupCredential = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
 
-        DefaultAzureCredential? cred = null;
+        if (warmupCredential == null || warmupCredential.Credential == null)
+        {
+            return "Failed to create credential instance. credentialId=" + credentialId;
+        }
 
-        AccessToken token = new();
+        var credName = warmupCredential.Credential.GetType().Name;
+
+        sb.AppendLine($"Test 2: Creating New {credName} Instance Each Time");
+        sb.AppendLine($"--------------------------------------------------------------");
+        sb.AppendLine($"for (int i = 0; i < 10; i++)");
+        sb.AppendLine("{");
+        sb.AppendLine($"    var credential = new {credName}(...);");
+        sb.AppendLine($"    token = credential.GetToken(...);");
+        sb.AppendLine("}");
+        sb.AppendLine();
+
+        await GetAccessTokenAsync(warmupCredential.Credential, warmUpScopes);
+
         for (int i = 0; i < 10; i++)
         {
-            var sw = new Stopwatch();
-            sw.Start();
+            var sw = Stopwatch.StartNew();
 
-            //We create a new instance each time
-            cred = CreateDefaultAzureCredentialInstance();
-            token = GetAccessToken(cred);
+            var credential = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+
+            var token = await GetAccessTokenAsync(credential?.Credential, testScopes);
             var hash = token.Token.GetHashCode();
 
             sw.Stop();
-            result.Add($"Attempt {i} took {(int)sw.Elapsed.TotalMilliseconds} ms - Token.Hashcode={hash}");
+
+            sb.AppendLine($"Attempt {i + 1,2}: {sw.ElapsedMilliseconds,4}ms - Token hash: {hash,12}");
         }
 
-        totalTimeSw.Stop();
-        result.Add("");
-        result.Add($"Total time {totalTimeSw.Elapsed.TotalSeconds} sec");
+        return sb.ToString();
+    }
 
-        if (cred != null)
+    private static async Task<AccessToken> GetAccessTokenAsync(TokenCredential? credential, string[] scopes)
+    {
+        if (credential != null)
         {
-            var selectedCredential = cred.SelectedTokenCredential;
-            result.Add("Selected TokenCredential: " + selectedCredential?.GetType().Name);
+            var tokenRequestContext = new TokenRequestContext(scopes);
+            return await credential.GetTokenAsync(tokenRequestContext, default);
         }
-
-        return (result, token.Token);
-    }
-
-
-    private static AccessToken GetAccessToken(DefaultAzureCredential credential)
-    {
-        var tokenRequestContext = new TokenRequestContext(scopes);
-
-        var token = credential.GetToken(tokenRequestContext);
-
-        return token;
-    }
-
-    private static DefaultAzureCredential CreateDefaultAzureCredentialInstance()
-    {
-        var options = new DefaultAzureCredentialOptions
+        else
         {
-            Diagnostics =
-                        {
-                            IsLoggingEnabled = true,
-                            LoggedHeaderNames = { "*" },
-                            LoggedQueryParameters = { "*" },
-                            IsAccountIdentifierLoggingEnabled=true,
-                            IsLoggingContentEnabled=true,
-                            IsDistributedTracingEnabled=true,
-                            IsTelemetryEnabled=true
-                        },
-        };
-
-        var cred = new DefaultAzureCredential(options);
-
-        return cred;
+            return new AccessToken("", DateTimeOffset.MinValue);
+        }
     }
 }

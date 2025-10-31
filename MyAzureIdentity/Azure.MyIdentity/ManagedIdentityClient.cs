@@ -55,8 +55,6 @@ namespace Azure.MyIdentity
             return sb.ToString();
         }
 
-
-
         protected ManagedIdentityClient()
         {
         }
@@ -98,6 +96,8 @@ namespace Azure.MyIdentity
             MSAL.ManagedIdentitySource availableSource = ManagedIdentityApplication.GetManagedIdentitySource();
 
             // HACK: logging for source selection
+
+            log.AppendLine($"\r\nTrying to authenticate");
             log.AppendLine($"ManagedIdentity source detected: {availableSource.ToString()}");
             log.AppendLine($"ManagedIdentityId type: {_options.ManagedIdentityId.ToString()}");
 
@@ -250,12 +250,7 @@ namespace Azure.MyIdentity
             MyAzureIdentityLog.AddToLog("ManagedIdentityClient", $"SelectManagedIdentitySource\r\n{log}");
 
             return imdsProbeSource;
-
         }
-
-
-
-
         private static bool HasInnerExceptionMatching(Exception exception, Func<Exception, bool> condition)
         {
             var current = exception;
