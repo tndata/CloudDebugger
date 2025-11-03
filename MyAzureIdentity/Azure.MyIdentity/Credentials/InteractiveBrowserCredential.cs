@@ -270,6 +270,14 @@ namespace Azure.MyIdentity
                                 .ConfigureAwait(false);
                         }
 
+                        // Hack: Custom Code for debugging purposes.
+                        var log = DebugAuthenticationResult(result);
+                        MyAzureIdentityLog.AddToLog("InteractiveBrowserCredential", log);
+                        DefaultAzureCredential.LogText.AppendLine("");
+                        DefaultAzureCredential.LogText.AppendLine("InteractiveBrowserCredential log");
+                        DefaultAzureCredential.LogText.AppendLine(log);
+                        DefaultAzureCredential.LogText.AppendLine();
+
                         return scope.Succeeded(result.ToAccessToken());
                     }
                     catch (MsalUiRequiredException e)
@@ -294,6 +302,7 @@ namespace Azure.MyIdentity
                 throw scope.FailWrapAndThrow(e, null, IsChainedCredential);
             }
         }
+
 
         private async Task<AccessToken> GetTokenViaBrowserLoginAsync(TokenRequestContext context, bool async, CancellationToken cancellationToken)
         {
@@ -320,6 +329,45 @@ namespace Azure.MyIdentity
 
             Record = new AuthenticationRecord(result, ClientId);
             return result.ToAccessToken();
+        }
+
+
+        // Hack: Custom Code for debugging purposes.
+        private static string DebugAuthenticationResult(AuthenticationResult result)
+        {
+            var sb = new StringBuilder();
+
+            if (result == null)
+            {
+                sb.AppendLine("AuthenticationResult is null");
+                return sb.ToString();
+            }
+
+            sb.AppendLine($"AccessToken: {result.AccessToken}");
+            sb.AppendLine($"ExpiresOn: {result.ExpiresOn}");
+            sb.AppendLine($"IsExtendedLifeTimeToken: {result.IsExtendedLifeTimeToken}");
+            sb.AppendLine($"Scopes: {string.Join(", ", result.Scopes ?? new string[0])}");
+            sb.AppendLine($"TenantId: {result.TenantId}");
+            sb.AppendLine($"CorrelationId: {result.CorrelationId}");
+            sb.AppendLine($"IdToken: {result.IdToken}");
+            sb.AppendLine($"TokenType: {result.TokenType}");
+
+            if (result.Account != null)
+            {
+                sb.AppendLine("Account:");
+                sb.AppendLine($"  Username: {result.Account.Username}");
+                sb.AppendLine($"  Environment: {result.Account.Environment}");
+                sb.AppendLine($"  HomeAccountId.Identifier: {result.Account.HomeAccountId?.Identifier}");
+                sb.AppendLine($"  HomeAccountId.ObjectId: {result.Account.HomeAccountId?.ObjectId}");
+                sb.AppendLine($"  HomeAccountId.TenantId: {result.Account.HomeAccountId?.TenantId}");
+            }
+            else
+            {
+                sb.AppendLine("Account: null");
+            }
+
+            return sb.ToString();
+
         }
     }
 }

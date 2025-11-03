@@ -12,6 +12,13 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
 <br />
 
 
+<form method="get" action="/DefaultAzureCredentials/GetAccessToken" class="form-inline mb-3">
+    <label for="tenantIdInput">Optional Tenant ID:</label>
+    <input type="text" name="TenantId" id="tenantIdInput" class="form-control mx-2" maxlength="36" value="@Model.TenantId" style="width: 400px;" placeholder="" />
+    <button type="submit" class="btn btn-primary">Get Access Token</button>
+</form>
+<br />
+
 @if (!String.IsNullOrWhiteSpace(Model.ErrorMessage))
 {
     <div class="alert alert-danger" role="alert">

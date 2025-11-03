@@ -39,7 +39,21 @@ namespace Azure.MyIdentity
             sb.AppendLine("VisualStudioCodeCredential");
             sb.AppendLine("==========================");
             sb.AppendLine($" - TenantId = {TenantId}");
+            sb.AppendLine($" - ClientId = {ClientId}");
+            sb.AppendLine($" - LoginHint = {LoginHint}");
+            sb.AppendLine($" - DisableAutomaticAuthentication = {DisableAutomaticAuthentication}");
+            sb.AppendLine($" - DefaultScope = {DefaultScope}");
+            sb.AppendLine($" - UseOperatingSystemAccount = {UseOperatingSystemAccount}");
+            sb.AppendLine($" - IsChainedCredential = {IsChainedCredential}");
+
             sb.AppendLine($" - isBrokerOptionsEnabled = {_isBrokerOptionsEnabled}");
+
+            if (Record != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine(Record.ToString());
+            }
+
             return sb.ToString();
         }
         /// <summary>

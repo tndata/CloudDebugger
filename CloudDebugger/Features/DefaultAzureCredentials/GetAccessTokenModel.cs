@@ -11,6 +11,11 @@ public class GetAccessTokenModel
     public TokenCredential? SelectedTokenCredential { get; set; }
 
     /// <summary>
+    /// The TenantId used to create DefaultAzureCredential.
+    /// </summary>
+    public string? TenantId { get; set; }
+
+    /// <summary>
     /// List of TokenCredentials that MyDefaultAzureCredential will try to get token from.
     /// </summary>
     public List<TokenCredential>? CredentialSources { get; set; }

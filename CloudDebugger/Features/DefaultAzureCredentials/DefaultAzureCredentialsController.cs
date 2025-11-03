@@ -28,16 +28,19 @@ public class DefaultAzureCredentialsController : Controller
     /// Get an access token using the custom MyDefaultAzureCredential class.
     /// </summary>
     /// <returns></returns>
-    public IActionResult GetAccessToken()
+    public IActionResult GetAccessToken(string? TenantId = null)
     {
+        TenantId = TenantId?.Trim();
+
         var model = new GetAccessTokenModel();
+        model.TenantId = TenantId;
 
         var totalTimeSw = new Stopwatch();
         totalTimeSw.Start();
 
         try
         {
-            model.MyDefaultAzureCredential = CreateMyDefaultAzureCredentialInstance();
+            model.MyDefaultAzureCredential = CreateMyDefaultAzureCredentialInstance(TenantId);
 
             model.AccessToken = GetAccessToken(model.MyDefaultAzureCredential);
             if (model.AccessToken.Token != null)
@@ -82,10 +85,11 @@ public class DefaultAzureCredentialsController : Controller
         return token;
     }
 
-    private static DefaultAzureCredential CreateMyDefaultAzureCredentialInstance()
+    private static DefaultAzureCredential CreateMyDefaultAzureCredentialInstance(string? tenantId = null)
     {
         var options = new DefaultAzureCredentialOptions
         {
+            TenantId = tenantId!,
             Diagnostics =
                         {
                             IsLoggingEnabled = true,
