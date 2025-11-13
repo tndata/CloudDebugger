@@ -23,7 +23,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="10.0.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 		<PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.3.0-preview.4" />
-		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
+		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.13.1" />
 		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.10.0-beta.1" />
