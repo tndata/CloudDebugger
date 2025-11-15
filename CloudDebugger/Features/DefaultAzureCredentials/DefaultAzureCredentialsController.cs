@@ -32,8 +32,10 @@ public class DefaultAzureCredentialsController : Controller
     {
         TenantId = TenantId?.Trim();
 
-        var model = new GetAccessTokenModel();
-        model.TenantId = TenantId;
+        var model = new GetAccessTokenModel
+        {
+            TenantId = TenantId
+        };
 
         var totalTimeSw = new Stopwatch();
         totalTimeSw.Start();
