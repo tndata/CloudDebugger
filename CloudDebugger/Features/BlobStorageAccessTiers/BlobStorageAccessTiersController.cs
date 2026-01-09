@@ -167,7 +167,11 @@ public class BlobStorageAccessTiersController : Controller
 
         var container = client.GetBlobContainerClient(containerName);
 
-        var blobs = container.GetBlobs(BlobTraits.None, BlobStates.None);
+        var blobs = container.GetBlobs(new GetBlobsOptions
+        {
+            Traits = BlobTraits.None,
+            States = BlobStates.None
+        });
 
         foreach (BlobItem blob in blobs)
         {

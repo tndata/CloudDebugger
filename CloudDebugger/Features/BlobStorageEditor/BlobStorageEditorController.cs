@@ -142,7 +142,7 @@ public class BlobStorageEditorController : Controller
 
     private static void GetBlogsInNormalStorageAccount(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container)
     {
-        var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path).ToList();
+        var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path, default).ToList();
 
         // Always add an root element to the list, for easier navigation.
         result.Add(("/", ""));

@@ -104,7 +104,7 @@ public class BlobVersioningController : Controller
 
         var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
 
-        var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: model?.BlobName);
+        var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: model?.BlobName, default);
 
         foreach (BlobItem version in blobVersions)
         {
