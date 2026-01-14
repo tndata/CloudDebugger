@@ -46,37 +46,14 @@ public partial class CredentialsCachingController : Controller
         {
             cred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
 
-            if (cred != null && cred.Credential != null)
+            if (cred?.Credential != null)
             {
-                model.CredentialMessage = cred.Message;
-                model.CredentialName = cred.Credential.GetType().Name;
-
-                var log1 = await TestSingleInstance(credentialId, clientId);
-                result.Add(log1);
-
-                var log2 = await TestMultipleInstances(credentialId, clientId);
-                result.Add(log2);
-
-                // Get sample access token
-                var sampleCred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
-                if (sampleCred != null)
-                {
-                    model.AccessToken = await GetAccessTokenAsync(sampleCred.Credential, testScopes);
-                    if (model.AccessToken.Token != null)
-                    {
-                        model.UrlToJWTIOSite = new Uri("https://jwt.io").SetFragment("value=" + model.AccessToken.Token);
-                        model.UrlToJWTMSSite = new Uri("https://jwt.ms").SetFragment("access_token=" + model.AccessToken.Token);
-                    }
-                }
+                await RunCredentialCachingTests(credentialId, clientId, model, result, cred);
             }
             else
             {
-                if (cred != null)
-                {
-                    // Credential creation error
-                    var msg = cred.Message ?? "";
-                    model.ErrorMessage = $"Failed to create credentials:\r\n{msg}";
-                }
+                // Credential creation error
+                model.ErrorMessage = $"Failed to create credentials:\r\n{cred?.Message ?? "[Unknown]"}";
             }
         }
         catch (Exception exc)
@@ -91,6 +68,30 @@ public partial class CredentialsCachingController : Controller
         model.Log = result;
 
         return View(model);
+    }
+
+    private static async Task RunCredentialCachingTests(int credentialId, string? clientId, CredentialCachingModel model, List<string> result, CredentialResult cred)
+    {
+        model.CredentialMessage = cred.Message;
+        model.CredentialName = cred.Credential?.GetType().Name ?? "Uknown";
+
+        var log1 = await TestSingleInstance(credentialId, clientId);
+        result.Add(log1);
+
+        var log2 = await TestMultipleInstances(credentialId, clientId);
+        result.Add(log2);
+
+        // Get sample access token
+        var sampleCred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+        if (sampleCred != null)
+        {
+            model.AccessToken = await GetAccessTokenAsync(sampleCred.Credential, testScopes);
+            if (model.AccessToken.Token != null)
+            {
+                model.UrlToJWTIOSite = new Uri("https://jwt.io").SetFragment("value=" + model.AccessToken.Token);
+                model.UrlToJWTMSSite = new Uri("https://jwt.ms").SetFragment("access_token=" + model.AccessToken.Token);
+            }
+        }
     }
 
     private static async Task<string> TestSingleInstance(int credentialId, string? clientId)

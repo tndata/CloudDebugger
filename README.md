@@ -1,7 +1,7 @@
 # Cloud Debugger - the exploration tool for Azure cloud developers
 
 ## About the Cloud Debugger
-Cloud Debugger is an open-source tool built with ASP.NET Core 9, providing a comprehensive set of utilities for exploring, teaching, and debugging Azure services. 
+Cloud Debugger is an open-source tool built with ASP.NET Core 10, providing a comprehensive set of utilities for exploring, teaching, and debugging Azure services. 
 Designed to be deployed to Azure App Services, it enables developers, architects, and DevOps engineers to seamlessly explore and troubleshoot Azure services and APIs. 
 Cloud Debugger is a web-based tool that can be accessed from any browser, making it easy to gain insights into your cloud environment and streamline your debugging processes.
 
