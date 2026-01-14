@@ -406,3 +406,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# AI/Development tools
+.claude/
+.mcp.json
+.cursor/
+
