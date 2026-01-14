@@ -19,7 +19,6 @@ namespace Azure.MyIdentity
         /// or the system default browser
         /// </summary>
         [Obsolete("This option requires additional dependencies on Microsoft.Identity.Client.Desktop and is no longer supported. Consider using brokered authentication instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool? UseEmbeddedWebView { get; set; }
 
         internal SystemWebViewOptions SystemBrowserOptions;

@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.AspNetCore.MyHttpLogging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Microsoft.AspNetCore.Builder;
 

@@ -10,7 +10,6 @@ using MyHttpLogging.CustomCode;
 
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
-
 /// <summary>
 /// Middleware that logs HTTP requests and HTTP responses.
 /// </summary>
@@ -111,7 +110,7 @@ internal sealed class HttpLoggingMiddleware
         loggingFields = logContext.LoggingFields;
 
         var request = context.Request;
-        if (logContext.IsAnyEnabled(HttpLoggingFields.RequestPropertiesAndHeaders))
+        if (logContext.IsAnyEnabled(HttpLoggingFields.RequestPropertiesAndHeaders | HttpLoggingFields.RequestQuery))
         {
             if (loggingFields.HasFlag(HttpLoggingFields.RequestProtocol))
             {

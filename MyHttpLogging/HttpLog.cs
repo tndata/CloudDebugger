@@ -60,9 +60,6 @@ internal sealed class HttpLog : IReadOnlyList<KeyValuePair<string, object?>>
                 builder.Append(kvp.Value?.ToString());
             }
 
-
-
-
             _cachedToString = builder.ToString();
         }
 

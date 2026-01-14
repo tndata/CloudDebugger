@@ -15,6 +15,10 @@ It contains the following modification:
 * Most of the changes is in the HttpLoggingMiddleware class.
 
 
+
+# Version history
+* January 2026 - Updated with ASP.NET Core 10.0.1 and .NET 10.
+
 ### Resources
  * <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/http-logging/" target="_blank">HTTP logging in ASP.NET Core</a>
 
