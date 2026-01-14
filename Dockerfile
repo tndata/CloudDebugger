@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src 
 
@@ -28,7 +28,7 @@ RUN dotnet publish CloudDebugger/CloudDebugger.csproj -c Release -o /app
 
 # Phase #2, Build final image ------------------------------------------
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS release
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS release
 
 # Switch to non-root user for security
 USER app

@@ -10,7 +10,7 @@ dotnet publish ../CloudDebugger.sln -r linux-x64
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Publish succeeded."
 } else {
-    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 9 SDK not installed?" -ForegroundColor Red
+    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 10 SDK not installed?" -ForegroundColor Red
     exit 1
 }
 
@@ -20,7 +20,7 @@ $zipFolder = '../publish'
 if (-not (Test-Path $zipFolder)) {
     New-Item -ItemType Directory -Path $zipFolder
 }
-Compress-Archive -Path ..\CloudDebugger\bin\Release\net9.0\linux-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-linux.zip"
+Compress-Archive -Path ..\CloudDebugger\bin\Release\net10.0\linux-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-linux.zip"
 Write-Host "Zip file created at ${zipFolder}/publish-linux.zip"
 
 # Step 3: Create the resource group
@@ -57,7 +57,7 @@ Write-Host "`nCreating the Linux App Service '${AppServiceName_linux}'."
 $AppService = az webapp create --name $AppServiceName_linux `
                                           --plan $AppServicePlan_linux `
                                           --resource-group $rgname `
-                                          --runtime 'DOTNETCORE:9.0' `
+                                          --runtime 'DOTNETCORE:10.0' `
                                           --assign-identity $identityId `
                                           --output json | ConvertFrom-Json
 

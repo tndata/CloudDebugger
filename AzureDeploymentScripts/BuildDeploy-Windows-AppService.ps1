@@ -10,7 +10,7 @@ dotnet publish ../CloudDebugger.sln -r win-x64
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Publish succeeded."
 } else {
-    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 9 SDK not installed?" -ForegroundColor Red
+    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 10 SDK not installed?" -ForegroundColor Red
     exit 1
 }
 
@@ -20,7 +20,7 @@ $zipFolder = '../publish'
 if (-not (Test-Path $zipFolder)) {
     New-Item -ItemType Directory -Path $zipFolder
 }
-Compress-Archive -Path ..\CloudDebugger\bin\Release\net9.0\win-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-windows.zip"
+Compress-Archive -Path ..\CloudDebugger\bin\Release\net10.0\win-x64\publish\* -Force  -DestinationPath "${zipFolder}/publish-windows.zip"
 Write-Host "Zip file created at ${zipFolder}/publish-windows.zip"
 
 # Step 3: Create the resource group
@@ -57,7 +57,7 @@ Write-Host "`nCreating the Windows App Service '${AppServiceName_win}'."
 $AppService = az webapp create --name $AppServiceName_win `
                                --plan $AppServicePlan_win `
                                -g $rgname `
-                               --runtime 'dotnet:9' `
+                               --runtime 'dotnet:10' `
                                --assign-identity $identityId `
                                | ConvertFrom-Json
 $appServiceID = $AppService.id

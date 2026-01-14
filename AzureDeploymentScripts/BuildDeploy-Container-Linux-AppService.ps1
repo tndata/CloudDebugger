@@ -69,14 +69,14 @@ $role = az role assignment create `
         --output json `
         --output json | ConvertFrom-Json
 
-# Step 6: Create App Service and deploy the default .NET 9 runtime, we deploy the container at the end of the script.
-Write-Host "`n`nCreating the App Service with the default runtime 'DOTNETCORE:9.0'."
+# Step 6: Create App Service and deploy the default .NET 10 runtime, we deploy the container at the end of the script.
+Write-Host "`n`nCreating the App Service with the default runtime 'DOTNETCORE:10.0'."
 $AppService = az webapp create `
     --name $AppServiceName_container_linux `
     --acr-use-identity `
     --plan $AppServicePlan_linux `
     --resource-group $rgname `
-    --runtime 'DOTNETCORE:9.0' `
+    --runtime 'DOTNETCORE:10.0' `
     --assign-identity $identityId `
     --output json | ConvertFrom-Json
 $hostName = $AppService.defaultHostName

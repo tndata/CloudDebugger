@@ -45,7 +45,7 @@ This tool provides detailed insights into the current HTTP(s) request.
         <tr>
             <td class="col-md-2">Raw Client IP Address</td>
             <td class="col-md-10">@(Model.RawRequest.RemoteIpAddress ?? "Unknown")</td>
-        </tr> 
+        </tr>
     }
 </table>
 
@@ -55,6 +55,8 @@ This tool provides detailed insights into the current HTTP(s) request.
     var sslStream = Context.Features.Get<SslStream>();
     if (sslStream != null)
     {
+        var cipherSuite = sslStream.NegotiatedCipherSuite;
+
         <h4>TLS/SSL details</h4>
         <table class="table table-bordered">
             <tr>
@@ -63,30 +65,7 @@ This tool provides detailed insights into the current HTTP(s) request.
             </tr>
             <tr>
                 <td class="col-md-2">Cipher suite</td>
-                <td class="col-md-10">@sslStream.NegotiatedCipherSuite</td>
-            </tr>
-            <tr>
-                <td class="col-md-2">Cipher strength</td>
-                <td class="col-md-2">@sslStream.CipherStrength</td>
-            </tr>
-            <tr>
-                <td class="col-md-2">Cipher algorithm</td>
-                <td class="col-md-10">@sslStream.CipherAlgorithm.ToString()</td>
-            </tr>
-            <tr>
-                <td class="col-md-2">KeyExchange algorithm</td>
-                <td class="col-md-10">
-                    @sslStream.KeyExchangeAlgorithm.ToString()
-                    @if ((int)(sslStream.KeyExchangeAlgorithm) == 44550)
-                    {
-                        @:(DiffieHellman)
-                    }
-
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-2">KeyExchange strength</td>
-                <td class="col-md-10">@sslStream.KeyExchangeStrength</td>
+                <td class="col-md-10">@cipherSuite</td>
             </tr>
 
             @if (sslStream.RemoteCertificate != null)

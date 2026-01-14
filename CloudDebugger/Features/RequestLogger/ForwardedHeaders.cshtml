@@ -64,13 +64,13 @@ This tool will display the current configuration of the Forwarded Headers middle
             </td>
         </tr>
         <tr>
-            <td>KnownNetworks</td>
+            <td>KnownIPNetworks</td>
             <td>
 
-                @if (Model.KnownNetworks.Any())
+                @if (Model.KnownIPNetworks.Any())
                 {
                     <ul>
-                        @foreach (var host in Model.KnownNetworks)
+                        @foreach (var host in Model.KnownIPNetworks)
                         {
                             <li>@host</li>
                         }
@@ -83,7 +83,7 @@ This tool will display the current configuration of the Forwarded Headers middle
 
             </td>
             <td>
-                KnownNetworks allows you to specify trusted IP address ranges (using CIDR notation)
+                KnownIPNetworks allows you to specify trusted IP address ranges (using CIDR notation)
                 from which forwarded headers are accepted, ensuring that only traffic from these ranges is trusted when processing forwarded requests.
             </td>
         </tr>

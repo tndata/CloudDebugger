@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -13,9 +13,9 @@
 	<ItemGroup>
 		<PackageReference Include="Azure.Core" Version="1.50.0" />
 		<PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.81.0" />
-		<PackageReference Include="System.Memory" Version="4.6.3" />
-		<PackageReference Include="System.Text.Json" Version="10.0.2" />
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+		<!--<PackageReference Include="System.Memory" Version="4.6.3" />-->
+		<!--<PackageReference Include="System.Text.Json" Version="10.0.2" />-->
+		<!--<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />-->
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.81.0" />
 		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.81.0" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.2" />

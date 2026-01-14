@@ -59,7 +59,7 @@ internal static class HostingExtensions
             // We trust all hosts, networks and proxies, so that this debugger can work across
             // all supported hosting models (App Services, Container Apps, container Instances...)
             options.AllowedHosts.Clear();
-            options.KnownNetworks.Clear();
+            options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
         });
 
