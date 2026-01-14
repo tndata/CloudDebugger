@@ -14,7 +14,7 @@
 		<PackageReference Include="Azure.Core" Version="1.50.0" />
 		<PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.81.0" />
 		<PackageReference Include="System.Memory" Version="4.6.3" />
-		<PackageReference Include="System.Text.Json" Version="10.0.1" />
+		<PackageReference Include="System.Text.Json" Version="10.0.2" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.81.0" />
 		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.81.0" />
@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+  	<PackageReference Include="System.Memory.Data" Version="10.0.2" />
 	  <Folder Include="Azure.Identity.Broker\" />
 	</ItemGroup>
 
