@@ -36,7 +36,8 @@ try
 {
     Banners.DisplayPreStartupBanner();
 
-    // We use CreateSlimBuilder to be able to better customize the request pipeline.
+    // CreateSlimBuilder (vs CreateBuilder) excludes default middleware and services,
+    // giving us full control over what's included in the request pipeline.
     var builder = WebApplication.CreateSlimBuilder(args);
 
     var app = builder
