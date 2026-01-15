@@ -1,4 +1,4 @@
-namespace CloudDebugger.Models;
+namespace CloudDebugger.Features.Home;
 
 public class ErrorViewModel
 {
