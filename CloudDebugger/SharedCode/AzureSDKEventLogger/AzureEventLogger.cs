@@ -14,6 +14,8 @@ public static class AzureEventLogger
     private readonly static List<EventLogEntry> log = [];
 
     private readonly static Lock lockObj = new();
+
+    // Limit stored events to prevent unbounded memory growth while keeping enough for debugging
     private const int NumberOfEventsToKeep = 100;
 
     public static List<EventLogEntry> LogEntries
