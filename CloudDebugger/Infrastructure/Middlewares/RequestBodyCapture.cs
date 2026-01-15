@@ -18,14 +18,14 @@ public static class RequestBodyCaptureExtensions
 public class RequestBodyCaptureMiddleware
 {
     private readonly ILogger _logger;
-    private readonly RequestDelegate next;
+    private readonly RequestDelegate _next;
 
     public RequestBodyCaptureMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
 
         _logger = loggerFactory.CreateLogger<RequestBodyCaptureMiddleware>();
-        this.next = next;
+        _next = next;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -39,7 +39,7 @@ public class RequestBodyCaptureMiddleware
         await CaptureBody(context);
 
         // Call the next middleware in the pipeline
-        await next(context);
+        await _next(context);
     }
 
     private static async Task CaptureBody(HttpContext context)

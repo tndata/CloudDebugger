@@ -11,9 +11,9 @@ namespace CloudDebugger.SharedCode.AzureSdkEventLogger;
 /// </summary>
 public static class AzureEventLogger
 {
-    private readonly static List<EventLogEntry> log = [];
+    private static readonly List<EventLogEntry> _log = [];
 
-    private readonly static Lock lockObj = new();
+    private static readonly Lock _lockObj = new();
 
     // Limit stored events to prevent unbounded memory growth while keeping enough for debugging
     private const int NumberOfEventsToKeep = 100;
@@ -22,10 +22,10 @@ public static class AzureEventLogger
     {
         get
         {
-            lock (lockObj)
+            lock (_lockObj)
             {
 
-                return new List<EventLogEntry>(log);
+                return new List<EventLogEntry>(_log);
             }
         }
     }
@@ -64,10 +64,10 @@ public static class AzureEventLogger
 
         sb.AppendLine();
 
-        lock (lockObj)
+        lock (_lockObj)
         {
 
-            log.Add(new EventLogEntry()
+            _log.Add(new EventLogEntry()
             {
                 EntryTime = DateTime.UtcNow,
                 Event = @event,
@@ -75,16 +75,16 @@ public static class AzureEventLogger
                 Message = sb.ToString()
             });
 
-            if (log.Count > NumberOfEventsToKeep)
-                log.RemoveAt(0);
+            if (_log.Count > NumberOfEventsToKeep)
+                _log.RemoveAt(0);
         }
     }
 
     public static void ClearLog()
     {
-        lock (lockObj)
+        lock (_lockObj)
         {
-            log.Clear();
+            _log.Clear();
         }
     }
 }

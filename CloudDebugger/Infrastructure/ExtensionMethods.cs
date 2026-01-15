@@ -2,7 +2,7 @@
 
 namespace CloudDebugger.Infrastructure;
 
-public static class ExtensionsMethods
+public static class ExtensionMethods
 {
     /// <summary>
     /// Will sanitize a given input to only include safe characters A-Z 0-9 [space] - . / \ :
