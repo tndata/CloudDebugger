@@ -7,6 +7,7 @@ public class AppServicesController : Controller
 {
     private readonly ILogger<AppServicesController> _logger;
 
+    // Limit displayed items to keep the UI responsive and page load times reasonable
     private const int MaxNumberOfDirectories = 50;
     private const int MaxNumberOfFiles = 100;
 
