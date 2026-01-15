@@ -138,7 +138,7 @@ public class AppServicesController : Controller
         }
         catch (Exception exc)
         {
-            result.Add($"An exception occured getting the files: {exc.Message}");
+            result.Add($"An exception occurred getting the files: {exc.Message}");
         }
 
         return result;
@@ -165,7 +165,7 @@ public class AppServicesController : Controller
         }
         catch (Exception exc)
         {
-            result.Add($"An exception occured getting the folders: {exc.Message}");
+            result.Add($"An exception occurred getting the folders: {exc.Message}");
         }
 
         return result;
