@@ -30,6 +30,8 @@ public class RequestBodyCaptureMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+        // Request body streams can only be read once by default. EnableBuffering() allows
+        // the stream to be read multiple times by buffering it and allowing Position reset.
         context.Request.EnableBuffering();
 
         _logger.LogDebug("RequestBodyCaptureMiddleware was called");
