@@ -14,7 +14,8 @@ public static class ExtensionsMethods
         if (input == null)
             return string.Empty;
 
-        // Define the regex pattern to allow only spaces, numerical, hyphen/minus and alphabetical characters, . / \ :
+        // Allowlist pattern: letters, numbers, whitespace, and path-safe characters (- . / \ :)
+        // Strips potentially dangerous characters (<, >, &, ", ', etc.) to prevent XSS/injection
         string pattern = @"[^a-zA-Z0-9\s-./\\:]";
         // Replace all unwanted characters with an empty string
         string filteredMessage = Regex.Replace(input, pattern, "", RegexOptions.None, TimeSpan.FromMilliseconds(250));
