@@ -56,9 +56,13 @@ public static class LogAnalyticsWorkspaceSender
         }
     }
 
+    /// <summary>
+    /// Builds the HMAC-SHA256 signature required by the Log Analytics Data Collector API.
+    /// Azure requires this specific signing format for authentication.
+    /// See: https://learn.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api
+    /// </summary>
     private static string BuildSignature(string message, string datestring, string workspaceId, string workspaceKey)
     {
-        // Create a hash for the API signature
         var jsonBytes = Encoding.UTF8.GetBytes(message);
         string stringToHash = "POST\n" + jsonBytes.Length + "\napplication/json\n" + "x-ms-date:" + datestring + "\n/api/logs";
 
