@@ -38,8 +38,8 @@ public static class InfraExtensionMethods
     {
         builder.Services.AddSession(options =>
         {
-            // We do want to support session over HTTP as well
-            // Remember, the session is lost across restarts, the data is stored in memory.
+            // SameAsRequest, to support HTTP for learning about SameSite cookies
+            // and observing the differences between HTTP and HTTPS behavior
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
