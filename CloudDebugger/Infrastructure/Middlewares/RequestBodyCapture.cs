@@ -57,7 +57,9 @@ public class RequestBodyCaptureMiddleware
         }
         catch (Exception)
         {
-            //Ignore any errors here
+            // Safe to ignore: body capture is optional diagnostic functionality.
+            // If it fails (e.g., stream already consumed, encoding issues), the request
+            // should still proceed normally. The Request Logger tool simply won't show the body.
         }
 
         context.Request.Body.Position = 0;
