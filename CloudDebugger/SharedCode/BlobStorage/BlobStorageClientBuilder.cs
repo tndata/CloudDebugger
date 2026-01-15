@@ -5,7 +5,7 @@ using Azure.Storage.Blobs;
 namespace CloudDebugger.SharedCode.BlobStorage;
 
 /// <summary>
-/// Shared Queue Storage Client Builder
+/// Shared Blob Storage Client Builder
 /// </summary>
 public static class BlobStorageClientBuilder
 {
