@@ -50,10 +50,10 @@ public class EventHubProduceController : Controller
         if (model == null)
             return View(new ProduceEventHubModel());
 
-        var ConnectionString = model.ConnectionString ?? "";
+        var connectionString = model.ConnectionString ?? "";
 
         //Remember ConnectionString
-        HttpContext.Session.SetString(connectionSessionKey, ConnectionString);
+        HttpContext.Session.SetString(connectionSessionKey, connectionString);
 
         model.Message = "";
         model.ErrorMessage = "";
@@ -61,7 +61,7 @@ public class EventHubProduceController : Controller
 
         try
         {
-            var producerClient = GetProducerClient(ConnectionString);
+            var producerClient = GetProducerClient(connectionString);
 
             int eventId = model.StartNumber;
 
@@ -88,9 +88,9 @@ public class EventHubProduceController : Controller
         return View(model);
     }
 
-    private static EventHubProducerClient GetProducerClient(string ConnectionString)
+    private static EventHubProducerClient GetProducerClient(string connectionString)
     {
-        var client = new EventHubProducerClient(ConnectionString);
+        var client = new EventHubProducerClient(connectionString);
 
         return client;
     }
