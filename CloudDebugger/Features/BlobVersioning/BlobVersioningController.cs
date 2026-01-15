@@ -13,10 +13,10 @@ public class BlobVersioningController : Controller
 {
     private const string defaultBlobName = "VersionedBlob.txt";
 
-    private const string storageAccountSessionKey = "blobStorageAccount";
-    private const string containerSessionKey = "blobContainer";
-    private const string sasTokenSessionKey = "blobSasToken";
-    private const string blobNameSessionKey = "blobName";
+    private const string storageAccountSessionKey = "BlobStorageAccount";
+    private const string containerSessionKey = "BlobContainer";
+    private const string sasTokenSessionKey = "BlobSasToken";
+    private const string blobNameSessionKey = "BlobName";
 
 
     public BlobVersioningController()

@@ -13,9 +13,9 @@ public class BlobStorageEditorController : Controller
 {
     private readonly ILogger<BlobStorageEditorController> _logger;
 
-    private const string storageAccountSessionKey = "blobStorageAccount";
-    private const string containerSessionKey = "blobContainer";
-    private const string sasTokenSessionKey = "blobSasToken";
+    private const string storageAccountSessionKey = "BlobStorageAccount";
+    private const string containerSessionKey = "BlobContainer";
+    private const string sasTokenSessionKey = "BlobSasToken";
 
     public BlobStorageEditorController(ILogger<BlobStorageEditorController> logger)
     {

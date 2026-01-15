@@ -17,8 +17,7 @@ public class RedisController : Controller
 {
     private readonly ILogger<RedisController> _logger;
 
-    // Session key for remembering the connection string
-    private const string sessionKey = "RedisConnectionString";
+    private const string connectionStringSessionKey = "RedisConnectionString";
 
     public RedisController(ILogger<RedisController> logger)
     {
@@ -36,7 +35,7 @@ public class RedisController : Controller
 
         var model = new RedisModel()
         {
-            ConnectionString = HttpContext.Session.GetString(sessionKey)
+            ConnectionString = HttpContext.Session.GetString(connectionStringSessionKey)
         };
 
         if (!string.IsNullOrEmpty(model.ConnectionString))
@@ -65,7 +64,7 @@ public class RedisController : Controller
             string connectionString = model.ConnectionString ?? "";
 
             // Remember the provided ConnectionString
-            HttpContext.Session.SetString(sessionKey, connectionString);
+            HttpContext.Session.SetString(connectionStringSessionKey, connectionString);
 
             try
             {
@@ -140,7 +139,7 @@ public class RedisController : Controller
     }
 
     /// <summary>
-    /// Write a key to Redis™
+    /// Write a key to Redisï¿½
     /// </summary>
     /// <param name="key"></param>
     /// <param name="value"></param>

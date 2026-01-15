@@ -14,8 +14,8 @@ namespace CloudDebugger.Features.BlobStorageAccessTiers;
 public class BlobStorageAccessTiersController : Controller
 {
     private const string storageAccountSessionKey = "StorageAccount";
-    private const string containerNameSessionKey = "blobContainerName";
-    private const string sasTokenSessionKey = "blobSasToken";
+    private const string containerNameSessionKey = "BlobContainerName";
+    private const string sasTokenSessionKey = "BlobSasToken";
 
     private const string HotTier = "Hot";
     private const string CoolTier = "Cool";
