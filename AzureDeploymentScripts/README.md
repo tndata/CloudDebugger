@@ -6,8 +6,15 @@ This folder contains various PowerShell scripts for deploying CloudDebugger acro
 
 ### Prerequisites
 
-1. Ensure you have the Azure CLI installed and logged in.
-2. Review and configure the settings in the **_Settings.ps1** script.
+Before running the deployment scripts, ensure you have the following installed and configured:
+
+- **.NET 10 SDK** - Required for building the application locally
+- **Azure CLI** - Required for all deployment scripts. Log in using `az login`
+- **Docker Desktop** - Required for container deployments (must be running, not suspended)
+- **Azure Subscription** - With permissions to create resource groups, App Services, Container Registry, etc.
+- **PowerShell** - Scripts are written for PowerShell
+
+After installing the prerequisites, review and configure the settings in **_Settings.ps1** (especially the Azure region and resource names).
 
 ### How to Deploy
 
