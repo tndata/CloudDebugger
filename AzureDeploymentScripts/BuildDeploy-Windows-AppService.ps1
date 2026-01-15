@@ -79,7 +79,7 @@ $res2 = az webapp log config --name $AppServiceName_win `
                              --level verbose `
                              | ConvertFrom-Json
 
-write-host "Set platform settings to 64 bits for Windows App Service (The App Service is by default 32 bit!)"
+Write-Host "Set platform settings to 64 bits for Windows App Service (The App Service is by default 32 bit!)"
 $tmp = az webapp config set --resource-group $rgname `
                      --name $AppServiceName_win `
                      --use-32bit-worker-process false

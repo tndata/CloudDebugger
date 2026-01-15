@@ -92,5 +92,5 @@ Write-Host "`n$containerDetails.properties.configuration.ingress"
 $containerDetails.properties.configuration.ingress
 
 # Final Output
-write-host "`n`nCloudDebugger container image deployed to Azure Container Apps.`n" -ForegroundColor Green
-write-host "Hostname: https://${hostName}" -ForegroundColor Green
+Write-Host "`n`nCloudDebugger container image deployed to Azure Container Apps.`n" -ForegroundColor Green
+Write-Host "Hostname: https://${hostName}" -ForegroundColor Green
