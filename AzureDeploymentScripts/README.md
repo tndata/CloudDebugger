@@ -51,7 +51,7 @@ Deploy CloudDebugger to a Windows App Service on a Windows App Service Plan.
 
 #### 3. **Container Deployments**
 
-To deploy containers, first run the following create an Azure Container Registry (ACR) and push your Docker image to it.
+To deploy containers, first run the following script to create an Azure Container Registry (ACR) and push your Docker image to it.
 
 1. Run **BuildAndPushDockerImage.ps1**.
 
