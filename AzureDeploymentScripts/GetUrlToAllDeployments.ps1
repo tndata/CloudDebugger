@@ -24,8 +24,8 @@ Write-Host "Linux App Service hostname:            https://${linuxAppServiceUrl}
 
 
 $linuxContainerAppService = az webapp show --resource-group $rgname --name $AppServiceName_container_linux --output json | ConvertFrom-Json  
-$linuxContaiinerAppServiceUrl = $linuxContainerAppService.defaultHostName
-Write-Host "Linux Container hostname:              https://${linuxContaiinerAppServiceUrl}"
+$linuxContainerAppServiceUrl = $linuxContainerAppService.defaultHostName
+Write-Host "Linux Container hostname:              https://${linuxContainerAppServiceUrl}"
 
 
 $containerInstance = az container show --resource-group $rgname --name $containerInstanceName  --output json | ConvertFrom-Json
@@ -41,7 +41,7 @@ Write-Host "Container App hostname:                https://${containerAppHostNam
 # Generate .URL files to each service
 "[InternetShortcut]`nURL=https://${windowsAppServiceUrl}" | Out-File -FilePath ".\Link-WindowsAppService.url"
 "[InternetShortcut]`nURL=https://${linuxAppServiceUrl}" | Out-File -FilePath ".\Link-LinuxAppService.url"
-"[InternetShortcut]`nURL=https://${linuxContaiinerAppServiceUrl}" | Out-File -FilePath ".\Link-LinuxContainerAppService.url"
+"[InternetShortcut]`nURL=https://${linuxContainerAppServiceUrl}" | Out-File -FilePath ".\Link-LinuxContainerAppService.url"
 "[InternetShortcut]`nURL=http://${containerInstanceHostName}:8080" | Out-File -FilePath ".\Link-ContainerInstance.url"
 "[InternetShortcut]`nURL=https://${containerAppHostName}" | Out-File -FilePath ".\Link-ContainerApp.url"
 Write-Host "`n`n";
