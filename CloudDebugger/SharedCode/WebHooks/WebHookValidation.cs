@@ -157,11 +157,12 @@ public static class WebHookValidation
     /// <param name="comment"></param>
     private static void SendCallBackRequest(int hookId, Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
     {
-        //Call the callBackUrl to confirm the webhoook
+        //Call the callBackUrl to confirm the webhook
         ThreadPool.QueueUserWorkItem(delegate (object? state)
         {
-            // We send the callback on a separate thread, slightly delayed, so that the callback will be accepted.
-            // It is important to send this request after the current request is completed, otherwise it will not be accepted. 
+            // Event Grid requires the validation callback to be sent AFTER the original HTTP request completes.
+            // If we call back too soon (while the original request is still in flight), Event Grid rejects it.
+            // 5 seconds provides a safe margin for the HTTP response to fully complete and be processed.
             Thread.Sleep(5000);
 
             var newLogEntry = new WebHookLogEntry()
