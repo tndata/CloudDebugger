@@ -111,7 +111,7 @@ public class HealthController : Controller
     {
         _logger.LogInformation("CustomEndpoint action called");
 
-        string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        string time = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
         switch (CustomHealthEndpointStatus)
         {
             case CustomHealthStatusEnum.Healthy:
