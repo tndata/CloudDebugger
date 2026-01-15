@@ -70,7 +70,7 @@ public class QueueStorageSenderController : Controller
     }
 
     /// <summary>
-    /// Send a number of events to the EventHub
+    /// Send a number of messages to Azure Queue Storage
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
