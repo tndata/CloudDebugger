@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Core" Version="1.51.0" />
+		<PackageReference Include="Azure.Core" Version="1.51.1" />
 		<PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.82.0" />
 		<!--<PackageReference Include="System.Memory" Version="4.6.3" />-->
 		<!--<PackageReference Include="System.Text.Json" Version="10.0.2" />-->
