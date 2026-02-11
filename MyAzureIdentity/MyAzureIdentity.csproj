@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+  	<PackageReference Include="System.Memory.Data" Version="10.0.3" />
 	  <Folder Include="Azure.Identity.Broker\" />
 	</ItemGroup>
 
