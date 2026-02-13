@@ -40,7 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Build" Version="18.0.2" />
+		<PackageReference Include="Microsoft.Build" Version="18.3.3" />
 		<Content Update="Features\OpenTelemetry\Histogram.cshtml">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
