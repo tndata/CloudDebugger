@@ -85,4 +85,8 @@ This tool was developed by [Tore Nestenius](https://nestenius.se/), a seasoned .
 * [DefaultAzureCredentials Under the Hood](https://nestenius.se/2024/04/18/default-azure-credentials-under-the-hood/)
 
 
+## Other projects by the author
+* [Coding Agent Explorer](https://github.com/tndata/CodingAgentExplorer) - Real-time .NET proxy and dashboard for inspecting AI coding agent API calls.
+
+
 Microsoft, Azure and .NET are trademarks of the Microsoft group of companies.
