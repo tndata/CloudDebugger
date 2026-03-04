@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  MyHttpLogging -> Z:\GitHubTN\CloudDebugger\MyHttpLogging\bin\Debug\net10.0\MyHttpLogging.dll
+  MyAzureIdentity -> Z:\GitHubTN\CloudDebugger\MyAzureIdentity\bin\Debug\net10.0\MyAzureIdentity.dll
+  CloudDebugger -> Z:\GitHubTN\CloudDebugger\CloudDebugger\bin\Debug\net10.0\CloudDebugger.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:17.72
