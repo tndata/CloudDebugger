@@ -16,7 +16,7 @@ public class AzureSdkEventLogViewerController : Controller
     {
         var model = new ViewLogModel()
         {
-            Log = AzureEventLogger.LogEntries
+            Log = AzureEventLogger.GetLogEntries()
         };
 
         return View(model);
