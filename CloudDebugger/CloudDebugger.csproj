@@ -27,8 +27,8 @@
 		<PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.15.2" />
 		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.2" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.10.0-beta.1" />
-		<PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
-		<PackageReference Include="Azure.Storage.Blobs.ChangeFeed" Version="12.0.0-preview.59" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.29.0-beta.1" />
+		<PackageReference Include="Azure.Storage.Blobs.ChangeFeed" Version="12.0.0-preview.61" />
 		<PackageReference Include="System.Memory.Data" Version="10.0.6" />
 		<PackageReference Include="Microsoft.Build" Version="18.4.0" />
 	</ItemGroup>
