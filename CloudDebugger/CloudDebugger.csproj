@@ -19,7 +19,7 @@
 		<PackageReference Include="Azure.Storage.Queues" Version="12.27.0-beta.1" />
 		<PackageReference Include="Flurl.Http" Version="4.0.2" />
 		<PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.3.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="10.0.6" />
+		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="10.0.7" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" PrivateAssets="all" />
 		<PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
