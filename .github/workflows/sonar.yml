@@ -15,6 +15,9 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu' # Alternative distribution options are available.
+      - name: Create Sonar scanner directory
+        shell: powershell
+        run: New-Item -Path "${{ github.workspace }}\.sonar\scanner" -ItemType Directory -Force   
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
