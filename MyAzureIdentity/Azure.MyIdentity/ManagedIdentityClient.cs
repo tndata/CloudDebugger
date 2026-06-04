@@ -157,9 +157,11 @@ namespace Azure.MyIdentity
                 // HACK: Log MSAL result
                 var accessToken = result.ToAccessToken();
                 var lifetime = accessToken.ExpiresOn - DateTimeOffset.UtcNow;
+                var currentTime = DateTimeOffset.UtcNow;
                 log.AppendLine("MSAL authentication successful - Got access token");
-                log.AppendLine($"ExpiresOn: {accessToken.ExpiresOn.ToString("HH:mm:ss")}");
-                log.AppendLine($"Lifetime: {((int)lifetime.TotalMinutes)} minutes (until it expires)");
+                log.AppendLine($"Current Time: {currentTime:yyyy-MM-dd HH:mm:ss} UTC");
+                log.AppendLine($"ExpiresOn: {accessToken.ExpiresOn:yyyy-MM-dd HH:mm:ss} UTC");
+                log.AppendLine($"Lifetime: {lifetime.TotalHours:F2} hours ({(int)lifetime.TotalMinutes} minutes)");
 
 
                 // HACK: log the token itself if needed for debugging

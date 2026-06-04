@@ -82,7 +82,7 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
                     {
                         <tr>
                             <td>
-                                <br />Expires: <b>@Model.AccessToken.ExpiresOn.ToString("HH:mm:ss") (in @((int)Model.AccessToken.ExpiresOn.Subtract(DateTime.UtcNow).TotalMinutes) min)</b><br>
+                                <br />Expires: <b>@Model.AccessToken.ExpiresOn.UtcDateTime.ToString("MMM dd, yyyy hh:mm:ss tt") UTC (in @((int)Model.AccessToken.ExpiresOn.Subtract(DateTimeOffset.UtcNow).TotalMinutes) min)</b><br>
                             </td>
                         </tr>
                     }
@@ -90,7 +90,7 @@ This page will retrieve an access token using a custom version of DefaultAzureCr
                     {
                         <tr>
                             <td>
-                                <br />Refresh on <b>@Model.AccessToken.RefreshOn.Value.ToString("HH:mm:ss") (in @((int)Model.AccessToken.RefreshOn.Value.Subtract(DateTime.UtcNow).TotalMinutes) min)</b><br />
+                                <br />Refresh on <b>@Model.AccessToken.RefreshOn.Value.UtcDateTime.ToString("MMM dd, yyyy hh:mm:ss tt") UTC (in @((int)Model.AccessToken.RefreshOn.Value.Subtract(DateTimeOffset.UtcNow).TotalMinutes) min)</b><br />
                                 Specifies the time when the cached token should be proactively refreshed.
                             </td>
                         </tr>
