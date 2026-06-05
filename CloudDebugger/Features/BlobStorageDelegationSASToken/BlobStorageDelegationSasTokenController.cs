@@ -1,5 +1,6 @@
 using Azure.MyIdentity;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using CloudDebugger.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -68,7 +69,11 @@ public class BlobStorageDelegationSasTokenController : Controller
             var startsOn = DateTimeOffset.UtcNow.AddMinutes(-1); // To avoid clock skew issues
             var expiresOn = startsOn.AddDays(1);                 // Max 7 days
 
-            var userDelegationKey = client.GetUserDelegationKey(startsOn, expiresOn);
+            var userDelegationKey = client.GetUserDelegationKey(
+                new BlobGetUserDelegationKeyOptions(expiresOn: expiresOn)
+                {
+                    StartsOn = startsOn,
+                });
             model.DelegationKey = userDelegationKey;
 
             model.CorrelationId = Guid.NewGuid().ToString();
