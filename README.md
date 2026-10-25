@@ -33,7 +33,7 @@ See the [deployment guide](https://github.com/tndata/CloudDebugger/wiki/Deployme
 ### Identity tools
 * [Credentials Eventlog](https://github.com/tndata/CloudDebugger/wiki/CredentialsEventLog)
 * [DefaultAzureCredentials](https://github.com/tndata/CloudDebugger/wiki/DefaultAzureCredentials)
-* [Token Caching](https://github.com/tndata/https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
+* [Token Caching](https://github.com/tndata/CloudDebugger/wiki/TokenCaching)
 * [TokenCredentials Explorer](https://github.com/tndata/CloudDebugger/wiki/TokenExplorer)
 
 ### Diagnostics and system information
@@ -80,9 +80,9 @@ This tool was developed by [Tore Nestenius](https://nestenius.se/), a seasoned .
 
 
 ## Related Azure blog posts by the author:
-* [Deploy a container to Azure App Services using Azure CLI and user-assigned managed identity](https://nestenius.se/2024/08/27/deploy-a-container-to-azure-app-services-using-azure-cli-and-user-assigned-managed-identity/)
-* [Deploy Container to Azure App Services with System-Assigned Identity](https://nestenius.se/2024/09/02/deploy-a-container-to-azure-app-services-using-a-system-assigned-identity/)
-* [DefaultAzureCredentials Under the Hood](https://nestenius.se/2024/04/18/default-azure-credentials-under-the-hood/)
+* [Deploy a container to Azure App Services using Azure CLI and user-assigned managed identity](https://nestenius.se/azure/deploy-a-container-to-azure-app-services-using-azure-cli-and-user-assigned-managed-identity/)
+* [Deploy Container to Azure App Services with System-Assigned Identity](https://nestenius.se/azure/deploy-a-container-to-azure-app-services-using-a-system-assigned-identity/)
+* [DefaultAzureCredentials Under the Hood](https://nestenius.se/azure/default-azure-credentials-under-the-hood/)
 
 
 ## Other projects by the author
