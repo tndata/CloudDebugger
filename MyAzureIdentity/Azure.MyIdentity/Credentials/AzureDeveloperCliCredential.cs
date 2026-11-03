@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -15,11 +18,13 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// Enables authentication to Microsoft Entra ID using Azure Developer CLI to obtain an access token.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class AzureDeveloperCliCredential : TokenCredential
     {
         internal const string AzdCliNotInstalled = "Azure Developer CLI could not be found.";
@@ -171,8 +176,10 @@ namespace Azure.MyIdentity
             }
             catch (InvalidOperationException exception)
             {
+                string errorText = ProcessCliErrorForDisplay(exception.Message);
+
                 // If an older azd version doesn't recognize the --claims flag, surface explicit guidance to update.
-                if (!string.IsNullOrWhiteSpace(context.Claims) && exception.Message.IndexOf("unknown flag: --claims", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (!string.IsNullOrWhiteSpace(context.Claims) && errorText.IndexOf("unknown flag: --claims", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     throw new AuthenticationFailedException(AzdUnknownClaimsFlagError);
                 }
@@ -188,26 +195,26 @@ namespace Azure.MyIdentity
                     throw new AuthenticationFailedException(string.Format(CultureInfo.InvariantCulture, ClaimsChallengeLoginFormat, loginCommand));
                 }
 
-                bool isWinError = exception.Message.StartsWith(WinAzdCliError, StringComparison.CurrentCultureIgnoreCase);
+                bool isWinError = errorText.StartsWith(WinAzdCliError, StringComparison.CurrentCultureIgnoreCase);
 
-                bool isOtherOsError = AzdNotFoundPattern.IsMatch(exception.Message);
+                bool isOtherOsError = AzdNotFoundPattern.IsMatch(errorText);
 
                 if (isWinError || isOtherOsError)
                 {
                     throw new CredentialUnavailableException(AzdCliNotInstalled);
                 }
 
-                bool isAADSTSError = exception.Message.Contains("AADSTS");
-                bool isLoginError = exception.Message.IndexOf("azd auth login", StringComparison.OrdinalIgnoreCase) != -1;
+                bool isAADSTSError = errorText.Contains("AADSTS");
+                bool isLoginError = errorText.IndexOf("azd auth login", StringComparison.OrdinalIgnoreCase) != -1;
 
                 if (isLoginError && !isAADSTSError)
                 {
                     throw new CredentialUnavailableException(AzdNotLogIn);
                 }
 
-                bool isRefreshTokenFailedError = exception.Message.IndexOf(AzdCliFailedError, StringComparison.OrdinalIgnoreCase) != -1 &&
-                                                 exception.Message.IndexOf(RefreshTokeExpired, StringComparison.OrdinalIgnoreCase) != -1 ||
-                                                 exception.Message.IndexOf("CLIInternalError", StringComparison.OrdinalIgnoreCase) != -1;
+                bool isRefreshTokenFailedError = errorText.IndexOf(AzdCliFailedError, StringComparison.OrdinalIgnoreCase) != -1 &&
+                                                 errorText.IndexOf(RefreshTokeExpired, StringComparison.OrdinalIgnoreCase) != -1 ||
+                                                 errorText.IndexOf("CLIInternalError", StringComparison.OrdinalIgnoreCase) != -1;
 
                 if (isRefreshTokenFailedError)
                 {
@@ -216,11 +223,11 @@ namespace Azure.MyIdentity
 
                 if (_isChainedCredential)
                 {
-                    throw new CredentialUnavailableException($"{AzdCliFailedError} {Troubleshoot} {exception.Message}");
+                    throw new CredentialUnavailableException($"{AzdCliFailedError} {Troubleshoot} {errorText}");
                 }
                 else
                 {
-                    throw new AuthenticationFailedException($"{AzdCliFailedError} {Troubleshoot} {exception.Message}");
+                    throw new AuthenticationFailedException($"{AzdCliFailedError} {Troubleshoot} {errorText}");
                 }
             }
 
@@ -290,6 +297,65 @@ namespace Azure.MyIdentity
             string accessToken = root.GetProperty("token").GetString();
             DateTimeOffset expiresOn = root.GetProperty("expiresOn").GetDateTimeOffset();
             return new AccessToken(accessToken, expiresOn);
+        }
+
+        // Extracts a human-readable error from azd's stderr JSON output. Three formats are supported:
+        //   pre-v1.23.7        : {"type":"consoleMessage","data":{"message":"..."}}
+        //   v1.23.7 - v1.23.15 : empty consoleMessage line followed by {"error":"...","message":"...","suggestion":"..."}
+        //   v1.24.0+           : {"error":"...","message":"...","suggestion":"..."}
+        // Prefers the structured "error" field; falls back to the first non-empty consoleMessage data.message;
+        // returns the raw text if neither is found.
+        private static string ProcessCliErrorForDisplay(string rawCliError)
+        {
+            if (string.IsNullOrWhiteSpace(rawCliError))
+            {
+                return rawCliError;
+            }
+
+            string parsedMessage = null;
+
+            foreach (string rawLine in rawCliError.Split('\n'))
+            {
+                string line = rawLine.Trim();
+                if (line.Length == 0 || line[0] != '{')
+                {
+                    continue;
+                }
+
+                try
+                {
+                    using JsonDocument jsonDoc = JsonDocument.Parse(line);
+                    JsonElement root = jsonDoc.RootElement;
+
+                    if (root.TryGetProperty("error", out JsonElement errorObj) &&
+                        errorObj.ValueKind == JsonValueKind.String)
+                    {
+                        string errorText = errorObj.GetString();
+                        if (!string.IsNullOrWhiteSpace(errorText))
+                        {
+                            return errorText.Trim();
+                        }
+                    }
+
+                    if (parsedMessage == null &&
+                        root.TryGetProperty("data", out JsonElement dataObj) &&
+                        dataObj.TryGetProperty("message", out JsonElement msgObj) &&
+                        msgObj.ValueKind == JsonValueKind.String)
+                    {
+                        string msgText = msgObj.GetString();
+                        if (!string.IsNullOrWhiteSpace(msgText))
+                        {
+                            parsedMessage = msgText.Trim();
+                        }
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Not valid JSON on this line; continue.
+                }
+            }
+
+            return parsedMessage ?? rawCliError;
         }
     }
 }

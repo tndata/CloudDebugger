@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+// Hack: Compile shared ASP.NET Core internals inside the local diagnostic namespace.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 // Copied from https://github.com/dotnet/runtime/blob/a9c5eadd951dcba73167f72cc624eb790573663a/src/libraries/Common/src/System/Text/ValueStringBuilder.cs

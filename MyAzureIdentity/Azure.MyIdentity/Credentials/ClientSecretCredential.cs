@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
@@ -9,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -16,6 +20,7 @@ namespace Azure.MyIdentity
     /// to configure a client secret can be found at
     /// <see href="https://learn.microsoft.com/entra/identity-platform/quickstart-configure-app-access-web-apis#add-credentials-to-your-web-application"/>.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class ClientSecretCredential : TokenCredential
     {
         private readonly CredentialPipeline _pipeline;

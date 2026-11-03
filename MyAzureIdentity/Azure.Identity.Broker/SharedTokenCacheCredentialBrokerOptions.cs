@@ -1,12 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Azure.MyIdentity;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Broker;
 using System;
 using System.ComponentModel;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Broker;
 
+// Hack: Broker companion sources are compiled locally against Azure.MyIdentity.
 namespace Azure.Identity.Broker
 {
     /// <summary>
@@ -14,7 +15,7 @@ namespace Azure.Identity.Broker
     /// </summary>
     [Obsolete("SharedTokenCacheCredential is deprecated. For brokered authentication, consider using InteractiveBrowserCredential.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class SharedTokenCacheCredentialBrokerOptions : SharedTokenCacheCredentialOptions, IMsalPublicClientInitializerOptions
+    public class SharedTokenCacheCredentialBrokerOptions : Azure.MyIdentity.SharedTokenCacheCredentialOptions, IMsalPublicClientInitializerOptions
     {
         /// <summary>
         /// Gets or sets whether Microsoft Account (MSA) passthrough is enabled.
@@ -37,8 +38,8 @@ namespace Azure.Identity.Broker
         /// <summary>
         /// Initializes a new instance of <see cref="SharedTokenCacheCredentialBrokerOptions"/>.
         /// </summary>
-        /// <param name="tokenCacheOptions">The <see cref="TokenCachePersistenceOptions"/> that will apply to the token cache used by this credential.</param>
-        public SharedTokenCacheCredentialBrokerOptions(TokenCachePersistenceOptions tokenCacheOptions)
+        /// <param name="tokenCacheOptions">The <see cref="Azure.MyIdentity.TokenCachePersistenceOptions"/> that will apply to the token cache used by this credential.</param>
+        public SharedTokenCacheCredentialBrokerOptions(Azure.MyIdentity.TokenCachePersistenceOptions tokenCacheOptions)
             : base(tokenCacheOptions)
         {
         }

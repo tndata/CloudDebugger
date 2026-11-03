@@ -1,10 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -26,7 +29,7 @@ namespace Azure.MyIdentity
 
         /// <summary>
         /// Returns the bytes used to initialize the token cache. This would most likely have come from the <see cref="TokenCacheUpdatedArgs"/>.
-        /// It is recommended that if this method is overriden, there is no need to provide a duplicate implementation for the parameterless <see cref="RefreshCacheAsync()"/>.
+        /// It is recommended that if this method is overridden, there is no need to provide a duplicate implementation for the parameterless <see cref="RefreshCacheAsync()"/>.
         /// </summary>
         /// <param name="args">The <see cref="TokenCacheRefreshArgs"/> containing information about the current state of the cache.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> controlling the lifetime of this operation.</param>

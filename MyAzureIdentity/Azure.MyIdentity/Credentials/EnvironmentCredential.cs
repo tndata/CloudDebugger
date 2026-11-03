@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -9,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -30,22 +34,22 @@ namespace Azure.MyIdentity
     /// <listheader><term>Variable</term><description>Description</description></listheader>
     /// <item><term>AZURE_TENANT_ID</term><description>The Microsoft Entra tenant (directory) ID.</description></item>
     /// <item><term>AZURE_CLIENT_ID</term><description>The client (application) ID of an App Registration in the tenant.</description></item>
-    /// <item><term>AZURE_CLIENT_CERTIFICATE_PATH</term><description>A path to certificate and private key pair in PEM or PFX format, which can authenticate the App Registration.</description></item>
+    /// <item><term>AZURE_CLIENT_CERTIFICATE_PATH</term><description>Path to the client certificate and the private key. The path must be to either a "pfx"- or "pem"-encoded certificate on disk, or a certificate in the platform certificate store by thumbprint.
+    /// For example:
+    /// <list type="bullet">
+    ///   <item><description><c>c:\data\certificate.pfx</c></description></item>
+    ///   <item><description><c>/etc/app/cert.pem</c></description></item>
+    ///   <item><description><c>cert:/CurrentUser/My/E661583E8FABEF4C0BEF694CBC41C28FB81CD870</c></description></item>
+    /// </list></description></item>
     /// <item><term>AZURE_CLIENT_CERTIFICATE_PASSWORD</term><description>(Optional) The password protecting the certificate file (currently only supported for PFX (PKCS12) certificates).</description></item>
     /// <item><term>AZURE_CLIENT_SEND_CERTIFICATE_CHAIN</term><description>(Optional) Specifies whether an authentication request will include an x5c header to support subject name / issuer based authentication. When set to `true` or `1`, authentication requests include the x5c header.</description></item>
     /// </list>
     ///
-    /// <b>Username and password:</b>
-    /// <list type="table">
-    /// <listheader><term>Variable</term><description>Description</description></listheader>
-    /// <item><term>AZURE_TENANT_ID</term><description>The Microsoft Entra tenant (directory) ID.</description></item>
-    /// <item><term>AZURE_CLIENT_ID</term><description>The client (application) ID of an App Registration in the tenant.</description></item>
-    /// </list>
-    ///
-    /// This credential ultimately uses a <see cref="ClientSecretCredential"/> or <see cref="ClientCertificateCredential"/> to
-    /// perform the authentication using these details. Please consult the
-    /// documentation of those classes for more details.
+    /// This credential uses the configuration above to create a credential for authentication (for example,
+    /// <see cref="ClientSecretCredential"/> or <see cref="ClientCertificateCredential"/>). Please consult the documentation of the selected
+    /// credential for more details.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class EnvironmentCredential : TokenCredential
     {
         private const string UnavailableErrorMessage = "EnvironmentCredential authentication unavailable. Environment variables are not fully configured. See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/environmentcredential/troubleshoot";
@@ -101,6 +105,7 @@ namespace Azure.MyIdentity
             return sb.ToString();
         }
 
+        // Hack: Record internal credential activity for the learning UI.
         private StringBuilder log = new StringBuilder();
 
         internal EnvironmentCredential(CredentialPipeline pipeline, TokenCredentialOptions options = null)
@@ -135,6 +140,7 @@ namespace Azure.MyIdentity
             if (string.IsNullOrEmpty(clientSecret) == false)
                 safeClientSecret = clientSecret.Length <= 5 ? clientSecret : clientSecret.Substring(0, 5) + "******";
 
+            // Hack: Record internal credential activity for the learning UI.
             log.AppendLine();
             log.AppendLine("EnvironmentCredential");
             log.AppendLine("=====================");
@@ -155,6 +161,7 @@ namespace Azure.MyIdentity
             {
                 if (!string.IsNullOrEmpty(clientSecret))
                 {
+                    // Hack: Record internal credential activity for the learning UI.
                     log.AppendLine($"Selected ClientSecretCredential based on the provided environment variables");
                     Credential = new ClientSecretCredential(tenantId, clientId, clientSecret, envCredOptions, _pipeline, envCredOptions.MsalConfidentialClient);
                 }
@@ -164,6 +171,7 @@ namespace Azure.MyIdentity
 
                     clientCertificateCredentialOptions.SendCertificateChain = sendCertificateChain;
 
+                    // Hack: Record internal credential activity for the learning UI.
                     log.AppendLine($"Selected ClientCertificateCredential based on the provided environment variables");
                     Credential = new ClientCertificateCredential(tenantId, clientId, clientCertificatePath, clientCertificatePassword, clientCertificateCredentialOptions, _pipeline, envCredOptions.MsalConfidentialClient);
                 }

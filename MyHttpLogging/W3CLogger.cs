@@ -4,6 +4,7 @@
 using System.Text;
 using Microsoft.Extensions.Options;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 #pragma warning disable CA1852 // Seal internal types

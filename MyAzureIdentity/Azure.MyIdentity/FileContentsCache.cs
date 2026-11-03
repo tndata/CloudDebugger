@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
 #pragma warning disable CA1001 // Types that own disposable fields should be disposable
@@ -31,6 +32,8 @@ namespace Azure.MyIdentity
 
         public async Task<string> GetTokenFileContentsAsync(CancellationToken cancellationToken)
         {
+            // Hack: Track whether this invocation actually read the file, including lock contenders.
+            bool readFromFile = false;
             if (_refreshOn <= DateTimeOffset.UtcNow)
             {
                 await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -43,6 +46,8 @@ namespace Azure.MyIdentity
                         {
                             _tokenFileContents = await reader.ReadToEndAsync().ConfigureAwait(false);
 
+                            // Hack: Distinguish a file refresh from reuse of cached file contents.
+                            readFromFile = true;
                             _refreshOn = DateTimeOffset.UtcNow + _refreshInterval;
                         }
                     }
@@ -53,6 +58,8 @@ namespace Azure.MyIdentity
                 }
             }
 
+            // Hack: Do not log the assertion contents here.
+            MyAzureIdentityLog.AddToLog("FileContentsCache", $"{(readFromFile ? "Read token file" : "Reused cached token-file contents")}: {_tokenFilePath}; next file refresh: {IdentityDiagnosticLogging.FormatUtc(_refreshOn)}");
             return _tokenFileContents;
         }
     }

@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
+using System.Text;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 internal sealed class HttpLog : IReadOnlyList<KeyValuePair<string, object?>>

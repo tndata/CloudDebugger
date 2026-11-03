@@ -5,6 +5,7 @@ using Microsoft.Identity.Client;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>

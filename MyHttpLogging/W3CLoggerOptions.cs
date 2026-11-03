@@ -3,6 +3,7 @@
 
 using Microsoft.Net.Http.Headers;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 /// <summary>

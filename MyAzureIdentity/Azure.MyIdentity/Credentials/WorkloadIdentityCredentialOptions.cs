@@ -1,10 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -38,6 +41,16 @@ namespace Azure.MyIdentity
 
         /// <inheritdoc />
         public bool DisableInstanceDiscovery { get; set; }
+
+        /// <summary>
+        /// Enables Azure Kubernetes Service identity binding mode to work around Entra's limit on federated identity credentials.
+        /// When enabled and proxy configuration environment variables are set, requests are sent to the AKS proxy instead of directly to Entra ID.
+        /// This feature is not supported when using <see cref="DefaultAzureCredential"/> or <see cref="ManagedIdentityCredential"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. The AKS identity binding and Kubernetes permissions must be configured separately.
+        /// </remarks>
+        public bool IsAzureProxyEnabled { get; set; }
 
         /// <summary>
         /// Specifies tenants in addition to the specified <see cref="TenantId"/> for which the credential may acquire tokens.

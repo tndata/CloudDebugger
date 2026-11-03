@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -8,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -21,6 +25,7 @@ namespace Azure.MyIdentity
     /// <item><description><see href="https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureresourcegroups">Azure Resources extension</see></description></item>
     /// </list>
     /// </remarks>
+    [UnsupportedOSPlatform("browser")]
     public class VisualStudioCodeCredential : InteractiveBrowserCredential
     {
         private const string CredentialsSection = "VS Code Azure";

@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 /// <summary>

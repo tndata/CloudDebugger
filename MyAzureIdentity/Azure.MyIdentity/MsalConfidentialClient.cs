@@ -1,5 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Versioning;
 
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Extensibility;
@@ -9,8 +13,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
+    [UnsupportedOSPlatform("browser")]
     internal class MsalConfidentialClient : MsalClientBase<IConfidentialClientApplication>
     {
         internal readonly string _clientSecret;
@@ -18,7 +24,9 @@ namespace Azure.MyIdentity
         internal readonly IX509Certificate2Provider _certificateProvider;
         private readonly Func<string> _clientAssertionCallback;
         private readonly Func<CancellationToken, Task<string>> _clientAssertionCallbackAsync;
+        private readonly Func<AssertionRequestOptions, CancellationToken, Task<ClientSignedAssertion>> _clientSignedAssertionCallbackAsync;
         private readonly Func<AppTokenProviderParameters, Task<AppTokenProviderResult>> _appTokenProviderCallback;
+        internal readonly bool _enableMtlsProofOfPossession;
 
         internal string RedirectUrl { get; }
 
@@ -39,6 +47,9 @@ namespace Azure.MyIdentity
             sb.AppendLine($" - AuthorityHost: {AuthorityHost?.AbsoluteUri}");
             sb.AppendLine($" - RegionalAuthority: {RegionalAuthority ?? "Not set"}");
 
+            // Hack: Show whether this confidential client is configured for certificate-bound tokens.
+            sb.AppendLine($" - mTLS Proof-of-Possession enabled: {_enableMtlsProofOfPossession}");
+
             // Show auth method type
             if (!string.IsNullOrEmpty(_clientSecret))
             {
@@ -56,6 +67,11 @@ namespace Azure.MyIdentity
             else if (_clientAssertionCallbackAsync != null)
             {
                 sb.AppendLine(" - AuthMethod: ClientAssertion (async callback)");
+            }
+            else if (_clientSignedAssertionCallbackAsync != null)
+            {
+                // Hack: Identify the PoP assertion callback instead of displaying "None configured".
+                sb.AppendLine(" - AuthMethod: ClientSignedAssertion (async callback, mTLS PoP)");
             }
             else if (_appTokenProviderCallback != null)
             {
@@ -97,11 +113,12 @@ namespace Azure.MyIdentity
             RedirectUrl = redirectUrl;
         }
 
-        public MsalConfidentialClient(CredentialPipeline pipeline, string tenantId, string clientId, IX509Certificate2Provider certificateProvider, bool includeX5CClaimHeader, TokenCredentialOptions options)
+        public MsalConfidentialClient(CredentialPipeline pipeline, string tenantId, string clientId, IX509Certificate2Provider certificateProvider, bool includeX5CClaimHeader, TokenCredentialOptions options, bool enableMtlsProofOfPossession = false)
             : base(pipeline, tenantId, clientId, options)
         {
             _includeX5CClaimHeader = includeX5CClaimHeader;
             _certificateProvider = certificateProvider;
+            _enableMtlsProofOfPossession = enableMtlsProofOfPossession;
         }
 
         public MsalConfidentialClient(CredentialPipeline pipeline, string tenantId, string clientId, Func<string> assertionCallback, TokenCredentialOptions options)
@@ -114,6 +131,13 @@ namespace Azure.MyIdentity
             : base(pipeline, tenantId, clientId, options)
         {
             _clientAssertionCallbackAsync = assertionCallback;
+        }
+
+        internal MsalConfidentialClient(CredentialPipeline pipeline, string tenantId, string clientId, Func<AssertionRequestOptions, CancellationToken, Task<ClientSignedAssertion>> assertionCallback, TokenCredentialOptions options)
+            : base(pipeline, tenantId, clientId, options)
+        {
+            _clientSignedAssertionCallbackAsync = assertionCallback;
+            _enableMtlsProofOfPossession = true;
         }
 
         public MsalConfidentialClient(CredentialPipeline pipeline, string tenantId, string clientId, Func<AppTokenProviderParameters, Task<AppTokenProviderResult>> appTokenProviderCallback, TokenCredentialOptions options)
@@ -139,13 +163,18 @@ namespace Azure.MyIdentity
                 enableCae ? cp1Capabilities : Array.Empty<string>();
 
             ConfidentialClientApplicationBuilder confClientBuilder = ConfidentialClientApplicationBuilder.Create(ClientId)
-                .WithHttpClientFactory(new HttpPipelineClientFactory(Pipeline.HttpPipeline))
                 .WithLogging(AzureIdentityEventSource.Singleton, enablePiiLogging: IsSupportLoggingEnabled);
+
+            if (!_enableMtlsProofOfPossession)
+            {
+                confClientBuilder.WithHttpClientFactory(new HttpPipelineClientFactory(Pipeline.HttpPipeline), false);
+            }
 
             // Special case for using appTokenProviderCallback, authority validation and instance metadata discovery should be disabled since we're not calling the STS
             // The authority matches the one configured in the CredentialOptions.
             if (_appTokenProviderCallback != null)
             {
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine(" - Using AppTokenProvider (Managed Identity mode)");
 
                 confClientBuilder.WithAppTokenProvider(_appTokenProviderCallback)
@@ -154,11 +183,13 @@ namespace Azure.MyIdentity
             }
             else
             {
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine($" - Using standard authority: {AuthorityHost.AbsoluteUri}");
 
                 confClientBuilder.WithAuthority(AuthorityHost.AbsoluteUri, TenantId);
                 if (DisableInstanceDiscovery)
                 {
+                    // Hack: Record internal credential activity for the learning UI.
                     log.AppendLine(" - Instance discovery disabled");
                     confClientBuilder.WithInstanceDiscovery(false);
                 }
@@ -166,6 +197,7 @@ namespace Azure.MyIdentity
 
             if (clientCapabilities.Length > 0)
             {
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine($" - Client capabilities: {string.Join(", ", clientCapabilities)}");
 
                 confClientBuilder.WithClientCapabilities(clientCapabilities);
@@ -173,6 +205,7 @@ namespace Azure.MyIdentity
 
             if (_clientSecret != null)
             {
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine(" - Configuring client secret authentication");
                 confClientBuilder.WithClientSecret(_clientSecret);
             }
@@ -183,6 +216,7 @@ namespace Azure.MyIdentity
                 {
                     throw new InvalidOperationException($"Cannot set both {nameof(_clientAssertionCallback)} and {nameof(_clientAssertionCallbackAsync)}");
                 }
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine(" - Configuring client assertion (sync)");
                 confClientBuilder.WithClientAssertion(_clientAssertionCallback);
             }
@@ -193,13 +227,20 @@ namespace Azure.MyIdentity
                 {
                     throw new InvalidOperationException($"Cannot set both {nameof(_clientAssertionCallback)} and {nameof(_clientAssertionCallbackAsync)}");
                 }
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine(" - Configuring client assertion (async)");
                 confClientBuilder.WithClientAssertion(_clientAssertionCallbackAsync);
+            }
+
+            if (_clientSignedAssertionCallbackAsync != null)
+            {
+                confClientBuilder.WithClientAssertion(_clientSignedAssertionCallbackAsync);
             }
 
             if (_certificateProvider != null)
             {
                 X509Certificate2 clientCertificate = await _certificateProvider.GetCertificateAsync(async, cancellationToken).ConfigureAwait(false);
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine(" - Configuring certificate authentication");
                 log.AppendLine($"   - Certificate Subject: {clientCertificate?.Subject}");
                 log.AppendLine($"   - Certificate Thumbprint: {clientCertificate?.Thumbprint}");
@@ -210,14 +251,21 @@ namespace Azure.MyIdentity
             // When the appTokenProviderCallback is set, meaning this is for managed identity, the regional authority is not relevant.
             if (_appTokenProviderCallback == null && !string.IsNullOrEmpty(RegionalAuthority))
             {
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine($" - Configuring regional authority: {RegionalAuthority}");
                 confClientBuilder.WithAzureRegion(RegionalAuthority);
             }
 
             if (!string.IsNullOrEmpty(RedirectUrl))
             {
+                // Hack: Record internal credential activity for the learning UI.
                 log.AppendLine($" - Configuring redirect URL: {RedirectUrl}");
                 confClientBuilder.WithRedirectUri(RedirectUrl);
+            }
+
+            if (AdditionalQueryParameters != null)
+            {
+                confClientBuilder.WithExtraQueryParameters(AdditionalQueryParameters.ToDictionary(kvp => kvp.Key, kvp => (kvp.Value.Value, kvp.Value.IncludeInCacheKey)));
             }
 
             return confClientBuilder.Build();
@@ -239,20 +287,48 @@ namespace Azure.MyIdentity
             log.AppendLine($" - EnableCAE: {enableCae}, Async: {async}");
 
 
-            var result = await AcquireTokenForClientCoreAsync(scopes, tenantId, claims, enableCae, async, cancellationToken).ConfigureAwait(false);
+            // Hack: Identify actual requests through the PoP client, including cached-client reuse.
+            log.AppendLine($" - Token acquisition mode: {(_enableMtlsProofOfPossession ? "mTLS Proof-of-Possession (PopClient)" : "standard client")}");
+            if (_enableMtlsProofOfPossession)
+            {
+                MyAzureIdentityLog.AddToLog("MsalConfidentialClient", "PopClient used: requesting an mTLS proof-of-possession token.");
+            }
+
+            AuthenticationResult result;
+            try
+            {
+                result = await AcquireTokenForClientCoreAsync(scopes, tenantId, claims, enableCae, async, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception e) when (_enableMtlsProofOfPossession)
+            {
+                // Hack: Keep failed PoP attempts visible even when the caller subsequently retries with its regular client.
+                string errorCode = (e as MsalException)?.ErrorCode ?? e.GetType().Name;
+                string message = $"PopClient token acquisition failed: {errorCode}";
+                log.AppendLine($" - {message}");
+                MyAzureIdentityLog.AddToLog("MsalConfidentialClient", message);
+                throw;
+            }
 
             // HACK: Log the result
             if (result != null)
             {
+                // Hack: Keep shared token facts visible through the existing confidential-client operation log.
+                log.AppendLine(IdentityDiagnosticLogging.DescribeResult(result));
                 var lifetime = result.ExpiresOn - DateTimeOffset.UtcNow;
                 log.AppendLine($" - Success! Token acquired");
-                log.AppendLine($"   - ExpiresOn: {result.ExpiresOn.ToString("HH:mm:ss")}");
+                // Hack: Distinguish requesting PoP from the token type actually returned by MSAL.
+                if (_enableMtlsProofOfPossession)
+                {
+                    log.AppendLine($"   - PopClient acquisition succeeded; returned token type: {result.TokenType}");
+                }
+                log.AppendLine($"   - ExpiresOn: {IdentityDiagnosticLogging.FormatUtc(result.ExpiresOn)}");
                 log.AppendLine($"   - Lifetime: {((int)lifetime.TotalMinutes)} minutes");
                 log.AppendLine($"   - Cached: {result.AuthenticationResultMetadata?.TokenSource == TokenSource.Cache}");
 
                 // Optionally log the token for debugging
                 // log.AppendLine($"   - AccessToken: {result.AccessToken}");
 
+                // Hack: Record internal credential activity for the learning UI.
                 MyAzureIdentityLog.AddToLog("MsalConfidentialClient", $"AcquireTokenForClient\r\n{log.ToString()}");
             }
 
@@ -274,6 +350,13 @@ namespace Azure.MyIdentity
                 .AcquireTokenForClient(scopes)
                 .WithSendX5C(_includeX5CClaimHeader);
 
+            if (_enableMtlsProofOfPossession)
+            {
+                // Hack: Record that the MSAL request builder actually enables mTLS PoP.
+                log.AppendLine(" - MSAL request configured with mTLS Proof-of-Possession");
+                builder.WithMtlsProofOfPossession();
+            }
+
             if (!string.IsNullOrEmpty(tenantId))
             {
                 builder.WithTenantId(tenantId);
@@ -282,6 +365,7 @@ namespace Azure.MyIdentity
             {
                 builder.WithClaims(claims);
             }
+            ApplyTokenRequestCallback(builder);
             return await builder
                 .ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
@@ -306,9 +390,11 @@ namespace Azure.MyIdentity
             // HACK: Log result
             if (result != null)
             {
+                // Hack: Keep shared token facts visible through the existing confidential-client operation log.
+                log.AppendLine(IdentityDiagnosticLogging.DescribeResult(result));
                 var lifetime = result.ExpiresOn - DateTimeOffset.UtcNow;
                 log.AppendLine($" - Silent acquisition successful");
-                log.AppendLine($"   - ExpiresOn: {result.ExpiresOn.ToString("HH:mm:ss")}");
+                log.AppendLine($"   - ExpiresOn: {IdentityDiagnosticLogging.FormatUtc(result.ExpiresOn)}");
                 log.AppendLine($"   - Lifetime: {((int)lifetime.TotalMinutes)} minutes");
                 log.AppendLine($"   - From Cache: {result.AuthenticationResultMetadata?.TokenSource == TokenSource.Cache}");
             }
@@ -339,6 +425,7 @@ namespace Azure.MyIdentity
             {
                 builder.WithClaims(claims);
             }
+            ApplyTokenRequestCallback(builder);
             return await builder
                 .ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
@@ -365,9 +452,11 @@ namespace Azure.MyIdentity
             // HACK: Log result
             if (result != null)
             {
+                // Hack: Keep shared token facts visible through the existing confidential-client operation log.
+                log.AppendLine(IdentityDiagnosticLogging.DescribeResult(result));
                 var lifetime = result.ExpiresOn - DateTimeOffset.UtcNow;
                 log.AppendLine($" - Authorization code exchange successful");
-                log.AppendLine($"   - ExpiresOn: {result.ExpiresOn.ToString("HH:mm:ss")}");
+                log.AppendLine($"   - ExpiresOn: {IdentityDiagnosticLogging.FormatUtc(result.ExpiresOn)}");
                 log.AppendLine($"   - Lifetime: {((int)lifetime.TotalMinutes)} minutes");
             }
 
@@ -398,6 +487,7 @@ namespace Azure.MyIdentity
             {
                 builder.WithClaims(claims);
             }
+            ApplyTokenRequestCallback(builder);
             return await builder
                 .ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
@@ -424,9 +514,11 @@ namespace Azure.MyIdentity
             // HACK: Log result
             if (result != null)
             {
+                // Hack: Keep shared token facts visible through the existing confidential-client operation log.
+                log.AppendLine(IdentityDiagnosticLogging.DescribeResult(result));
                 var lifetime = result.ExpiresOn - DateTimeOffset.UtcNow;
                 log.AppendLine($" - OBO token acquisition successful");
-                log.AppendLine($"   - ExpiresOn: {result.ExpiresOn.ToString("HH:mm:ss")}");
+                log.AppendLine($"   - ExpiresOn: {IdentityDiagnosticLogging.FormatUtc(result.ExpiresOn)}");
                 log.AppendLine($"   - Lifetime: {((int)lifetime.TotalMinutes)} minutes");
                 log.AppendLine($"   - Account: {result.Account?.Username ?? "N/A"}");
             }
@@ -459,6 +551,7 @@ namespace Azure.MyIdentity
             {
                 builder.WithClaims(claims);
             }
+            ApplyTokenRequestCallback(builder);
             return await builder
                 .ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);

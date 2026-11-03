@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -10,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -58,11 +62,11 @@ namespace Azure.MyIdentity
     ///     credential);
     /// </code>
     /// </example>
+    [UnsupportedOSPlatform("browser")]
     public class DefaultAzureCredential : TokenCredential
     {
         //HACK: For debugging
         public TokenCredential SelectedTokenCredential = null;
-
 
         private const string Troubleshooting = "See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/defaultazurecredential/troubleshoot";
         private const string DefaultExceptionMessage = "DefaultAzureCredential failed to retrieve a token from the included credentials. " + Troubleshooting;
@@ -77,6 +81,8 @@ namespace Azure.MyIdentity
         //HACK: Made public ffor debugging
         public TokenCredential[] _sources;
 
+        internal CredentialPipeline Pipeline => _pipeline;
+
         /// <summary>
         /// The default environment variable name used for token credential configuration.
         /// </summary>
@@ -85,18 +91,8 @@ namespace Azure.MyIdentity
         /// <summary>
         /// Protected constructor for <see href="https://aka.ms/azsdk/net/mocking">mocking</see>.
         /// </summary>
-        internal DefaultAzureCredential() : this(false) { }  //HACK: Made internal for debugging
-
-
-        /// <summary>
-        /// Hack: Custom ToString() method to return the log text
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return "\r\nDefaultAzureCredential\r\n======================\r\n\r\n" + LogText.ToString();
-        }
-
+        // Hack: Retain local assembly access and upstream subclass access for diagnostics.
+        protected internal DefaultAzureCredential() : this(false) { }
 
         /// <summary>
         /// Creates an instance of the DefaultAzureCredential class.
@@ -133,6 +129,7 @@ namespace Azure.MyIdentity
 
         internal DefaultAzureCredential(DefaultAzureCredentialFactory factory)
         {
+            // Hack: Record internal credential activity for the learning UI.
             MyAzureIdentityLog.AddToLog("DefaultAzureCredential", "Constructor");
             _pipeline = factory.Pipeline;
             _sources = factory.CreateCredentialChain();
@@ -180,7 +177,7 @@ namespace Azure.MyIdentity
             using CredentialDiagnosticScope scope = _pipeline.StartGetTokenScopeGroup("DefaultAzureCredential.GetToken", requestContext);
 
             //HACK: Logging
-            MyAzureIdentityLog.AddToLog("ManagedIdentityCredential", "GetToken() was called");
+            MyAzureIdentityLog.AddToLog("DefaultAzureCredential", "GetToken() was called");
 
 
             try
@@ -190,6 +187,10 @@ namespace Azure.MyIdentity
                 AccessToken token;
                 if (asyncLock.HasValue)
                 {
+                    // Hack: Credential selection reuse is distinct from a token-cache hit.
+                    string reuse = $"Reusing selected credential: {asyncLock.Value.GetType().Name} (token cache outcome is reported separately)";
+                    LogText.AppendLine(reuse);
+                    MyAzureIdentityLog.AddToLog("DefaultAzureCredential", reuse);
                     token = await GetTokenFromCredentialAsync(asyncLock.Value, requestContext, async, cancellationToken).ConfigureAwait(false);
                 }
                 else
@@ -240,25 +241,31 @@ namespace Azure.MyIdentity
             totalTimeSw.Start();
 
 
+            // Hack: Record internal credential activity for the learning UI.
             LogText = new StringBuilder();
             LogText.AppendLine("\r\nDefaultAzureCredential.GetTokenFromSourcesAsync was called");
 
 
+            // Hack: Record internal credential activity for the learning UI.
             MyAzureIdentityLog.AddToLog("DefaultAzureCredential", "GetTokenFromSourcesAsync started");
 
 
 
             if (requestContext.Scopes != null)
             {
+                // Hack: Record internal credential activity for the learning UI.
                 LogText.AppendLine("\r\nScopes");
                 foreach (var scope in requestContext.Scopes)
                 {
+                    // Hack: Record internal credential activity for the learning UI.
                     LogText.AppendLine($" - {scope}");
                 }
             }
+            // Hack: Record internal credential activity for the learning UI.
             LogText.AppendLine("");
 
 
+            // Hack: Record internal credential activity for the learning UI.
             LogText.AppendLine("Processing sources");
             bool foundSource = false;
             for (var i = 0; i < sources.Length && sources[i] != null; i++)
@@ -269,6 +276,7 @@ namespace Azure.MyIdentity
                 foundSource = true;
                 try
                 {
+                    // Hack: Record internal credential activity for the learning UI.
                     LogText.AppendLine($"Trying: {sources[i].GetType().FullName}");
                     LogText.AppendLine($"{sources[i].ToString()}");
 
@@ -280,15 +288,18 @@ namespace Azure.MyIdentity
                     var lifetime = token.ExpiresOn - DateTimeOffset.UtcNow;
 
                     sw.Stop();
+                    // Hack: Record internal credential activity for the learning UI.
                     LogText.AppendLine($"We successfully got a token using DefaultAzureCredential");
                     LogText.AppendLine($" - Took {sw.ElapsedMilliseconds} ms");
                     LogText.AppendLine($" - Token.Hash={token.Token.GetHashCode()}");
                     LogText.AppendLine($" - Token={token.Token}");
-                    LogText.AppendLine($" - Expires={token.ExpiresOn.ToUniversalTime()} (lifetime={(int)(lifetime.TotalMinutes)} minutes)");
+                    LogText.AppendLine($" - Expires={IdentityDiagnosticLogging.FormatUtc(token.ExpiresOn)} (lifetime={(int)(lifetime.TotalMinutes)} minutes)");
 
+                    // Hack: Record internal credential activity for the learning UI.
                     LogText.AppendLine($"\r\nTotal time taken for checking all credentials: {totalTimeSw.ElapsedMilliseconds} ms");
 
 
+                    // Hack: Record internal credential activity for the learning UI.
                     MyAzureIdentityLog.AddToLog("yDefaultAzureCredential", LogText.ToString());
 
                     return (token, sources[i]);
@@ -296,6 +307,7 @@ namespace Azure.MyIdentity
                 catch (CredentialUnavailableException e)
                 {
                     sw.Stop();
+                    // Hack: Record internal credential activity for the learning UI.
                     LogText.AppendLine($" - Failure: Took {sw.ElapsedMilliseconds} ms");
                     LogText.AppendLine($" - Failure: Failed to get token: {e.Message}");
                     exceptions.Add(e);
@@ -303,25 +315,31 @@ namespace Azure.MyIdentity
                 catch (Exception e)
                 {
                     sw.Stop();
+                    // Hack: Record internal credential activity for the learning UI.
                     LogText.AppendLine($" - Failure: Took {sw.ElapsedMilliseconds} ms");
                     LogText.AppendLine($" - Failure: Failed to get token: {e.Message}");
                     LogText.AppendLine($"Aborting!!!");
 
+                    // Hack: Record internal credential activity for the learning UI.
                     MyAzureIdentityLog.AddToLog("DefaultAzureCredential", LogText.ToString());
 
                     throw;
                 }
 
+                // Hack: Record internal credential activity for the learning UI.
                 LogText.AppendLine("");
             }
 
             if (foundSource == false)
+                // Hack: Record internal credential activity for the learning UI.
                 MyAzureIdentityLog.AddToLog("DefaultAzureCredential", "No source found");
 
+            // Hack: Record internal credential activity for the learning UI.
             LogText.AppendLine(" - All sources failed to get token");
             LogText.AppendLine();
             LogText.AppendLine($"Total time taken for checking all credentials: {totalTimeSw.ElapsedMilliseconds} ms");
 
+            // Hack: Record internal credential activity for the learning UI.
             MyAzureIdentityLog.AddToLog("DefaultAzureCredential", LogText.ToString());
 
 
@@ -333,6 +351,15 @@ namespace Azure.MyIdentity
             Validations.ValidateAuthorityHost(options?.AuthorityHost ?? AzureAuthorityHosts.GetDefault());
 
             return options;
+        }
+
+        /// <summary>
+        /// Hack: Custom ToString() method to return the log text
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "\r\nDefaultAzureCredential\r\n======================\r\n\r\n" + LogText.ToString();
         }
 
     }

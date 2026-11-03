@@ -1,26 +1,28 @@
 # MyHttpLogging
 
-Contains a copy of the HttpLogging middleware. 
+An instrumented copy of ASP.NET Core HTTP Logging middleware, used by CloudDebugger to display HTTP requests and responses.
 
-The original source code is found at: https://github.com/dotnet/aspnetcore/tree/main/src/Middleware/HttpLogging
+The middleware uses `Microsoft.AspNetCore.MyHttpLogging` and preserves custom request-log storage, separate request/response headers, and captured request/response bodies. Local patches are marked with `Hack:` comments.
 
-It contains the following modification:
-* Changed the namespace to Azure.MyHttpLogging.
-* Renamed the library to MyHttpLogging 
-* Introduced some tweaks to enable logging to my custom request logging class. So that I can display the request log in the debugger application.
-* Created a custom ILogger to capture the logs.
-* In HttpLoggingMiddleware we use my custom RequestLogger to log the request instead of the system logger.
-* Added a new class RequestLogger to log the request.
-* Modifications in the library code is marked with //HACK:
-* Most of the changes is in the HttpLoggingMiddleware class.
+Headers and bodies can contain sensitive information. This library is intended for learning and controlled debugging.
 
+## Source
 
+Synchronized with **ASP.NET Core 10.0.13**, using `aspnetcore-10.0.13.zip`, including the middleware and supporting shared sources.
 
-# Version history
-* January 2026 - Updated with ASP.NET Core 10.0.1 and .NET 10.
+[Original source](https://github.com/dotnet/aspnetcore/tree/v10.0.13/src/Middleware/HttpLogging)
 
-### Resources
- * <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/http-logging/" target="_blank">HTTP logging in ASP.NET Core</a>
+## Build
 
+From the repository root:
 
- This library is Copyright (c) Microsoft.
+```powershell
+dotnet build CloudDebugger.sln
+```
+
+## Version history
+
+- November 2026: synchronized with ASP.NET Core 10.0.13.
+- January 2026: updated to ASP.NET Core 10.0.1 and .NET 10.
+
+Upstream code is licensed to the .NET Foundation under the MIT license.

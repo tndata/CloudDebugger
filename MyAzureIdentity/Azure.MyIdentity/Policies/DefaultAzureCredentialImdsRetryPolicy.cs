@@ -6,6 +6,7 @@ using Azure.Core.Pipeline;
 using System;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal class DefaultAzureCredentialImdsRetryPolicy : RetryPolicy
@@ -14,20 +15,21 @@ namespace Azure.MyIdentity
 
         public DefaultAzureCredentialImdsRetryPolicy(RetryOptions retryOptions, DelayStrategy delayStrategy = null) : base(retryOptions.MaxRetries,
                     delayStrategy ?? new ImdsRetryDelayStrategy(retryOptions.Delay, retryOptions.MaxDelay))
-        { }
+        {
+        }
 
+        // Hack: Cross-assembly overrides of protected internal members must be protected.
         protected override bool ShouldRetry(HttpMessage message, Exception exception)
         {
             message.ResponseClassifier = classifier;
-            // For IMDS requests, do not retry until we have observed the first response cycle
-            return !ImdsManagedIdentityProbeSource.IsProbRequest(message) ? base.ShouldRetry(message, exception) : false;
+            return ImdsManagedIdentityProbeSource.IsProbRequest(message) ? false : base.ShouldRetry(message, exception);
         }
 
+        // Hack: Cross-assembly overrides of protected internal members must be protected.
         protected override ValueTask<bool> ShouldRetryAsync(HttpMessage message, Exception exception)
         {
             message.ResponseClassifier = classifier;
-            // For IMDS requests, do not retry until we have observed the first response cycle
-            return !ImdsManagedIdentityProbeSource.IsProbRequest(message) ? base.ShouldRetryAsync(message, exception) : default;
+            return ImdsManagedIdentityProbeSource.IsProbRequest(message) ? default : base.ShouldRetryAsync(message, exception);
         }
 
         public override void Process(HttpMessage message, ReadOnlyMemory<HttpPipelinePolicy> pipeline)

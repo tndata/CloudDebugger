@@ -1,11 +1,14 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+#nullable disable
 
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal sealed class WindowsVisualStudioCodeAdapter : IVisualStudioCodeAdapter
@@ -20,7 +23,7 @@ namespace Azure.MyIdentity
             try
             {
                 WindowsNativeMethods.CredentialData credData = Marshal.PtrToStructure<WindowsNativeMethods.CredentialData>(credentials);
-                return Marshal.PtrToStringAnsi(credData.CredentialBlob, (int) credData.CredentialBlobSize);
+                return Marshal.PtrToStringAnsi(credData.CredentialBlob, (int)credData.CredentialBlobSize);
             }
             finally
             {

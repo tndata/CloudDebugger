@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Azure.Core;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal abstract class TenantIdResolverBase

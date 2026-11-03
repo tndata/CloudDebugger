@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,7 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Microsoft.Identity.Client;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal class ImdsManagedIdentityProbeSource : ManagedIdentitySource
@@ -97,7 +100,10 @@ namespace Azure.MyIdentity
             return message;
         }
 
-        public async override ValueTask<AccessToken> AuthenticateAsync(bool async, TokenRequestContext context, CancellationToken cancellationToken)
+        public override ValueTask<AccessToken> AuthenticateAsync(bool async, TokenRequestContext context, CancellationToken cancellationToken) =>
+            AuthenticateAsync(async, context, isKeyGuardAvailable: false, cancellationToken);
+
+        internal async ValueTask<AccessToken> AuthenticateAsync(bool async, TokenRequestContext context, bool isKeyGuardAvailable, CancellationToken cancellationToken)
         {
             bool continueIMDSRequestAfterProbe;
             try
@@ -139,7 +145,7 @@ namespace Azure.MyIdentity
                 try
                 {
 #pragma warning disable AZC0110 // DO NOT use await keyword in possibly synchronous scope.
-                    var authResult = await _client.AcquireTokenForManagedIdentityAsync(context, cancellationToken).ConfigureAwait(false);
+                    var authResult = await _client.AcquireTokenForManagedIdentityAsync(context, isKeyGuardAvailable, cancellationToken).ConfigureAwait(false);
 #pragma warning restore AZC0110 // DO NOT use await keyword in possibly synchronous scope.
                     return authResult.ToAccessToken();
                 }

@@ -1,7 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Core.Pipeline;
+using Azure.Core.Diagnostics;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +12,8 @@ using System.Reflection;
 
 #nullable enable
 
+// Hack: Keep copied Azure.Core internals local to the diagnostic library.
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal class ClientDiagnostics : DiagnosticScopeFactory

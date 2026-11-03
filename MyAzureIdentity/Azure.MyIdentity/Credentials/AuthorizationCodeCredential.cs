@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
@@ -10,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -17,6 +21,7 @@ namespace Azure.MyIdentity
     /// <seealso href="https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow" /> for more information
     /// about the authorization code authentication flow.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class AuthorizationCodeCredential : TokenCredential
     {
         private readonly string _authCode;
@@ -42,7 +47,7 @@ namespace Azure.MyIdentity
             sb.AppendLine("===========================");
             sb.AppendLine($" - authCode = {_authCode}");
             sb.AppendLine($" - clientId = {_clientId}");
-            sb.AppendLine($" - record = {_record.ToString()}");
+            sb.AppendLine($" - record = {_record?.ToString()}");
             sb.AppendLine($" - redirectUri = {_redirectUri}");
             sb.AppendLine($" - tenantId = {_tenantId}");
             sb.AppendLine("");

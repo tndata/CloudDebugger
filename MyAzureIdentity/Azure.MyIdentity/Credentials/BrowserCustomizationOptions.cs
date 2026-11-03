@@ -1,12 +1,15 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-using Microsoft.Identity.Client;
-
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -15,10 +18,38 @@ namespace Azure.MyIdentity
     public class BrowserCustomizationOptions
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="BrowserCustomizationOptions"/> class.
+        /// </summary>
+        public BrowserCustomizationOptions() { }
+
+        internal BrowserCustomizationOptions(IConfigurationSection section)
+        {
+            if (section == null || !section.Exists())
+            {
+                return;
+            }
+            if (section[nameof(SuccessMessage)] is string successMessage)
+            {
+                SuccessMessage = successMessage;
+            }
+            if (section[nameof(ErrorMessage)] is string errorMessage)
+            {
+                ErrorMessage = errorMessage;
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (bool.TryParse(section[nameof(UseEmbeddedWebView)], out bool useEmbeddedWebView))
+            {
+                UseEmbeddedWebView = useEmbeddedWebView;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        /// <summary>
         /// Specifies if the public client application should used an embedded web browser
         /// or the system default browser
         /// </summary>
         [Obsolete("This option requires additional dependencies on Microsoft.Identity.Client.Desktop and is no longer supported. Consider using brokered authentication instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool? UseEmbeddedWebView { get; set; }
 
         internal SystemWebViewOptions SystemBrowserOptions;
@@ -65,6 +96,19 @@ namespace Azure.MyIdentity
             {
                 systemWebViewOptions.HtmlMessageError = value;
             }
+        }
+
+        internal BrowserCustomizationOptions Clone()
+        {
+            var clone = new BrowserCustomizationOptions
+            {
+                ErrorMessage = ErrorMessage,
+                SuccessMessage = SuccessMessage,
+#pragma warning disable CS0618 // Type or member is obsolete
+                UseEmbeddedWebView = UseEmbeddedWebView ?? false
+#pragma warning restore CS0618 // Type or member is obsolete
+            };
+            return clone;
         }
     }
 }

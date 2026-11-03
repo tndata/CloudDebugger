@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.MyHttpLogging;
+// Hack: Custom request-log capture/model consumed by CloudDebugger.
+using Microsoft.AspNetCore.MyHttpLogging;
 
 using Microsoft.Extensions.Logging;
 

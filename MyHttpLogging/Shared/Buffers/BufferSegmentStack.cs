@@ -4,6 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
+// Hack: Compile shared ASP.NET Core internals inside the local diagnostic namespace.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 // Copied from https://github.com/dotnet/corefx/blob/de3902bb56f1254ec1af4bf7d092fc2c048734cc/src/System.IO.Pipelines/src/System/IO/Pipelines/BufferSegmentStack.cs

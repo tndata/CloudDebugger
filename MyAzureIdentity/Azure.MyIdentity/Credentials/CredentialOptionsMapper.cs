@@ -1,11 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Extensions.Options;
+
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity;
 
+[UnsupportedOSPlatform("browser")]
 internal class CredentialOptionsMapper
 {
     /// <summary>
@@ -23,14 +28,7 @@ internal class CredentialOptionsMapper
 
         if (isBrokerEnabled && options != null)
         {
-            if (credentialOptions != null)
-            {
-                options.TenantId = (credentialOptions as ISupportsTenantId)?.TenantId;
-                options.AdditionallyAllowedTenants = (credentialOptions as ISupportsAdditionallyAllowedTenants)?.AdditionallyAllowedTenants;
-                options.AuthorityHost = credentialOptions.AuthorityHost;
-                options.IsUnsafeSupportLoggingEnabled = credentialOptions.IsUnsafeSupportLoggingEnabled;
-                options.IsChainedCredential = credentialOptions.IsChainedCredential;
-            }
+            CopySharedProperties(options, credentialOptions);
 
             if (fileSystem is not null)
                 options.AuthenticationRecord = GetAuthenticationRecord(fileSystem);
@@ -53,32 +51,32 @@ internal class CredentialOptionsMapper
     /// identifiers (TenantId and HomeAccountId); otherwise <c>null</c>. Any I/O or deserialization errors are swallowed.
     /// </returns>
     internal static AuthenticationRecord GetAuthenticationRecord(IFileSystemService _fileSystem)
+    {
+        var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        var authRecordPathLowerCase = Path.Combine(homeDir, ".azure", "ms-azuretools.vscode-azureresourcegroups", "authRecord.json");
+        var authRecordPathUpperCase = Path.Combine(homeDir, ".Azure", "ms-azuretools.vscode-azureresourcegroups", "authRecord.json");
+
+        var authRecordPath = _fileSystem.FileExists(authRecordPathLowerCase) ? authRecordPathLowerCase :
+                             _fileSystem.FileExists(authRecordPathUpperCase) ? authRecordPathUpperCase : null;
+
+        if (authRecordPath == null)
         {
-            var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            var authRecordPathLowerCase = Path.Combine(homeDir, ".azure", "ms-azuretools.vscode-azureresourcegroups", "authRecord.json");
-            var authRecordPathUpperCase = Path.Combine(homeDir, ".Azure", "ms-azuretools.vscode-azureresourcegroups", "authRecord.json");
-
-            var authRecordPath = _fileSystem.FileExists(authRecordPathLowerCase) ? authRecordPathLowerCase :
-                                 _fileSystem.FileExists(authRecordPathUpperCase) ? authRecordPathUpperCase : null;
-
-            if (authRecordPath == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                using var authRecordStream = _fileSystem.GetFileStream(authRecordPath);
-                var authRecord = AuthenticationRecord.Deserialize(authRecordStream);
-                if (authRecord != null && !string.IsNullOrEmpty(authRecord.TenantId) && !string.IsNullOrEmpty(authRecord.HomeAccountId))
-                {
-                    return authRecord;
-                }
-            }
-            catch (Exception) { }
             return null;
         }
+
+        try
+        {
+            using var authRecordStream = _fileSystem.GetFileStream(authRecordPath);
+            var authRecord = AuthenticationRecord.Deserialize(authRecordStream);
+            if (authRecord != null && !string.IsNullOrEmpty(authRecord.TenantId) && !string.IsNullOrEmpty(authRecord.HomeAccountId))
+            {
+                return authRecord;
+            }
+        }
+        catch (Exception) { }
+        return null;
+    }
 
     /// <summary>
     /// Creates non-broker (interactive browser) fallback options from the provided credential options when broker options are not available.
@@ -88,16 +86,57 @@ internal class CredentialOptionsMapper
     internal static InteractiveBrowserCredentialOptions CreateFallbackOptions(TokenCredentialOptions credentialOptions = null)
     {
         var fallbackOptions = new InteractiveBrowserCredentialOptions();
+        CopySharedProperties(fallbackOptions, credentialOptions);
+        return fallbackOptions;
+    }
 
-        if (credentialOptions != null)
+    /// <summary>
+    /// Copies common credential properties from <paramref name="source"/> onto <paramref name="target"/>.
+    /// Used by both the broker and fallback option creation paths.
+    /// </summary>
+    private static void CopySharedProperties(InteractiveBrowserCredentialOptions target, TokenCredentialOptions source)
+    {
+        if (source == null)
         {
-            fallbackOptions.TenantId = (credentialOptions as ISupportsTenantId)?.TenantId;
-            fallbackOptions.AdditionallyAllowedTenants = (credentialOptions as ISupportsAdditionallyAllowedTenants)?.AdditionallyAllowedTenants;
-            fallbackOptions.AuthorityHost = credentialOptions.AuthorityHost;
-            fallbackOptions.IsUnsafeSupportLoggingEnabled = credentialOptions.IsUnsafeSupportLoggingEnabled;
-            fallbackOptions.IsChainedCredential = credentialOptions.IsChainedCredential;
+            return;
         }
 
-        return fallbackOptions;
+        target.TenantId = (source as ISupportsTenantId)?.TenantId;
+        target.AdditionallyAllowedTenants = (source as ISupportsAdditionallyAllowedTenants)?.AdditionallyAllowedTenants;
+        target.AuthorityHost = source.AuthorityHost;
+        target.IsUnsafeSupportLoggingEnabled = source.IsUnsafeSupportLoggingEnabled;
+        target.IsChainedCredential = source.IsChainedCredential;
+
+        if (source is ISupportsDisableInstanceDiscovery disableInstanceDiscoverySource)
+        {
+            target.DisableInstanceDiscovery = disableInstanceDiscoverySource.DisableInstanceDiscovery;
+        }
+
+        target.CopyMsalSettableProperties(source);
+
+        if (source is InteractiveBrowserCredentialOptions ibcOptions)
+        {
+            target.ClientId = ibcOptions.ClientId;
+            target.DisableAutomaticAuthentication = ibcOptions.DisableAutomaticAuthentication;
+            target.LoginHint = ibcOptions.LoginHint;
+
+            if (ibcOptions.BrowserCustomization != null)
+            {
+                target.BrowserCustomization = ibcOptions.BrowserCustomization.Clone();
+            }
+
+            if (ibcOptions.AuthenticationRecord != null)
+            {
+                target.AuthenticationRecord = ibcOptions.AuthenticationRecord;
+            }
+
+            if (ibcOptions.RedirectUri != null)
+            {
+                target.RedirectUri = ibcOptions.RedirectUri;
+            }
+
+            target.TokenCachePersistenceOptions = ibcOptions.TokenCachePersistenceOptions
+                ?? new TokenCachePersistenceOptions();
+        }
     }
 }

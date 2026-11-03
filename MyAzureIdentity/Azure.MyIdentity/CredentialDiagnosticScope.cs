@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
@@ -8,6 +8,7 @@ using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal readonly struct CredentialDiagnosticScope : IDisposable
@@ -33,6 +34,8 @@ namespace Azure.MyIdentity
 
         public AccessToken Succeeded(AccessToken token)
         {
+            // Hack: Also show result facts for credentials that do not use MSAL (CLI, PowerShell, etc.).
+            MyAzureIdentityLog.AddToLog(_name, $"Request CAE: {_context.IsCaeEnabled}; PoP: {_context.IsProofOfPossessionEnabled}\n{IdentityDiagnosticLogging.DescribeToken(token)}");
             AzureIdentityEventSource.Singleton.GetTokenSucceeded(_name, _context, token.ExpiresOn);
             return token;
         }

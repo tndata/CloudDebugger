@@ -1,7 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
 using Azure.Core.Pipeline;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using System;
 using System.IO;
@@ -9,6 +12,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -52,6 +56,23 @@ namespace Azure.MyIdentity
             AccountId = BuildAccountIdFromString(homeAccountId);
             TenantId = tenantId;
             ClientId = clientId;
+        }
+
+        internal AuthenticationRecord(IConfigurationSection section)
+        {
+            if (section == null || !section.Exists())
+            {
+                return;
+            }
+
+            Username = section[nameof(Username)];
+            Authority = section[nameof(Authority)];
+            if (section[nameof(HomeAccountId)] is string homeAccountId)
+            {
+                AccountId = BuildAccountIdFromString(homeAccountId);
+            }
+            TenantId = section[nameof(TenantId)];
+            ClientId = section[nameof(ClientId)];
         }
 
         /// <summary>

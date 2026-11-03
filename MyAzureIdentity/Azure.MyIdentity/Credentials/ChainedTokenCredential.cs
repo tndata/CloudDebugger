@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -9,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -72,7 +75,8 @@ namespace Azure.MyIdentity
         /// <summary>
         /// Protected constructor for <see href="https://aka.ms/azsdk/net/mocking">mocking</see>.
         /// </summary>
-        internal ChainedTokenCredential()
+        // Hack: Retain local assembly access and upstream subclass access for diagnostics.
+        protected internal ChainedTokenCredential()
         {
             // Hack: Custom Code for debugging purposes.
             MyAzureIdentityLog.AddToLog("        internal ChainedTokenCredential()\n", "Constructor");
@@ -88,7 +92,8 @@ namespace Azure.MyIdentity
             // Hack: Custom Code for debugging purposes.
             MyAzureIdentityLog.AddToLog("ChainedTokenCredential", "Constructor");
 
-            if (sources is null) throw new ArgumentNullException(nameof(sources));
+            if (sources is null)
+                throw new ArgumentNullException(nameof(sources));
 
             if (sources.Length == 0)
             {
@@ -99,11 +104,11 @@ namespace Azure.MyIdentity
             MyAzureIdentityLog.AddToLog("ChainedTokenCredential", "Sources");
             for (int i = 0; i < sources.Length; i++)
             {
-
                 if (sources[i] == null)
                 {
                     throw new ArgumentException("sources must not contain null", nameof(sources));
                 }
+                // Hack: Record internal credential activity for the learning UI.
                 MyAzureIdentityLog.AddToLog("ChainedTokenCredential", $" - {sources[i].GetType().Name}");
             }
 
@@ -169,8 +174,9 @@ namespace Azure.MyIdentity
                         LogText.AppendLine($"We successfully got a token using ChainedTokenCredential");
                         LogText.AppendLine($" - Token.Hash={token.Token.GetHashCode()}");
                         LogText.AppendLine($" - Token={token.Token}");
-                        LogText.AppendLine($" - Expires={token.ExpiresOn.ToUniversalTime()} (lifetime={(int)(lifetime.TotalMinutes)} minutes");
+                        LogText.AppendLine($" - Expires={IdentityDiagnosticLogging.FormatUtc(token.ExpiresOn)} (lifetime={(int)(lifetime.TotalMinutes)} minutes");
 
+                        // Hack: Record internal credential activity for the learning UI.
                         MyAzureIdentityLog.AddToLog("ChainedTokenCredential", LogText.ToString());
 
                         return token;

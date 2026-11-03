@@ -1,5 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -10,11 +13,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// Enables authentication to Microsoft Entra ID using an On-Behalf-Of flow.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class OnBehalfOfCredential : TokenCredential
     {
         internal MsalConfidentialClient Client { get; }
@@ -235,7 +240,7 @@ namespace Azure.MyIdentity
                 not null => client,
                 _ when clientAssertionCallback is not null => new MsalConfidentialClient(_pipeline, _tenantId, _clientId, clientAssertionCallback, options),
                 _ when clientAssertionCallbackAsync is not null => new MsalConfidentialClient(_pipeline, _tenantId, _clientId, clientAssertionCallbackAsync, options),
-                _ => throw new ArgumentNullException($"nameof(clientAssertionCallback)")
+                _ => throw new ArgumentNullException(nameof(clientAssertionCallback))
             };
 
             TenantIdResolver = options?.TenantIdResolver ?? TenantIdResolverBase.Default;

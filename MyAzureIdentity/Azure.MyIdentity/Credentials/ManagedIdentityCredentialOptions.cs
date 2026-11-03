@@ -1,6 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
+#nullable disable
+
+using System.Diagnostics.CodeAnalysis;
+
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -19,6 +26,16 @@ namespace Azure.MyIdentity
         {
             ManagedIdentityId = managedIdentityId ?? ManagedIdentityId.SystemAssigned;
         }
+
+        /// <summary>
+        /// Enables mTLS proof-of-possession token acquisition for <see cref="ManagedIdentityCredential"/>.
+        /// The default is <c>true</c>. Set to <c>false</c> to request bearer tokens even when proof-of-possession
+        /// was requested by the caller and the runtime prerequisites for mTLS proof-of-possession are available.
+        /// </summary>
+        /// <seealso href="https://learn.microsoft.com/entra/msal/dotnet/advanced/proof-of-possession-tokens"/>
+        [Experimental("AZID0004")]
+        public bool EnableMtlsProofOfPossession { get; set; } = true;
+
         /// <summary>
         /// Specifies the configuration for the managed identity.
         /// </summary>

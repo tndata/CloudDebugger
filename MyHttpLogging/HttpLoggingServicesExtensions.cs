@@ -1,9 +1,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.MyHttpLogging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -16,15 +16,30 @@ public static class HttpLoggingServicesExtensions
     /// Adds HTTP Logging services.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> for adding services.</param>
+    /// <returns>The original service collection for chaining.</returns>
+    // Hack: Keep the local registration APIs distinct from framework HTTP logging.
+    public static IServiceCollection AddMyHttpLogging(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddSingleton(ObjectPool.ObjectPool.Create<HttpLoggingInterceptorContext>());
+        services.TryAddSingleton(TimeProvider.System);
+        return services;
+    }
+
+    /// <summary>
+    /// Adds HTTP Logging services.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> for adding services.</param>
     /// <param name="configureOptions">A delegate to configure the <see cref="HttpLoggingOptions"/>.</param>
     /// <returns>The original service collection for chaining.</returns>
+    // Hack: Keep the local registration APIs distinct from framework HTTP logging.
     public static IServiceCollection AddMyHttpLogging(this IServiceCollection services, Action<HttpLoggingOptions> configureOptions)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        services.TryAddSingleton(ObjectPool.ObjectPool.Create<HttpLoggingInterceptorContext>());
-        services.TryAddSingleton(TimeProvider.System);
+        services.AddMyHttpLogging();
         services.Configure(configureOptions);
         return services;
     }
@@ -35,6 +50,7 @@ public static class HttpLoggingServicesExtensions
     /// <typeparam name="T">A type that implements <see cref="IHttpLoggingInterceptor"/>.</typeparam>
     /// <param name="services">The service collection.</param>
     /// <returns>The original service collection for chaining.</returns>
+    // Hack: Keep the local registration APIs distinct from framework HTTP logging.
     public static IServiceCollection AddMyHttpLoggingInterceptor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>
         (this IServiceCollection services) where T : class, IHttpLoggingInterceptor
     {

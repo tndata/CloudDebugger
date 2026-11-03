@@ -1,17 +1,40 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Azure.Core;
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using Azure.Core;
+using Microsoft.Identity.Client;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
+    [UnsupportedOSPlatform("browser")]
     internal class DefaultAzureCredentialFactory
     {
         private readonly string _customEnvironmentVariableName;
         private static string _troubleshootingMessage = $" See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/defaultazurecredential/troubleshoot";
+
+        /// <summary>
+        /// True when the credential is part of a chain (default, dev, or prod).
+        /// Controls IsChainedCredential on individual credentials so they throw CredentialUnavailableException instead of AuthenticationFailedException.
+        /// Single-credential selections are NOT in a chain.
+        /// </summary>
+        private bool IsInChain =>
+            Options.CredentialSource == null ||
+            Options.CredentialSource == Constants.DevCredentials ||
+            Options.CredentialSource == Constants.ProdCredentials;
+
+        /// <summary>
+        /// True only for the actual DefaultAzureCredential chain (no explicit selection).
+        /// Controls whether MI uses the IMDS retry policy with probe-skip behavior for fast chain progression.
+        /// </summary>
+        private bool IsDefaultAzureCredentialChain =>
+            Options.CredentialSource == null;
 
         public DefaultAzureCredentialFactory(DefaultAzureCredentialOptions options)
             : this(options, CredentialPipeline.GetInstance(options))
@@ -42,78 +65,28 @@ namespace Azure.MyIdentity
         public TokenCredential[] CreateCredentialChain()
         {
             TokenCredential[] tokenCredentials = Array.Empty<TokenCredential>();
-            string credentialSelection = EnvironmentVariables.CredentialSelection?.Trim().ToLower();
 
-            if (_customEnvironmentVariableName != null)
+            // Configuration always takes precedence over environment variables.
+            if (Options.CredentialSource != null)
             {
-                // When using custom environment variable, read from that variable and validate it's set
-                credentialSelection = ValidateAndGetCustomEnvironmentVariable(_customEnvironmentVariableName);
-                // For custom environment variables, always use the token credentials logic
+                // String CredentialSource from config.
+                tokenCredentials = ProcessCredentialSelection(Options.CredentialSource, "CredentialSource");
+            }
+            else if (_customEnvironmentVariableName != null)
+            {
+                // Custom environment variable — explicit constructor parameter.
+                string credentialSelection = ValidateAndGetCustomEnvironmentVariable(_customEnvironmentVariableName);
                 tokenCredentials = ProcessCredentialSelection(credentialSelection, _customEnvironmentVariableName);
             }
-            else if (credentialSelection != null)
+            else if (EnvironmentVariables.CredentialSelection != null)
             {
+                // AZURE_TOKEN_CREDENTIALS environment variable.
+                string credentialSelection = EnvironmentVariables.CredentialSelection.Trim().ToLowerInvariant();
                 tokenCredentials = ProcessCredentialSelection(credentialSelection, "AZURE_TOKEN_CREDENTIALS");
             }
             else
             {
-                List<TokenCredential> chain = new(10);
-
-                if (!Options.ExcludeEnvironmentCredential)
-                {
-                    chain.Add(CreateEnvironmentCredential());
-                }
-
-                if (!Options.ExcludeWorkloadIdentityCredential)
-                {
-                    chain.Add(CreateWorkloadIdentityCredential());
-                }
-
-                if (!Options.ExcludeManagedIdentityCredential)
-                {
-                    chain.Add(CreateManagedIdentityCredential());
-                }
-#pragma warning disable CS0618 // Type of member is obsolete
-                if (!Options.ExcludeSharedTokenCacheCredential)
-                {
-                    chain.Add(CreateSharedTokenCacheCredential());
-                }
-#pragma warning restore CS0618
-
-                if (!Options.ExcludeVisualStudioCredential)
-                {
-                    chain.Add(CreateVisualStudioCredential());
-                }
-
-                if (!Options.ExcludeVisualStudioCodeCredential)
-                {
-                    chain.Add(CreateVisualStudioCodeCredential());
-                }
-
-                if (!Options.ExcludeAzureCliCredential)
-                {
-                    chain.Add(CreateAzureCliCredential());
-                }
-
-                if (!Options.ExcludeAzurePowerShellCredential)
-                {
-                    chain.Add(CreateAzurePowerShellCredential());
-                }
-
-                if (!Options.ExcludeAzureDeveloperCliCredential)
-                {
-                    chain.Add(CreateAzureDeveloperCliCredential());
-                }
-
-                if (!Options.ExcludeInteractiveBrowserCredential)
-                {
-                    chain.Add(CreateInteractiveBrowserCredential());
-                }
-                if (!Options.ExcludeBrokerCredential)
-                {
-                    chain.Add(CreateBrokerCredential());
-                }
-                tokenCredentials = chain.ToArray();
+                tokenCredentials = CreateFullDefaultCredentialChain();
             }
 
             if (tokenCredentials.Length == 0)
@@ -121,7 +94,93 @@ namespace Azure.MyIdentity
                 throw new ArgumentException("At least one credential type must be included in the authentication flow.", "options");
             }
 
+            // Hack: Explain the effective selection origin and ordered chain.
+            string origin = Options.CredentialSource != null ? "configuration" : _customEnvironmentVariableName ?? (EnvironmentVariables.CredentialSelection != null ? "AZURE_TOKEN_CREDENTIALS" : "default chain and exclusion options");
+            MyAzureIdentityLog.AddToLog("DefaultAzureCredentialFactory", $"Selection origin: {origin}; configured selection: {Options.CredentialSource ?? "environment/default"}; chain: {string.Join(" -> ", System.Array.ConvertAll(tokenCredentials, credential => credential.GetType().Name))}; managed identity kind: {Options.ManagedIdentityIdKind ?? "legacy/default"}");
+            // Hack: Exclusion flags apply when constructing the full default chain; explicit selections are reported above.
+            if (Options.CredentialSource == null && _customEnvironmentVariableName == null && EnvironmentVariables.CredentialSelection == null)
+            {
+                var excluded = new List<string>();
+                if (Options.ExcludeEnvironmentCredential) excluded.Add("EnvironmentCredential");
+                if (Options.ExcludeWorkloadIdentityCredential) excluded.Add("WorkloadIdentityCredential");
+                if (Options.ExcludeManagedIdentityCredential) excluded.Add("ManagedIdentityCredential");
+                if (Options.ExcludeAzureDeveloperCliCredential) excluded.Add("AzureDeveloperCliCredential");
+                if (Options.ExcludeSharedTokenCacheCredential) excluded.Add("SharedTokenCacheCredential");
+                if (Options.ExcludeInteractiveBrowserCredential) excluded.Add("InteractiveBrowserCredential");
+                if (Options.ExcludeBrokerCredential) excluded.Add("BrokerCredential");
+                if (Options.ExcludeAzureCliCredential) excluded.Add("AzureCliCredential");
+                if (Options.ExcludeVisualStudioCredential) excluded.Add("VisualStudioCredential");
+                if (Options.ExcludeVisualStudioCodeCredential) excluded.Add("VisualStudioCodeCredential");
+                if (Options.ExcludeAzurePowerShellCredential) excluded.Add("AzurePowerShellCredential");
+                MyAzureIdentityLog.AddToLog("DefaultAzureCredentialFactory", $"Excluded by options: {(excluded.Count == 0 ? "none" : string.Join(", ", excluded))}");
+            }
             return tokenCredentials;
+        }
+
+        private static readonly string s_validCredentials = $"'{Constants.VisualStudioCredential}', '{Constants.VisualStudioCodeCredential}', '{Constants.AzureCliCredential}', '{Constants.AzurePowerShellCredential}', '{Constants.AzureDeveloperCliCredential}', '{Constants.EnvironmentCredential}', '{Constants.WorkloadIdentityCredential}', '{Constants.ManagedIdentityCredential}', '{Constants.InteractiveBrowserCredential}', '{Constants.BrokerCredential}', '{Constants.AzurePipelinesCredential}', '{Constants.ManagedIdentityAsFederatedIdentityCredential}'";
+
+        /// <summary>
+        /// Creates the full default credential chain with all non-excluded credentials.
+        /// </summary>
+        private TokenCredential[] CreateFullDefaultCredentialChain()
+        {
+            List<TokenCredential> chain = new(10);
+
+            if (!Options.ExcludeEnvironmentCredential)
+            {
+                chain.Add(CreateEnvironmentCredential());
+            }
+
+            if (!Options.ExcludeWorkloadIdentityCredential)
+            {
+                chain.Add(CreateWorkloadIdentityCredential());
+            }
+
+            if (!Options.ExcludeManagedIdentityCredential)
+            {
+                chain.Add(CreateManagedIdentityCredential());
+            }
+#pragma warning disable CS0618 // Type of member is obsolete
+            if (!Options.ExcludeSharedTokenCacheCredential)
+            {
+                chain.Add(CreateSharedTokenCacheCredential());
+            }
+#pragma warning restore CS0618
+
+            if (!Options.ExcludeVisualStudioCredential)
+            {
+                chain.Add(CreateVisualStudioCredential());
+            }
+
+            if (!Options.ExcludeVisualStudioCodeCredential)
+            {
+                chain.Add(CreateVisualStudioCodeCredential());
+            }
+
+            if (!Options.ExcludeAzureCliCredential)
+            {
+                chain.Add(CreateAzureCliCredential());
+            }
+
+            if (!Options.ExcludeAzurePowerShellCredential)
+            {
+                chain.Add(CreateAzurePowerShellCredential());
+            }
+
+            if (!Options.ExcludeAzureDeveloperCliCredential)
+            {
+                chain.Add(CreateAzureDeveloperCliCredential());
+            }
+
+            if (!Options.ExcludeInteractiveBrowserCredential)
+            {
+                chain.Add(CreateInteractiveBrowserCredential());
+            }
+            if (!Options.ExcludeBrokerCredential)
+            {
+                chain.Add(CreateBrokerCredential());
+            }
+            return chain.ToArray();
         }
 
         /// <summary>
@@ -147,7 +206,7 @@ namespace Azure.MyIdentity
             {
                 throw new InvalidOperationException($"Environment variable '{environmentVariableName}' is not set or is empty.{_troubleshootingMessage}");
             }
-            return credentialSelection.Trim().ToLower();
+            return credentialSelection.Trim().ToLowerInvariant();
         }
 
         /// <summary>
@@ -234,7 +293,7 @@ namespace Azure.MyIdentity
         /// <returns>Array containing the specific TokenCredential instance.</returns>
         private TokenCredential[] CreateSpecificCredentialChain(string credentialSelection, string environmentVariableName)
         {
-            string validCredentials = $"'{Constants.DevCredentials}', '{Constants.ProdCredentials}', '{Constants.VisualStudioCredential}', '{Constants.VisualStudioCodeCredential}', '{Constants.AzureCliCredential}', '{Constants.AzurePowerShellCredential}', '{Constants.AzureDeveloperCliCredential}', '{Constants.EnvironmentCredential}', '{Constants.WorkloadIdentityCredential}', '{Constants.ManagedIdentityCredential}', '{Constants.InteractiveBrowserCredential}', '{Constants.BrokerCredential}'";
+            string validCredentials = $"'{Constants.DevCredentials}', '{Constants.ProdCredentials}', '{Constants.VisualStudioCredential}', '{Constants.VisualStudioCodeCredential}', '{Constants.AzureCliCredential}', '{Constants.AzurePowerShellCredential}', '{Constants.AzureDeveloperCliCredential}', '{Constants.EnvironmentCredential}', '{Constants.WorkloadIdentityCredential}', '{Constants.ManagedIdentityCredential}', '{Constants.InteractiveBrowserCredential}', '{Constants.BrokerCredential}', '{Constants.AzurePipelinesCredential}', '{Constants.ManagedIdentityAsFederatedIdentityCredential}'";
 
             return credentialSelection switch
             {
@@ -248,6 +307,8 @@ namespace Azure.MyIdentity
                 Constants.ManagedIdentityCredential => [CreateManagedIdentityCredential(false)],
                 Constants.InteractiveBrowserCredential => [CreateInteractiveBrowserCredential()],
                 Constants.BrokerCredential => [CreateBrokerCredential()],
+                Constants.AzurePipelinesCredential => [CreateAzurePipelinesCredential()],
+                Constants.ManagedIdentityAsFederatedIdentityCredential => [CreateManagedIdentityAsFederatedIdentityCredential()],
                 _ => throw new InvalidOperationException($"Invalid value for environment variable {environmentVariableName}: {credentialSelection}. Valid values are {validCredentials}.{_troubleshootingMessage}")
             };
         }
@@ -256,9 +317,34 @@ namespace Azure.MyIdentity
         {
             var options = Options.Clone<EnvironmentCredentialOptions>();
 
-            if (!string.IsNullOrEmpty(options.TenantId))
+            if (!string.IsNullOrEmpty(Options.TenantId))
             {
                 options.TenantId = Options.TenantId;
+            }
+
+            if (!string.IsNullOrEmpty(Options.ClientId))
+            {
+                options.ClientId = Options.ClientId;
+            }
+
+            if (!string.IsNullOrEmpty(Options.EnvironmentClientSecret))
+            {
+                options.ClientSecret = Options.EnvironmentClientSecret;
+            }
+
+            if (!string.IsNullOrEmpty(Options.EnvironmentClientCertificatePath))
+            {
+                options.ClientCertificatePath = Options.EnvironmentClientCertificatePath;
+            }
+
+            if (!string.IsNullOrEmpty(Options.EnvironmentClientCertificatePassword))
+            {
+                options.ClientCertificatePassword = Options.EnvironmentClientCertificatePassword;
+            }
+
+            if (Options.EnvironmentSendCertificateChain.HasValue)
+            {
+                options.SendCertificateChain = Options.EnvironmentSendCertificateChain.Value;
             }
 
             return new EnvironmentCredential(Pipeline, options);
@@ -271,14 +357,20 @@ namespace Azure.MyIdentity
             options.ClientId = Options.WorkloadIdentityClientId;
             options.TenantId = Options.TenantId;
             options.Pipeline = Pipeline;
+            options.IsAzureProxyEnabled = Options.IsAzureProxyEnabled;
+
+            if (!string.IsNullOrEmpty(Options.WorkloadTokenFilePath))
+            {
+                options.TokenFilePath = Options.WorkloadTokenFilePath;
+            }
 
             return new WorkloadIdentityCredential(options);
         }
 
-        public virtual TokenCredential CreateManagedIdentityCredential(bool isProbeEnabled = true)
+        public virtual TokenCredential CreateManagedIdentityCredential(bool isChained = true)
         {
             var options = Options.Clone<DefaultAzureCredentialOptions>();
-            options.IsChainedCredential = isProbeEnabled;
+            options.IsChainedCredential = isChained;
 
             if (options.ManagedIdentityClientId != null && options.ManagedIdentityResourceId != null)
             {
@@ -288,14 +380,27 @@ namespace Azure.MyIdentity
 
             var miOptions = new ManagedIdentityClientOptions
             {
-                Pipeline = CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true),
+                Pipeline = CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: IsInChain),
                 Options = options,
                 InitialImdsConnectionTimeout = TimeSpan.FromSeconds(1),
                 ExcludeTokenExchangeManagedIdentitySource = options.ExcludeWorkloadIdentityCredential,
                 IsForceRefreshEnabled = options.IsForceRefreshEnabled,
+                EnableMtlsProofOfPossession = options.EnableMtlsProofOfPossession,
             };
 
-            if (!string.IsNullOrEmpty(options.ManagedIdentityClientId))
+            // ManagedIdentityIdKind/ManagedIdentityId (new config properties) take priority
+            if (!string.IsNullOrEmpty(options.ManagedIdentityIdKind))
+            {
+                miOptions.ManagedIdentityId = options.ManagedIdentityIdKind switch
+                {
+                    "SystemAssigned" => ManagedIdentityId.SystemAssigned,
+                    "ClientId" => ManagedIdentityId.FromUserAssignedClientId(options.ManagedIdentityId),
+                    "ResourceId" => ManagedIdentityId.FromUserAssignedResourceId(new ResourceIdentifier(options.ManagedIdentityId)),
+                    "ObjectId" => ManagedIdentityId.FromUserAssignedObjectId(options.ManagedIdentityId),
+                    _ => throw new ArgumentException($"Invalid {nameof(options.ManagedIdentityIdKind)} value: '{options.ManagedIdentityIdKind}'. Valid values are 'SystemAssigned', 'ClientId', 'ResourceId', 'ObjectId'."),
+                };
+            }
+            else if (!string.IsNullOrEmpty(options.ManagedIdentityClientId))
             {
                 miOptions.ManagedIdentityId = ManagedIdentityId.FromUserAssignedClientId(options.ManagedIdentityClientId);
             }
@@ -326,10 +431,17 @@ namespace Azure.MyIdentity
 
         public virtual TokenCredential CreateInteractiveBrowserCredential()
         {
-            var options = Options.Clone<InteractiveBrowserCredentialOptions>();
+            InteractiveBrowserCredentialOptions brokerOptions = null;
+            if (Options.UseDefaultBrokerAccount && !TryCreateDevelopmentBrokerOptions(out brokerOptions))
+            {
+                throw new InvalidOperationException("Must reference the Azure.Identity.Broker package to use broker authentication with InteractiveBrowserCredential.");
+            }
 
-            options.TokenCachePersistenceOptions = new TokenCachePersistenceOptions();
+            brokerOptions?.CopyMsalSettableProperties(Options);
 
+            var options = brokerOptions ?? Options.Clone<InteractiveBrowserCredentialOptions>();
+
+            options.TokenCachePersistenceOptions ??= new TokenCachePersistenceOptions();
             options.TenantId = Options.InteractiveBrowserTenantId;
 
             return new InteractiveBrowserCredential(
@@ -342,9 +454,17 @@ namespace Azure.MyIdentity
         internal TokenCredential CreateBrokerCredential()
         {
             var options = Options.Clone<DevelopmentBrokerOptions>();
-            options.TokenCachePersistenceOptions = new TokenCachePersistenceOptions();
+            options.TokenCachePersistenceOptions ??= new TokenCachePersistenceOptions();
             options.TenantId = Options.InteractiveBrowserTenantId;
-            options.IsChainedCredential = true;
+            options.IsChainedCredential = IsInChain;
+            options.ClientId = Options.InteractiveBrowserCredentialClientId ?? Constants.DeveloperSignOnClientId;
+
+            options.CopyMsalSettableProperties(Options);
+
+            if (Options.IsLegacyMsaPassthroughEnabled.HasValue)
+            {
+                options.IsLegacyMsaPassthroughEnabled = Options.IsLegacyMsaPassthroughEnabled;
+            }
 
             return new BrokerCredential(options);
         }
@@ -354,7 +474,7 @@ namespace Azure.MyIdentity
             var options = Options.Clone<AzureDeveloperCliCredentialOptions>();
             options.TenantId = Options.TenantId;
             options.ProcessTimeout = Options.CredentialProcessTimeout;
-            options.IsChainedCredential = true;
+            options.IsChainedCredential = IsInChain;
 
             return new AzureDeveloperCliCredential(Pipeline, default, options);
         }
@@ -364,7 +484,11 @@ namespace Azure.MyIdentity
             var options = Options.Clone<AzureCliCredentialOptions>();
             options.TenantId = Options.TenantId;
             options.ProcessTimeout = Options.CredentialProcessTimeout;
-            options.IsChainedCredential = true;
+            if (!string.IsNullOrEmpty(Options.Subscription))
+            {
+                options.Subscription = Options.Subscription;
+            }
+            options.IsChainedCredential = IsInChain;
 
             return new AzureCliCredential(Pipeline, default, options);
         }
@@ -374,7 +498,7 @@ namespace Azure.MyIdentity
             var options = Options.Clone<VisualStudioCredentialOptions>();
             options.TenantId = Options.VisualStudioTenantId;
             options.ProcessTimeout = Options.CredentialProcessTimeout;
-            options.IsChainedCredential = true;
+            options.IsChainedCredential = IsInChain;
 
             return new VisualStudioCredential(Options.VisualStudioTenantId, Pipeline, default, default, options);
         }
@@ -383,7 +507,7 @@ namespace Azure.MyIdentity
         {
             var options = Options.Clone<VisualStudioCodeCredentialOptions>();
             options.TenantId = Options.VisualStudioCodeTenantId;
-            options.IsChainedCredential = true;
+            options.IsChainedCredential = IsInChain;
 
             return new VisualStudioCodeCredential(options);
         }
@@ -393,10 +517,110 @@ namespace Azure.MyIdentity
             var options = Options.Clone<AzurePowerShellCredentialOptions>();
             options.TenantId = Options.TenantId;
             options.ProcessTimeout = Options.CredentialProcessTimeout;
-            options.IsChainedCredential = true;
+            options.IsChainedCredential = IsInChain;
 
             return new AzurePowerShellCredential(options, Pipeline, default);
         }
+
+        public virtual TokenCredential CreateAzurePipelinesCredential()
+        {
+            if (IsDefaultAzureCredentialChain)
+            {
+                throw new InvalidOperationException(
+                    "AzurePipelinesCredential is not supported via the AZURE_TOKEN_CREDENTIALS environment variable. " +
+                    "Use IConfiguration-based credential selection with DefaultAzureCredentialOptions to configure AzurePipelinesCredential, " +
+                    "as it requires additional properties (ClientId, AzurePipelinesServiceConnectionId, AzurePipelinesSystemAccessToken) " +
+                    "that cannot be specified through environment variables.");
+            }
+
+            var options = Options.Clone<AzurePipelinesCredentialOptions>();
+
+            if (Options.TokenCachePersistenceOptions != null)
+            {
+                options.TokenCachePersistenceOptions = Options.TokenCachePersistenceOptions;
+            }
+
+            var tenantId = Options.TenantId;
+            var clientId = Options.ClientId;
+            var serviceConnectionId = Options.AzurePipelinesServiceConnectionId;
+            var systemAccessToken = Options.AzurePipelinesSystemAccessToken;
+
+            Argument.AssertNotNullOrEmpty(tenantId, nameof(tenantId));
+            Argument.AssertNotNullOrEmpty(clientId, nameof(clientId));
+            Argument.AssertNotNullOrEmpty(serviceConnectionId, nameof(serviceConnectionId));
+            Argument.AssertNotNullOrEmpty(systemAccessToken, nameof(systemAccessToken));
+
+            return new AzurePipelinesCredential(tenantId, clientId, serviceConnectionId, systemAccessToken, options);
+        }
+
+        public virtual TokenCredential CreateManagedIdentityAsFederatedIdentityCredential()
+        {
+            if (IsDefaultAzureCredentialChain)
+            {
+                throw new InvalidOperationException(
+                    "ManagedIdentityAsFederatedIdentityCredential is not supported via the AZURE_TOKEN_CREDENTIALS environment variable. " +
+                    "Use IConfiguration-based credential selection with DefaultAzureCredentialOptions to configure ManagedIdentityAsFederatedIdentityCredential, " +
+                    "as it requires additional properties (ClientId, AzureCloud, ManagedIdentityIdKind, ManagedIdentityId) " +
+                    "that cannot be specified through environment variables.");
+            }
+
+            ManagedIdentityId managedIdentityId;
+            if (!string.IsNullOrEmpty(Options.ManagedIdentityIdKind))
+            {
+                managedIdentityId = Options.ManagedIdentityIdKind switch
+                {
+                    "ClientId" => ManagedIdentityId.FromUserAssignedClientId(Options.ManagedIdentityId),
+                    "ResourceId" => ManagedIdentityId.FromUserAssignedResourceId(new ResourceIdentifier(Options.ManagedIdentityId)),
+                    "ObjectId" => ManagedIdentityId.FromUserAssignedObjectId(Options.ManagedIdentityId),
+                    _ => throw new ArgumentException($"Invalid {nameof(Options.ManagedIdentityIdKind)} value: '{Options.ManagedIdentityIdKind}'. For ManagedIdentityAsFederatedIdentityCredential, valid values are 'ClientId', 'ResourceId', 'ObjectId'. SystemAssigned is not supported."),
+                };
+            }
+            else
+            {
+                throw new ArgumentException(
+                    "A user-assigned managed identity must be specified for ManagedIdentityAsFederatedIdentityCredential. " +
+                    "Set ManagedIdentityIdKind and ManagedIdentityId in the configuration.");
+            }
+
+            string tokenScope = TranslateCloudToTokenScope(Options.AzureCloud);
+            var managedIdentityOptions = Options.Clone<DefaultAzureCredentialOptions>();
+            managedIdentityOptions.IsChainedCredential = false;
+            var managedIdentityCredential = new ManagedIdentityCredential(new ManagedIdentityClient(new ManagedIdentityClientOptions
+            {
+                ManagedIdentityId = managedIdentityId,
+                Pipeline = CredentialPipeline.GetInstance(managedIdentityOptions, IsManagedIdentityCredential: true),
+                Options = managedIdentityOptions,
+                IsForceRefreshEnabled = managedIdentityOptions.IsForceRefreshEnabled,
+                EnableMtlsProofOfPossession = managedIdentityOptions.EnableMtlsProofOfPossession,
+            }));
+
+            var assertionOptions = Options.Clone<ClientAssertionCredentialOptions>();
+            assertionOptions.EnableMtlsProofOfPossession = managedIdentityOptions.EnableMtlsProofOfPossession;
+
+            if (Options.AdditionallyAllowedTenants?.Count > 0)
+            {
+                foreach (var tenant in Options.AdditionallyAllowedTenants)
+                {
+                    assertionOptions.AdditionallyAllowedTenants.Add(tenant);
+                }
+            }
+
+            return new ClientAssertionCredential(
+                Options.TenantId,
+                Options.ClientId,
+                managedIdentityCredential,
+                tokenScope,
+                assertionOptions);
+        }
+
+        private static string TranslateCloudToTokenScope(string azureCloud) =>
+            azureCloud?.ToLowerInvariant() switch
+            {
+                "public" => "api://AzureADTokenExchange/.default",
+                "usgov" => "api://AzureADTokenExchangeUSGov/.default",
+                "china" => "api://AzureADTokenExchangeChina/.default",
+                _ => throw new ArgumentException($"Unknown Azure cloud: '{azureCloud}'. Valid values are 'public', 'usgov', 'china'.", nameof(azureCloud)),
+            };
 
         /// <summary>
         /// Creates a DevelopmentBrokerOptions instance if the Azure.Identity.Broker assembly is loaded.
@@ -411,11 +635,9 @@ namespace Azure.MyIdentity
                 // Use Type.GetType and ConstructorInfo because they can be analyzed by the ILLinker and are
                 // AOT friendly.
 
-
-                // HACK: To enable BrokerCredential support, Types are found in the \Azure.Identity.Broker folder. 
-
                 // Try to get the options type
-                var optionsType = Type.GetType("Azure.Identity.Broker.DevelopmentBrokerOptions", throwOnError: false);
+                // Hack: Broker options are compiled into this local assembly.
+                var optionsType = typeof(Azure.Identity.Broker.DevelopmentBrokerOptions);
                 if (optionsType == null)
                     return false;
 

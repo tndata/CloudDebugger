@@ -1,4 +1,5 @@
-﻿namespace Microsoft.AspNetCore.MyHttpLogging;
+// Hack: Custom request-log capture/model consumed by CloudDebugger.
+namespace Microsoft.AspNetCore.MyHttpLogging;
 
 /// <summary>
 /// Request log entry

@@ -8,6 +8,7 @@ using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using MyHttpLogging.CustomCode;
 
+// Hack: Keep the diagnostic middleware separate from the framework implementation.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 /// <summary>
@@ -368,7 +369,7 @@ internal sealed class HttpLoggingMiddleware
     {
         foreach (var (key, value) in headers)
         {
-            //HACK; Don't redact the headers
+            // Hack: Preserve unredacted headers for the request-inspection tool.
             //if (!allowedHeaders.Contains(key))
             //{
             //    // Key is not among the "only listed" headers.

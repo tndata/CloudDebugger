@@ -1,12 +1,16 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.Versioning;
 
 using System;
 using System.Diagnostics;
 using System.IO;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
+    [UnsupportedOSPlatform("browser")]
     internal class ProcessService : IProcessService
     {
         public static IProcessService Default { get; } = new ProcessService();

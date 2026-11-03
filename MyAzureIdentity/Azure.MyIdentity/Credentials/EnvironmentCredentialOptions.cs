@@ -1,8 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
 using System.Collections.Generic;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -16,22 +19,22 @@ namespace Azure.MyIdentity
         internal string TenantId { get; set; } = EnvironmentVariables.TenantId;
 
         /// <summary>
-        /// The client ID (app ID) of the service pricipal the credential will authenticate. This value defaults to the value of the environment variable AZURE_CLIENT_ID.
+        /// The client ID (app ID) of the service principal the credential will authenticate. This value defaults to the value of the environment variable AZURE_CLIENT_ID.
         /// </summary>
         internal string ClientId { get; set; } = EnvironmentVariables.ClientId;
 
         /// <summary>
-        /// The client secret used to authenticate the service pricipal. This value defaults to the value of the environment variable AZURE_CLIENT_SECRET.
+        /// The client secret used to authenticate the service principal. This value defaults to the value of the environment variable AZURE_CLIENT_SECRET.
         /// </summary>
         internal string ClientSecret { get; set; } = EnvironmentVariables.ClientSecret;
 
         /// <summary>
-        /// The path to the client certificate used to authenticate the service pricipal. This value defaults to the value of the environment variable AZURE_CLIENT_CERTIFICATE_PATH.
+        /// The path to the client certificate used to authenticate the service principal. This value defaults to the value of the environment variable AZURE_CLIENT_CERTIFICATE_PATH.
         /// </summary>
         internal string ClientCertificatePath { get; set; } = EnvironmentVariables.ClientCertificatePath;
 
         /// <summary>
-        /// The password of the client certificate used to authenticate the service pricipal. This value defaults to the value of the environment variable AZURE_CLIENT_CERTIFICATE_PASSWORD.
+        /// The password of the client certificate used to authenticate the service principal. This value defaults to the value of the environment variable AZURE_CLIENT_CERTIFICATE_PASSWORD.
         /// </summary>
         internal string ClientCertificatePassword { get; set; } = EnvironmentVariables.ClientCertificatePassword;
 
@@ -53,12 +56,12 @@ namespace Azure.MyIdentity
         /// <summary>
         /// MSAL client to be used for testing.
         /// </summary>
-        internal MsalConfidentialClient MsalConfidentialClient { get; set;}
+        internal MsalConfidentialClient MsalConfidentialClient { get; set; }
 
         /// <summary>
         /// MSAL client to be used for testing.
         /// </summary>
-        internal MsalPublicClient MsalPublicClient { get; set;}
+        internal MsalPublicClient MsalPublicClient { get; set; }
 
         /// <inheritdoc/>
         public bool DisableInstanceDiscovery { get; set; }

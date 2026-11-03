@@ -1,8 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
 using System;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -11,6 +14,7 @@ namespace Azure.MyIdentity
     public static class AzureAuthorityHosts
     {
         private const string AzurePublicCloudHostUrl = "https://login.microsoftonline.com/";
+        private const string AzureBleuCloudHostUrl = "https://login.sovcloud-identity.fr/";
         private const string AzureChinaHostUrl = "https://login.chinacloudapi.cn/";
         private const string AzureGermanyHostUrl = "https://login.microsoftonline.de/";
         private const string AzureGovernmentHostUrl = "https://login.microsoftonline.us/";
@@ -18,6 +22,11 @@ namespace Azure.MyIdentity
         /// The host of the Microsoft Entra authority for tenants in the Azure Public Cloud.
         /// </summary>
         public static Uri AzurePublicCloud { get; } = new Uri(AzurePublicCloudHostUrl);
+
+        /// <summary>
+        /// The host of the Microsoft Entra authority for tenants in Bleu Cloud, the national partner cloud for France.
+        /// </summary>
+        public static Uri AzureBleuCloud { get; } = new Uri(AzureBleuCloudHostUrl);
 
         /// <summary>
         /// The host of the Microsoft Entra authority for tenants in the Azure China Cloud.
@@ -52,6 +61,9 @@ namespace Azure.MyIdentity
                 case AzurePublicCloudHostUrl:
                     // The double slash is intentional for public cloud.
                     return "https://management.azure.com//.default";
+                case AzureBleuCloudHostUrl:
+                    // The double slash is intentional for Bleu Cloud.
+                    return "https://management.sovcloud-api.fr//.default";
                 case AzureChinaHostUrl:
                     return "https://management.chinacloudapi.cn/.default";
                 case AzureGermanyHostUrl:

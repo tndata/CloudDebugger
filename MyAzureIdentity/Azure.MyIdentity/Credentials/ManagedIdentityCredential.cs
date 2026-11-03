@@ -1,5 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -11,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -18,6 +22,7 @@ namespace Azure.MyIdentity
     /// environments that support managed identity. For end-to-end guidance, see <see href="https://learn.microsoft.com/dotnet/azure/sdk/authentication/user-assigned-managed-identity">user-assigned managed identity</see>
     /// or <see href="https://learn.microsoft.com/dotnet/azure/sdk/authentication/system-assigned-managed-identity">system-assigned managed identity</see>.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class ManagedIdentityCredential : TokenCredential
     {
         internal const string MsiUnavailableError = "No managed identity endpoint found.";
@@ -76,8 +81,12 @@ namespace Azure.MyIdentity
         /// </param>
         /// <param name="options">Options to configure the management of the requests sent to Microsoft Entra ID.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use constructor ManagedIdentityCredential(ManagedIdentityId id) or ManagedIdentityCredential(ManagedIdentityCredentialOptions options).")]
         public ManagedIdentityCredential(string clientId = null, TokenCredentialOptions options = null)
-            : this(new ManagedIdentityClient(new ManagedIdentityClientOptions { ManagedIdentityId = string.IsNullOrEmpty(clientId) ? ManagedIdentityId.SystemAssigned : ManagedIdentityId.FromUserAssignedClientId(clientId), Pipeline = CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true), Options = options }))
+            : this(new ManagedIdentityClient(CreateManagedIdentityClientOptions(
+                options,
+                clientId,
+                CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true))))
         {
             _logAccountDetails = options?.Diagnostics?.IsAccountIdentifierLoggingEnabled ?? false;
         }
@@ -90,8 +99,12 @@ namespace Azure.MyIdentity
         /// </param>
         /// <param name="options">Options to configure the management of the requests sent to Microsoft Entra ID.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use constructor ManagedIdentityCredential(ManagedIdentityId id) or ManagedIdentityCredential(ManagedIdentityCredentialOptions options).")]
         public ManagedIdentityCredential(ResourceIdentifier resourceId, TokenCredentialOptions options = null)
-            : this(new ManagedIdentityClient(new ManagedIdentityClientOptions { ManagedIdentityId = ManagedIdentityId.FromUserAssignedResourceId(resourceId), Pipeline = CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true), Options = options }))
+            : this(new ManagedIdentityClient(CreateManagedIdentityClientOptions(
+                options,
+                ManagedIdentityId.FromUserAssignedResourceId(resourceId),
+                CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true))))
         {
             _logAccountDetails = options?.Diagnostics?.IsAccountIdentifierLoggingEnabled ?? false;
             _clientId = resourceId.ToString();
@@ -102,7 +115,10 @@ namespace Azure.MyIdentity
         /// </summary>
         /// <param name="id">The <see cref="ManagedIdentityId"/> specifying which managed identity will be configured.</param>
         public ManagedIdentityCredential(ManagedIdentityId id)
-            : this(new ManagedIdentityClient(new ManagedIdentityClientOptions { ManagedIdentityId = id, Pipeline = CredentialPipeline.GetInstance(null, IsManagedIdentityCredential: true), Options = null }))
+            : this(new ManagedIdentityClient(CreateManagedIdentityClientOptions(
+                null,
+                id,
+                CredentialPipeline.GetInstance(null, IsManagedIdentityCredential: true))))
         {
             if (id == null)
             {
@@ -115,22 +131,71 @@ namespace Azure.MyIdentity
         /// </summary>
         /// <param name="options">The options used to configure the credential.</param>
         public ManagedIdentityCredential(ManagedIdentityCredentialOptions options)
-            : this(new ManagedIdentityClient(new ManagedIdentityClientOptions { ManagedIdentityId = options.ManagedIdentityId, Pipeline = CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true), Options = options }))
+            : this(new ManagedIdentityClient(CreateManagedIdentityClientOptions(
+                options,
+                options.ManagedIdentityId,
+                CredentialPipeline.GetInstance(options, IsManagedIdentityCredential: true))))
         {
             Argument.AssertNotNull(options, nameof(options));
             _logAccountDetails = options?.Diagnostics?.IsAccountIdentifierLoggingEnabled ?? false;
         }
 
         internal ManagedIdentityCredential(string clientId, CredentialPipeline pipeline, TokenCredentialOptions options = null, bool preserveTransport = false)
-            : this(new ManagedIdentityClient(new ManagedIdentityClientOptions { Pipeline = pipeline, ManagedIdentityId = ManagedIdentityId.FromUserAssignedClientId(clientId), PreserveTransport = preserveTransport, Options = options }))
+            : this(new ManagedIdentityClient(CreateManagedIdentityClientOptions(
+                options,
+                ManagedIdentityId.FromUserAssignedClientId(clientId),
+                pipeline,
+                preserveTransport)))
         {
             _clientId = clientId;
         }
 
         internal ManagedIdentityCredential(ResourceIdentifier resourceId, CredentialPipeline pipeline, TokenCredentialOptions options, bool preserveTransport = false)
-            : this(new ManagedIdentityClient(new ManagedIdentityClientOptions { Pipeline = pipeline, ManagedIdentityId = ManagedIdentityId.FromUserAssignedResourceId(resourceId), PreserveTransport = preserveTransport, Options = options }))
+            : this(new ManagedIdentityClient(CreateManagedIdentityClientOptions(
+                options,
+                ManagedIdentityId.FromUserAssignedResourceId(resourceId),
+                pipeline,
+                preserveTransport)))
         {
             _clientId = resourceId.ToString();
+        }
+
+        private static ManagedIdentityClientOptions CreateManagedIdentityClientOptions(
+            TokenCredentialOptions options,
+            ManagedIdentityId managedIdentityId,
+            CredentialPipeline pipeline,
+            bool preserveTransport = false)
+        {
+            return new ManagedIdentityClientOptions
+            {
+                ManagedIdentityId = managedIdentityId,
+                Pipeline = pipeline,
+                PreserveTransport = preserveTransport,
+                Options = options,
+                EnableMtlsProofOfPossession = ResolveEnableMtlsProofOfPossession(options)
+            };
+        }
+
+        private static ManagedIdentityClientOptions CreateManagedIdentityClientOptions(
+            TokenCredentialOptions options,
+            string clientId,
+            CredentialPipeline pipeline,
+            bool preserveTransport = false)
+            => CreateManagedIdentityClientOptions(
+                options,
+                string.IsNullOrEmpty(clientId)
+                    ? ManagedIdentityId.SystemAssigned
+                    : ManagedIdentityId.FromUserAssignedClientId(clientId),
+                pipeline,
+                preserveTransport);
+
+        private static bool ResolveEnableMtlsProofOfPossession(TokenCredentialOptions options)
+        {
+#pragma warning disable AZID0004 // Internal usage of experimental mTLS proof-of-possession API
+            // mTLS proof-of-possession is enabled by default. Only an explicit
+            // ManagedIdentityCredentialOptions.EnableMtlsProofOfPossession = false opts out.
+            return options is not ManagedIdentityCredentialOptions managedIdentityCredentialOptions || managedIdentityCredentialOptions.EnableMtlsProofOfPossession;
+#pragma warning restore AZID0004
         }
 
         internal ManagedIdentityCredential(ManagedIdentityClient client)
@@ -173,6 +238,7 @@ namespace Azure.MyIdentity
         {
             using CredentialDiagnosticScope scope = _pipeline.StartGetTokenScope("ManagedIdentityCredential.GetToken", requestContext);
 
+            // Hack: Record internal credential activity for the learning UI.
             MyAzureIdentityLog.AddToLog("ManagedIdentityCredential", "GetToken() was called");
 
             try
@@ -190,11 +256,13 @@ namespace Azure.MyIdentity
             // that the response was not valid JSON.
             catch (MsalServiceException e) when (e.ErrorCode == MsalError.ManagedIdentityResponseParseFailure)
             {
+                // Hack: Record internal credential activity for the learning UI.
                 MyAzureIdentityLog.AddToLog("ManagedIdentityCredential", "GetToken.Exception " + e.Message);
                 throw scope.FailWrapAndThrow(new CredentialUnavailableException(MsiUnavailableError, e), Troubleshooting);
             }
             catch (Exception e)
             {
+                // Hack: Record internal credential activity for the learning UI.
                 MyAzureIdentityLog.AddToLog("ManagedIdentityCredential", "GetToken.Exception " + e.Message);
 
                 // This exception pattern indicates that the MI endpoint is not available after exhausting all retries.

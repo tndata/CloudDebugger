@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 internal sealed class UpgradeFeatureLoggingDecorator : IHttpUpgradeFeature

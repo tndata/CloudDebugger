@@ -1,5 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -10,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -18,6 +22,7 @@ namespace Azure.MyIdentity
     /// For usage instructions, see <see href="https://aka.ms/azsdk/net/identity/interactivebrowsercredential/usage">Interactive browser authentication</see>.
     /// </summary>
     /// <remarks>Implements the <see href="https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow">OAuth 2.0 authorization code flow</see>.</remarks>
+    [UnsupportedOSPlatform("browser")]
     public class InteractiveBrowserCredential : TokenCredential
     {
         internal string TenantId { get; }
@@ -125,6 +130,7 @@ namespace Azure.MyIdentity
             AdditionallyAllowedTenantIds = TenantIdResolver.ResolveAddionallyAllowedTenantIds((options as ISupportsAdditionallyAllowedTenants)?.AdditionallyAllowedTenants);
             Record = (options as InteractiveBrowserCredentialOptions)?.AuthenticationRecord;
             BrowserCustomization = (options as InteractiveBrowserCredentialOptions)?.BrowserCustomization;
+            DisableAutomaticAuthentication = (options as InteractiveBrowserCredentialOptions)?.DisableAutomaticAuthentication ?? false;
             UseOperatingSystemAccount = (options as IMsalPublicClientInitializerOptions)?.UseDefaultBrokerAccount ?? false;
             IsChainedCredential = options?.IsChainedCredential ?? false;
         }
@@ -303,7 +309,6 @@ namespace Azure.MyIdentity
             }
         }
 
-
         private async Task<AccessToken> GetTokenViaBrowserLoginAsync(TokenRequestContext context, bool async, CancellationToken cancellationToken)
         {
             Prompt prompt = LoginHint switch
@@ -344,7 +349,7 @@ namespace Azure.MyIdentity
             }
 
             sb.AppendLine($"AccessToken: {result.AccessToken}");
-            sb.AppendLine($"ExpiresOn: {result.ExpiresOn}");
+            sb.AppendLine($"ExpiresOn: {IdentityDiagnosticLogging.FormatUtc(result.ExpiresOn)}");
             sb.AppendLine($"IsExtendedLifeTimeToken: {result.IsExtendedLifeTimeToken}");
             sb.AppendLine($"Scopes: {string.Join(", ", result.Scopes ?? new string[0])}");
             sb.AppendLine($"TenantId: {result.TenantId}");

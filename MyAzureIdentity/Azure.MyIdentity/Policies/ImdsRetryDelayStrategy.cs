@@ -6,6 +6,7 @@
 using Azure.Core;
 using System;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>

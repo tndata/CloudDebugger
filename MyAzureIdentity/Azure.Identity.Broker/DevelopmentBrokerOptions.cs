@@ -2,19 +2,20 @@
 // Licensed under the MIT License.
 
 using Azure.MyIdentity;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Broker;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Broker;
 
+// Hack: Broker companion sources are compiled locally against Azure.MyIdentity.
 namespace Azure.Identity.Broker
 {
     /// <summary>
     /// Options to configure the <see cref="InteractiveBrowserCredential"/> to use the system authentication broker in lieu of an embedded web view or the system browser.
     /// For more information, see <see href="https://aka.ms/azsdk/net/identity/interactive-brokered-auth">Interactive brokered authentication</see>.
     /// </summary>
-    internal class DevelopmentBrokerOptions : InteractiveBrowserCredentialOptions, IMsalSettablePublicClientInitializerOptions, IMsalPublicClientInitializerOptions
+    internal class DevelopmentBrokerOptions : Azure.MyIdentity.InteractiveBrowserCredentialOptions, IMsalSettablePublicClientInitializerOptions, IMsalPublicClientInitializerOptions
     {
         private Action<PublicClientApplicationBuilder> _beforeBuildClient;
         /// <summary>
@@ -48,6 +49,23 @@ namespace Azure.Identity.Broker
         }
 
         Action<PublicClientApplicationBuilder> IMsalPublicClientInitializerOptions.BeforeBuildClient => _beforeBuildClient;
+
+        internal override void CopyMsalSettableProperties(Azure.MyIdentity.TokenCredentialOptions source)
+        {
+            base.CopyMsalSettableProperties(source);
+
+#pragma warning disable AZC0112 // Accessing internal property via InternalsVisibleTo
+            bool? value = source switch
+            {
+                Azure.MyIdentity.DefaultAzureCredentialOptions dac => dac.IsLegacyMsaPassthroughEnabled,
+                Azure.MyIdentity.DevelopmentBrokerOptions dbo => dbo.IsLegacyMsaPassthroughEnabled,
+                _ => null
+            };
+#pragma warning restore AZC0112
+
+            if (value.HasValue)
+                IsLegacyMsaPassthroughEnabled = value;
+        }
 
         private void AddBroker(PublicClientApplicationBuilder builder)
         {

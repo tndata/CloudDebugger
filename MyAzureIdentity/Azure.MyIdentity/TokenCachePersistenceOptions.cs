@@ -1,6 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
+using Microsoft.Extensions.Configuration;
+
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -57,6 +62,13 @@ namespace Azure.MyIdentity
     public class TokenCachePersistenceOptions
     {
         /// <summary>
+        /// Creates a new instance of <see cref="TokenCachePersistenceOptions"/>.
+        /// </summary>
+        public TokenCachePersistenceOptions()
+        {
+        }
+
+        /// <summary>
         /// Name uniquely identifying the <see cref="TokenCachePersistenceOptions"/>.
         /// </summary>
         public string Name { get; set; }
@@ -67,15 +79,22 @@ namespace Azure.MyIdentity
         /// </summary>
         public bool UnsafeAllowUnencryptedStorage { get; set; }
 
-        /// <summary>
-        /// Creates a copy of the <see cref="TokenCachePersistenceOptions"/>.
-        /// </summary>
-        /// <returns></returns>
-        internal TokenCachePersistenceOptions Clone() {
-            return new TokenCachePersistenceOptions {
-                Name = Name,
-                UnsafeAllowUnencryptedStorage = UnsafeAllowUnencryptedStorage
-            };
+        internal TokenCachePersistenceOptions(IConfigurationSection section)
+        {
+            if (section == null || !section.Exists())
+            {
+                return;
+            }
+
+            if (section[nameof(Name)] is string name)
+            {
+                Name = name;
+            }
+
+            if (bool.TryParse(section[nameof(UnsafeAllowUnencryptedStorage)], out bool unsafeAllow))
+            {
+                UnsafeAllowUnencryptedStorage = unsafeAllow;
+            }
         }
     }
 }

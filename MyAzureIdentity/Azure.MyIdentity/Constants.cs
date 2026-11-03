@@ -1,10 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal class Constants
@@ -53,6 +54,10 @@ namespace Azure.MyIdentity
         public const string ManagedIdentityCredential = "managedidentitycredential";
         public const string InteractiveBrowserCredential = "interactivebrowsercredential";
         public const string BrokerCredential = "brokercredential";
+        public const string AzurePipelinesCredential = "azurepipelinescredential";
+        public const string ManagedIdentityAsFederatedIdentityCredential = "managedidentityasfederatedidentitycredential";
         public const string MacBrokerRedirectUri = "msauth.com.msauth.unsignedapp://auth";
+        public const string ApiKeyCredential = "apikeycredential";
+        public const string ChainedTokenCredential = "chainedtokencredential";
     }
 }

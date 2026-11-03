@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -14,6 +17,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -21,6 +25,7 @@ namespace Azure.MyIdentity
     /// <seealso href="https://learn.microsoft.com/dotnet/azure/configure-visual-studio" /> for more information
     /// on how to configure Visual Studio for Azure development.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class VisualStudioCredential : TokenCredential
     {
         private static readonly string TokenProviderFilePath = Path.Combine(".IdentityService", "AzureServiceAuth", "tokenprovider.json");

@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.Versioning;
 
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -8,13 +10,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     // HACK: Marked public for debugging purposes. Only called by DefaultAzureCredentials
+    [UnsupportedOSPlatform("browser")]
     public class BrokerCredential : InteractiveBrowserCredential
     {
         private const string Troubleshooting = "See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/brokercredential/troubleshoot";
+
         private readonly bool _isBrokerOptionsEnabled;
+        // Hack: Preserve diagnostic configuration and authentication history.
         private readonly DevelopmentBrokerOptions _options;
         private int _authenticationAttempts = 0;
         private DateTime? _lastSuccessfulAuth = null;
@@ -68,7 +74,7 @@ namespace Azure.MyIdentity
             if (_lastSuccessfulAuth.HasValue)
             {
                 var timeSinceAuth = DateTime.UtcNow - _lastSuccessfulAuth.Value;
-                sb.AppendLine($"  Last successful: {_lastSuccessfulAuth.Value:yyyy-MM-dd HH:mm:ss} UTC ({timeSinceAuth.TotalMinutes:F1} minutes ago)");
+                sb.AppendLine($"  Last successful: {IdentityDiagnosticLogging.FormatUtc(_lastSuccessfulAuth.Value)} ({timeSinceAuth.TotalMinutes:F1} minutes ago)");
             }
             else
             {
@@ -161,6 +167,7 @@ namespace Azure.MyIdentity
             : base(CredentialOptionsMapper.GetBrokerOptions(out bool isBrokerEnabled, options) ?? CredentialOptionsMapper.CreateFallbackOptions(options))
         {
             _isBrokerOptionsEnabled = isBrokerEnabled;
+            // Hack: Retain supplied options for diagnostic display.
             _options = options;
         }
 
@@ -174,10 +181,12 @@ namespace Azure.MyIdentity
 
         private async Task<AccessToken> GetTokenImpl(bool async, TokenRequestContext requestContext, CancellationToken cancellationToken)
         {
+            // Hack: Track attempts for diagnostic display.
             _authenticationAttempts++;
 
             if (!_isBrokerOptionsEnabled)
             {
+                // Hack: Remember the failure for diagnostic display.
                 _lastError = "Azure.Identity.Broker package not referenced";
                 throw new CredentialUnavailableException($"The {nameof(BrokerCredential)} requires the Azure.Identity.Broker package to be referenced. {Troubleshooting}");
             }
@@ -190,6 +199,7 @@ namespace Azure.MyIdentity
                     ? await base.GetTokenAsync(requestContext, cancellationToken).ConfigureAwait(false)
                     : base.GetToken(requestContext, cancellationToken);
 
+                // Hack: Preserve broker success and account diagnostics.
                 _lastSuccessfulAuth = DateTime.UtcNow;
                 _lastError = null;
 
@@ -230,6 +240,7 @@ namespace Azure.MyIdentity
             }
             catch (Exception e)
             {
+                // Hack: Preserve broker failure diagnostics.
                 _lastError = e.Message;
 
                 // Try to determine failure reason

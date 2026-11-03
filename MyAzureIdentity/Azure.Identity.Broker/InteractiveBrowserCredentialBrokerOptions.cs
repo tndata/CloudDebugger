@@ -1,19 +1,20 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Azure.MyIdentity;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Broker;
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Broker;
 
+// Hack: Broker companion sources are compiled locally against Azure.MyIdentity.
 namespace Azure.Identity.Broker
 {
     /// <summary>
     /// Options to configure the <see cref="InteractiveBrowserCredential"/> to use the system authentication broker in lieu of an embedded web view or the system browser.
     /// For more information, see <see href="https://aka.ms/azsdk/net/identity/broker">Use a broker</see>.
     /// </summary>
-    public class InteractiveBrowserCredentialBrokerOptions : InteractiveBrowserCredentialOptions, IMsalPublicClientInitializerOptions
+    public class InteractiveBrowserCredentialBrokerOptions : Azure.MyIdentity.InteractiveBrowserCredentialOptions, IMsalPublicClientInitializerOptions
     {
         private readonly IntPtr _parentWindowHandle;
 

@@ -1,5 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -10,12 +13,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// WorkloadIdentityCredential supports Microsoft Entra Workload ID authentication on Kubernetes and other hosts supporting workload identity.
     /// Refer to <a href="https://learn.microsoft.com/azure/aks/workload-identity-overview">Microsoft Entra Workload ID</a> for more information.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class WorkloadIdentityCredential : TokenCredential
     {
         private const string UnavailableErrorMessage = "WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/workloadidentitycredential/troubleshoot";
@@ -59,7 +64,7 @@ namespace Azure.MyIdentity
                         {
                             var fileInfo = new System.IO.FileInfo(_tokenFileCache._tokenFilePath);
                             sb.AppendLine($"  Token file size: {fileInfo.Length} bytes");
-                            sb.AppendLine($"  Last modified: {fileInfo.LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss} UTC");
+                            sb.AppendLine($"  Last modified: {IdentityDiagnosticLogging.FormatUtc(fileInfo.LastWriteTimeUtc)}");
                         }
                         else
                         {
@@ -110,6 +115,8 @@ namespace Azure.MyIdentity
         public WorkloadIdentityCredential(WorkloadIdentityCredentialOptions options)
         {
             options = options ?? new();
+            // Hack: Record intent separately from actual proxy selection.
+            MyAzureIdentityLog.AddToLog("WorkloadIdentityCredential", $"AKS proxy requested: {options.IsAzureProxyEnabled}; selected: false until proxy configuration is resolved");
 
             if (!string.IsNullOrEmpty(options.TenantId) && !string.IsNullOrEmpty(options.ClientId) && !string.IsNullOrEmpty(options.TokenFilePath))
             {
@@ -118,6 +125,25 @@ namespace Azure.MyIdentity
                 ClientAssertionCredentialOptions clientAssertionCredentialOptions = options.Clone<ClientAssertionCredentialOptions>();
                 clientAssertionCredentialOptions.Pipeline = options.Pipeline;
                 clientAssertionCredentialOptions.MsalClient = options.MsalClient;
+
+                // Configure Kubernetes token proxy if user opted in
+                if (options.IsAzureProxyEnabled)
+                {
+                    var proxyConfig = KubernetesProxyConfig.TryCreate();
+                    if (proxyConfig != null)
+                    {
+                        // Hack: Show the resolved route and trust source, not the inline CA data.
+                        MyAzureIdentityLog.AddToLog("WorkloadIdentityCredential", $"AKS proxy selected: true; endpoint: {proxyConfig.ProxyUrl}; SNI: {proxyConfig.SniName ?? "default"}; CA source: {(proxyConfig.CaFilePath != null ? proxyConfig.CaFilePath : "inline CA data")}");
+                        var proxyHandler = new KubernetesProxyHttpHandler(proxyConfig);
+                        var httpClient = new System.Net.Http.HttpClient(proxyHandler);
+                        clientAssertionCredentialOptions.Transport = new HttpClientTransport(httpClient);
+                    }
+                    else
+                    {
+                        // Hack: An enabled option alone does not imply proxy routing.
+                        MyAzureIdentityLog.AddToLog("WorkloadIdentityCredential", "AKS proxy selected: false; no proxy configuration supplied, using direct Entra endpoint");
+                    }
+                }
 
                 _clientAssertionCredential = new ClientAssertionCredential(options.TenantId, options.ClientId, _tokenFileCache.GetTokenFileContentsAsync, clientAssertionCredentialOptions);
             }

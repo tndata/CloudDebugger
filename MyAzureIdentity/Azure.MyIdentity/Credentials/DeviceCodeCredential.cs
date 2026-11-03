@@ -1,5 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -11,12 +14,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// A <see cref="TokenCredential"/> implementation which authenticates a user using the device code flow, and provides access tokens for that user account.
     /// For more information on the device code authentication flow see https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Device-Code-Flow.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class DeviceCodeCredential : TokenCredential
     {
         private readonly string _tenantId;
@@ -46,13 +51,13 @@ namespace Azure.MyIdentity
 
             sb.AppendLine($" - ClientId = {ClientId}");
             sb.AppendLine($" - DisableAutomaticAuthentication = {DisableAutomaticAuthentication}");
-            sb.AppendLine($" - Record = {Record.ToString()}");
+            sb.AppendLine($" - Record = {Record?.ToString()}");
             sb.AppendLine($" - DefaultScope = {DefaultScope}");
 
             if (Record != null)
             {
                 sb.AppendLine();
-                sb.AppendLine(Record.ToString());
+                sb.AppendLine(Record?.ToString());
             }
 
             return sb.ToString();

@@ -1,9 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
 
 using System;
 using System.Runtime.InteropServices;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal static class LinuxNativeMethods
@@ -97,7 +100,7 @@ namespace Azure.MyIdentity
             public static extern IntPtr secret_schema_new(string name, int flags, string attribute1, int attribute1Type, string attribute2, int attribute2Type, IntPtr end);
 
             [DllImport("libsecret-1.so.0", CallingConvention = CallingConvention.StdCall)]
-            public static extern void secret_schema_unref (IntPtr schema);
+            public static extern void secret_schema_unref(IntPtr schema);
 
             [DllImport("libsecret-1.so.0", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true)]
             public static extern IntPtr secret_password_lookup_sync(IntPtr schema, IntPtr cancellable, out IntPtr error, string attribute1Type, string attribute1Value, string attribute2Type, string attribute2Value, IntPtr end);

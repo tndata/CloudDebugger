@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Identity.Client;
@@ -11,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -18,6 +22,7 @@ namespace Azure.MyIdentity
     /// on how to configure certificate authentication can be found at
     /// <see href="https://learn.microsoft.com/entra/identity-platform/certificate-credentials#register-your-certificate-with-microsoft-identity-platform"/>.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class ClientCertificateCredential : TokenCredential
     {
         internal const string Troubleshooting = "See the troubleshooting guide for more information. https://aka.ms/azsdk/net/identity/clientcertificatecredential/troubleshoot";
@@ -35,6 +40,10 @@ namespace Azure.MyIdentity
         internal IX509Certificate2Provider ClientCertificateProvider { get; }
 
         internal MsalConfidentialClient Client { get; }
+
+        private readonly Lazy<MsalConfidentialClient> _popClient;
+
+        internal MsalConfidentialClient PopClient => _popClient.Value;
 
         private readonly CredentialPipeline _pipeline;
 
@@ -77,7 +86,14 @@ namespace Azure.MyIdentity
         /// </summary>
         /// <param name="tenantId">The Microsoft Entra tenant (directory) ID of the service principal.</param>
         /// <param name="clientId">The client (application) ID of the service principal</param>
-        /// <param name="clientCertificatePath">The path to a file which contains both the client certificate and private key.</param>
+        /// <param name="clientCertificatePath">The file system or certificate store path to the client certificate and private key.
+        /// For example:
+        /// <list type="bullet">
+        ///   <item><description><c>c:\data\certificate.pfx</c></description></item>
+        ///   <item><description><c>/etc/app/cert.pem</c></description></item>
+        ///   <item><description><c>cert:/CurrentUser/My/E661583E8FABEF4C0BEF694CBC41C28FB81CD870</c></description></item>
+        /// </list>
+        /// </param>
         public ClientCertificateCredential(string tenantId, string clientId, string clientCertificatePath)
             : this(tenantId, clientId, clientCertificatePath, null, null, null, null)
         { }
@@ -87,7 +103,14 @@ namespace Azure.MyIdentity
         /// </summary>
         /// <param name="tenantId">The Microsoft Entra tenant (directory) ID of the service principal.</param>
         /// <param name="clientId">The client (application) ID of the service principal</param>
-        /// <param name="clientCertificatePath">The path to a file which contains both the client certificate and private key.</param>
+        /// <param name="clientCertificatePath">The file system or certificate store path to the client certificate and private key.
+        /// For example:
+        /// <list type="bullet">
+        ///   <item><description><c>c:\data\certificate.pfx</c></description></item>
+        ///   <item><description><c>/etc/app/cert.pem</c></description></item>
+        ///   <item><description><c>cert:/CurrentUser/My/E661583E8FABEF4C0BEF694CBC41C28FB81CD870</c></description></item>
+        /// </list>
+        /// </param>
         /// <param name="options">Options that allow to configure the management of the requests sent to Microsoft Entra ID.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ClientCertificateCredential(string tenantId, string clientId, string clientCertificatePath, TokenCredentialOptions options)
@@ -99,7 +122,14 @@ namespace Azure.MyIdentity
         /// </summary>
         /// <param name="tenantId">The Microsoft Entra tenant (directory) ID of the service principal.</param>
         /// <param name="clientId">The client (application) ID of the service principal</param>
-        /// <param name="clientCertificatePath">The path to a file which contains both the client certificate and private key.</param>
+        /// <param name="clientCertificatePath">The file system or certificate store path to the client certificate and private key.
+        /// For example:
+        /// <list type="bullet">
+        ///   <item><description><c>c:\data\certificate.pfx</c></description></item>
+        ///   <item><description><c>/etc/app/cert.pem</c></description></item>
+        ///   <item><description><c>cert:/CurrentUser/My/E661583E8FABEF4C0BEF694CBC41C28FB81CD870</c></description></item>
+        /// </list>
+        /// </param>
         /// <param name="options">Options that allow to configure the management of the requests sent to Microsoft Entra ID.</param>
         public ClientCertificateCredential(string tenantId, string clientId, string clientCertificatePath, ClientCertificateCredentialOptions options)
             : this(tenantId, clientId, clientCertificatePath, null, options, null, null)
@@ -149,7 +179,7 @@ namespace Azure.MyIdentity
             : this(
                 tenantId,
                 clientId,
-                new X509Certificate2FromFileProvider(certificatePath ?? throw new ArgumentNullException(nameof(certificatePath)), certificatePassword),
+                new X509Certificate2FromPathProvider(certificatePath ?? throw new ArgumentNullException(nameof(certificatePath)), certificatePassword),
                 options,
                 pipeline,
                 client)
@@ -161,14 +191,16 @@ namespace Azure.MyIdentity
             X509Certificate2 certificate,
             TokenCredentialOptions options,
             CredentialPipeline pipeline,
-            MsalConfidentialClient client)
+            MsalConfidentialClient client,
+            MsalConfidentialClient popClient = null)
             : this(
                 tenantId,
                 clientId,
                 new X509Certificate2FromObjectProvider(certificate ?? throw new ArgumentNullException(nameof(certificate))),
                 options,
                 pipeline,
-                client)
+                client,
+                popClient)
         { }
 
         internal ClientCertificateCredential(
@@ -177,13 +209,15 @@ namespace Azure.MyIdentity
             IX509Certificate2Provider certificateProvider,
             TokenCredentialOptions options,
             CredentialPipeline pipeline,
-            MsalConfidentialClient client)
+            MsalConfidentialClient client,
+            MsalConfidentialClient popClient = null)
         {
             TenantId = Validations.ValidateTenantId(tenantId, nameof(tenantId));
             ClientId = clientId ?? throw new ArgumentNullException(nameof(clientId));
             ClientCertificateProvider = certificateProvider;
             _pipeline = pipeline ?? CredentialPipeline.GetInstance(options);
             ClientCertificateCredentialOptions certCredOptions = options as ClientCertificateCredentialOptions;
+            bool sendCertificateChain = certCredOptions?.SendCertificateChain ?? false;
 
             Client = client ??
                      new MsalConfidentialClient(
@@ -191,8 +225,34 @@ namespace Azure.MyIdentity
                          tenantId,
                          clientId,
                          certificateProvider,
-                         certCredOptions?.SendCertificateChain ?? false,
+                         sendCertificateChain,
                          options);
+
+            // The PoP client requires subject name / issuer authentication via SendCertificateChain.
+            // PoP is enabled by default when requested by the caller, unless disabled by the
+            // first-party AppContext switch or environment variable.
+            //
+            // The PoP client is created lazily on first use, but all input parameters - including a
+            // snapshot of the options - are captured here at construction time so the client's state is
+            // locked in regardless of when it is materialized. Snapshotting the options ensures the PoP
+            // client observes the same AuthorityHost (and other MSAL settings) as the eagerly-created
+            // bearer client, even if the caller mutates its options instance before first use.
+            MsalConfidentialClient capturedClient = client;
+            MsalConfidentialClient capturedPopClient = popClient;
+            MsalConfidentialClient standardClient = Client;
+            TokenCredentialOptions snapshotOptions = certCredOptions?.Clone<ClientCertificateCredentialOptions>() ?? options?.Clone<TokenCredentialOptions>();
+            _popClient = new Lazy<MsalConfidentialClient>(() =>
+                capturedPopClient ?? capturedClient ??
+                (sendCertificateChain
+                    ? new MsalConfidentialClient(
+                        _pipeline,
+                        tenantId,
+                        clientId,
+                        certificateProvider,
+                        sendCertificateChain,
+                        snapshotOptions,
+                        enableMtlsProofOfPossession: true)
+                    : standardClient));
 
             TenantIdResolver = options?.TenantIdResolver ?? TenantIdResolverBase.Default;
             AdditionallyAllowedTenantIds = TenantIdResolver.ResolveAddionallyAllowedTenantIds((options as ISupportsAdditionallyAllowedTenants)?.AdditionallyAllowedTenants);
@@ -215,7 +275,8 @@ namespace Azure.MyIdentity
             try
             {
                 var tenantId = TenantIdResolver.Resolve(TenantId, requestContext, AdditionallyAllowedTenantIds);
-                AuthenticationResult result = Client.AcquireTokenForClientAsync(requestContext.Scopes, tenantId, requestContext.Claims, requestContext.IsCaeEnabled, false, cancellationToken).EnsureCompleted();
+                MsalConfidentialClient client = requestContext.IsProofOfPossessionEnabled && AppContextSwitches.EnableClientCertificateMtlsProofOfPossession ? PopClient : Client;
+                AuthenticationResult result = client.AcquireTokenForClientAsync(requestContext.Scopes, tenantId, requestContext.Claims, requestContext.IsCaeEnabled, false, cancellationToken).EnsureCompleted();
 
                 return scope.Succeeded(result.ToAccessToken());
             }
@@ -242,7 +303,8 @@ namespace Azure.MyIdentity
             try
             {
                 var tenantId = TenantIdResolver.Resolve(TenantId, requestContext, AdditionallyAllowedTenantIds);
-                AuthenticationResult result = await Client
+                MsalConfidentialClient client = requestContext.IsProofOfPossessionEnabled && AppContextSwitches.EnableClientCertificateMtlsProofOfPossession ? PopClient : Client;
+                AuthenticationResult result = await client
                     .AcquireTokenForClientAsync(requestContext.Scopes, tenantId, requestContext.Claims, requestContext.IsCaeEnabled, true, cancellationToken)
                     .ConfigureAwait(false);
 

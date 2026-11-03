@@ -1,9 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
 using Azure.Core;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal class ManagedIdentityClientOptions
@@ -22,6 +23,10 @@ namespace Azure.MyIdentity
 
         public bool IsForceRefreshEnabled { get; set; }
 
+        public bool EnableMtlsProofOfPossession { get; set; }
+
+        internal MsalManagedIdentityClient MsalManagedIdentityClientOverride { get; set; }
+
         public ManagedIdentityClientOptions Clone()
         {
             var cloned = new ManagedIdentityClientOptions
@@ -32,6 +37,8 @@ namespace Azure.MyIdentity
                 Pipeline = Pipeline,
                 ExcludeTokenExchangeManagedIdentitySource = ExcludeTokenExchangeManagedIdentitySource,
                 IsForceRefreshEnabled = IsForceRefreshEnabled,
+                EnableMtlsProofOfPossession = EnableMtlsProofOfPossession,
+                MsalManagedIdentityClientOverride = MsalManagedIdentityClientOverride,
             };
 
             if (Options != null)

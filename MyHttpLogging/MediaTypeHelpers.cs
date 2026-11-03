@@ -4,8 +4,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Net.Http.Headers;
+// Hack: Import nested media-type state from the local fork, not the framework assembly.
 using static Microsoft.AspNetCore.MyHttpLogging.MediaTypeOptions;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 internal static class MediaTypeHelpers

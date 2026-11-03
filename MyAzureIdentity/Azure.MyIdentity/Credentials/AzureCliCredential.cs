@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -14,11 +17,13 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// Enables authentication to Microsoft Entra ID using Azure CLI to obtain an access token.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class AzureCliCredential : TokenCredential
     {
         internal const string AzureCLINotInstalled = "Azure CLI not installed";
@@ -167,6 +172,8 @@ namespace Azure.MyIdentity
                 throw new AuthenticationFailedException(string.Format(CultureInfo.InvariantCulture, ClaimsChallengeLoginFormat, loginCommand));
             }
 
+            // Hack: Show effective command choices without dumping the complete command or claims.
+            MyAzureIdentityLog.AddToLog("AzureCliCredential", $"Resolved tenant: {tenantId ?? "not specified"}; configured subscription: {Subscription ?? "not specified"}; subscription passed: {(!string.IsNullOrEmpty(tenantId) ? "no (tenant takes precedence)" : string.IsNullOrEmpty(Subscription) ? "no" : "yes")}; process timeout: {ProcessTimeout}");
             GetFileNameAndArguments(resource, tenantId, Subscription, out string fileName, out string argument);
             ProcessStartInfo processStartInfo = GetAzureCliProcessStartInfo(fileName, argument);
             using var processRunner = new ProcessRunner(_processService.Create(processStartInfo), ProcessTimeout, _logPII, redirectStandardInput: true, cancellationToken);
@@ -250,16 +257,16 @@ namespace Azure.MyIdentity
 
         private static void GetFileNameAndArguments(string resource, string tenantId, string subscriptionId, out string fileName, out string argument)
         {
-            string command = tenantId switch
+            // Azure CLI does not support both --tenant and --subscription simultaneously.
+            // A requested tenant (for example, one surfaced by a challenge-based auth response) is
+            // authoritative for the issued token, so it takes precedence. --subscription is only used
+            // when no tenant is requested.
+            string command = !string.IsNullOrEmpty(tenantId) switch
             {
-                null => $"az account get-access-token --output json --resource {resource}",
-                _ => $"az account get-access-token --output json --resource {resource} --tenant {tenantId}"
+                true => $"az account get-access-token --output json --resource {resource} --tenant {tenantId}",
+                false when !string.IsNullOrEmpty(subscriptionId) => $"az account get-access-token --output json --resource {resource} --subscription \"{subscriptionId}\"",
+                _ => $"az account get-access-token --output json --resource {resource}"
             };
-
-            if (!string.IsNullOrEmpty(subscriptionId))
-            {
-                command += $" --subscription \"{subscriptionId}\"";
-            }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

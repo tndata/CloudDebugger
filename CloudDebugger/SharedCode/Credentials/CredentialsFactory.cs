@@ -1,4 +1,4 @@
-﻿using Azure.MyIdentity;
+using Azure.MyIdentity;
 
 namespace CloudDebugger.SharedCode.Credentials;
 
@@ -187,15 +187,15 @@ public static class CredentialsFactory
         if (!string.IsNullOrEmpty(clientId))
         {
             // User-assigned managed identity  
-            var options = new TokenCredentialOptions();
+            var options = new ManagedIdentityCredentialOptions(ManagedIdentityId.FromUserAssignedClientId(clientId));
             ConfigureDiagnostics(options.Diagnostics);
-            var credential = new ManagedIdentityCredential(clientId, options);
+            var credential = new ManagedIdentityCredential(options);
             return new() { Credential = credential, Message = $"User-assigned managed identity with Client ID: {clientId}" };
         }
         else
         {
             //System-assigned managed identity
-            var credential = new ManagedIdentityCredential();
+            var credential = new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);
             return new() { Credential = credential, Message = "System-assigned managed identity - set AZURE_CLIENT_ID environment variable for user-assigned" };
         }
     }

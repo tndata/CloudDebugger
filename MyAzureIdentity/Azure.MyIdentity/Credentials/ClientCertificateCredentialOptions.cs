@@ -1,14 +1,20 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// Options used to configure the <see cref="ClientCertificateCredential"/>.
     /// </summary>
-    public class ClientCertificateCredentialOptions : TokenCredentialOptions, ISupportsTokenCachePersistenceOptions, ISupportsDisableInstanceDiscovery, ISupportsAdditionallyAllowedTenants
+    public class ClientCertificateCredentialOptions : TokenCredentialOptions, ISupportsTokenCachePersistenceOptions, ISupportsDisableInstanceDiscovery, ISupportsAdditionallyAllowedTenants, ISupportsTokenRequestCallback
     {
         /// <summary>
         /// Specifies the <see cref="TokenCachePersistenceOptions"/> to be used by the credential. If no options are specified, the token cache will not be persisted to disk.
@@ -27,5 +33,9 @@ namespace Azure.MyIdentity
 
         /// <inheritdoc/>
         public bool DisableInstanceDiscovery { get; set; }
+
+        /// <inheritdoc/>
+        [Experimental("AZID0003")]
+        public Action<TokenRequestCallbackContext> TokenRequestCallback { get; set; }
     }
 }

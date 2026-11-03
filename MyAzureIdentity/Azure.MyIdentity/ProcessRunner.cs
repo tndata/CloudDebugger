@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.Versioning;
 
 using System;
 using System.Collections.Generic;
@@ -7,8 +9,10 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
+    [UnsupportedOSPlatform("browser")]
     internal sealed class ProcessRunner : IDisposable
     {
         private readonly IProcess _process;

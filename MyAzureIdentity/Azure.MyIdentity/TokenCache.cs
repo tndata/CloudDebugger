@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.Versioning;
 
 using System;
 using System.Linq;
@@ -10,6 +12,7 @@ using Azure.Core;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Extensions.Msal;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -17,6 +20,7 @@ namespace Azure.MyIdentity
     /// </summary>
 #pragma warning disable CA1001 // Types that own disposable fields should be disposable
     // SemaphoreSlim only needs to be disposed when AvailableWaitHandle is called.
+    [UnsupportedOSPlatform("browser")]
     internal class TokenCache
 #pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
@@ -39,7 +43,7 @@ namespace Azure.MyIdentity
         /// Determines whether the token cache will be associated with CAE enabled requests.
         /// </summary>
         /// <value>If true, this cache services only CAE enabled requests.Otherwise, this cache services non-CAE enabled requests.</value>
-        internal bool IsCaeEnabled { get;}
+        internal bool IsCaeEnabled { get; }
 
         private class CacheTimestamp
         {

@@ -14,6 +14,7 @@
 #nullable enable
 using System.Diagnostics;
 
+// Hack: Compile shared ASP.NET Core internals inside the local diagnostic namespace.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 /// <summary>

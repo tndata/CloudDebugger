@@ -1,14 +1,21 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.Identity.Client.Extensibility;
+
 using Azure.Core;
 using Microsoft.Identity.Client;
+using System;
+using System.Collections.ObjectModel;
+using System.Runtime.Versioning;
+using System.Threading;
+using System.Threading.Tasks;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
+    [UnsupportedOSPlatform("browser")]
     internal abstract class MsalClientBase<TClient>
         where TClient : IClientApplicationBase
     {
@@ -16,8 +23,12 @@ namespace Azure.MyIdentity
         private readonly AsyncLockWithValue<(TClient Client, TokenCache Cache)> _clientWithCaeAsyncLock;
         private readonly bool _logAccountDetails;
         private readonly TokenCachePersistenceOptions _tokenCachePersistenceOptions;
+#pragma warning disable AZID0003 // TokenRequestCallback is experimental
+        private readonly Action<TokenRequestCallbackContext> _onBeforeTokenRequestCallback;
+#pragma warning restore AZID0003
         protected internal bool IsSupportLoggingEnabled { get; }
         protected internal bool DisableInstanceDiscovery { get; }
+        protected internal IReadOnlyDictionary<string, (string Value, bool IncludeInCacheKey)> AdditionalQueryParameters { get; }
         protected string[] cp1Capabilities = new[] { "CP1" };
         protected internal CredentialPipeline Pipeline { get; }
         internal string TenantId { get; }
@@ -45,9 +56,24 @@ namespace Azure.MyIdentity
             ISupportsTokenCachePersistenceOptions cacheOptions = options as ISupportsTokenCachePersistenceOptions;
             _tokenCachePersistenceOptions = cacheOptions?.TokenCachePersistenceOptions;
             IsSupportLoggingEnabled = options?.IsUnsafeSupportLoggingEnabled ?? false;
+#pragma warning disable AZID0001 // AdditionalQueryParameters is experimental
+            AdditionalQueryParameters = options?.AdditionalQueryParameters is { Count: > 0 }
+                ? new ReadOnlyDictionary<string, (string Value, bool IncludeInCacheKey)>(new Dictionary<string, (string Value, bool IncludeInCacheKey)>(options.AdditionalQueryParameters))
+                : null;
+#pragma warning restore AZID0001
+#pragma warning disable AZID0003 // TokenRequestCallback is experimental
+            _onBeforeTokenRequestCallback = (options as ISupportsTokenRequestCallback)?.TokenRequestCallback;
+#pragma warning restore AZID0003
             Pipeline = pipeline;
             TenantId = tenantId;
             ClientId = clientId;
+            // Hack: Explain customization settings without dumping parameter values or request bodies.
+            MyAzureIdentityLog.AddToLog(GetType().Name, $"TokenRequestCallback configured: {_onBeforeTokenRequestCallback != null}");
+            if (AdditionalQueryParameters != null)
+            {
+                foreach (var parameter in AdditionalQueryParameters)
+                    MyAzureIdentityLog.AddToLog(GetType().Name, $"Additional query parameter: {parameter.Key}; IncludeInCacheKey: {parameter.Value.IncludeInCacheKey}");
+            }
             _clientAsyncLock = new AsyncLockWithValue<(TClient Client, TokenCache Cache)>();
             _clientWithCaeAsyncLock = new AsyncLockWithValue<(TClient Client, TokenCache Cache)>();
         }
@@ -97,6 +123,40 @@ namespace Azure.MyIdentity
             {
                 var accountDetails = TokenHelper.ParseAccountInfoFromToken(result.AccessToken);
                 AzureIdentityEventSource.Singleton.AuthenticatedAccountDetails(accountDetails.ClientId, accountDetails.TenantId ?? result.TenantId, accountDetails.Upn ?? result.Account?.Username, accountDetails.ObjectId ?? result.UniqueId);
+            }
+        }
+
+        protected void ApplyTokenRequestCallback<T>(AbstractAcquireTokenParameterBuilder<T> builder)
+            where T : AbstractAcquireTokenParameterBuilder<T>
+        {
+            if (_onBeforeTokenRequestCallback != null)
+            {
+                var callback = _onBeforeTokenRequestCallback;
+#pragma warning disable AZID0003 // TokenRequestCallback is experimental
+                builder.OnBeforeTokenRequest(data =>
+                {
+                    // Hack: Show actual callback execution and names changed, without logging values.
+                    var before = new Dictionary<string, string>(data.BodyParameters);
+                    MyAzureIdentityLog.AddToLog(GetType().Name, "TokenRequestCallback executing");
+                    try
+                    {
+                        callback(new TokenRequestCallbackContext(data));
+                    }
+                    catch (Exception e)
+                    {
+                        MyAzureIdentityLog.AddToLog(GetType().Name, $"TokenRequestCallback failed: {e.GetType().Name}");
+                        throw;
+                    }
+                    var changes = new List<string>();
+                    foreach (var parameter in data.BodyParameters)
+                        if (!before.TryGetValue(parameter.Key, out string previous) || previous != parameter.Value)
+                            changes.Add(parameter.Key);
+                    foreach (var parameter in before)
+                        if (!data.BodyParameters.ContainsKey(parameter.Key)) changes.Add(parameter.Key + " (removed)");
+                    MyAzureIdentityLog.AddToLog(GetType().Name, $"TokenRequestCallback completed; added/changed/removed body parameters: {(changes.Count == 0 ? "none" : string.Join(", ", changes))}");
+                    return Task.CompletedTask;
+                });
+#pragma warning restore AZID0003
             }
         }
 

@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.Versioning;
 
 using System;
 using System.Collections.Generic;
@@ -9,8 +11,10 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Microsoft.Identity.Client;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
+    [UnsupportedOSPlatform("browser")]
     internal class MsalPublicClient : MsalClientBase<IPublicClientApplication>
     {
         private Action<PublicClientApplicationBuilder> _beforeBuildClient;
@@ -47,7 +51,7 @@ namespace Azure.MyIdentity
             PublicClientApplicationBuilder pubAppBuilder = PublicClientApplicationBuilder
                 .Create(ClientId)
                 .WithAuthority(AuthorityHost.AbsoluteUri, TenantId ?? Constants.OrganizationsTenantId, false)
-                .WithHttpClientFactory(new HttpPipelineClientFactory(Pipeline.HttpPipeline))
+                .WithHttpClientFactory(new HttpPipelineClientFactory(Pipeline.HttpPipeline), false)
                 .WithLogging(AzureIdentityEventSource.Singleton, enablePiiLogging: IsSupportLoggingEnabled);
 
             if (!string.IsNullOrEmpty(RedirectUrl))
@@ -68,6 +72,11 @@ namespace Azure.MyIdentity
             if (DisableInstanceDiscovery)
             {
                 pubAppBuilder.WithInstanceDiscovery(false);
+            }
+
+            if (AdditionalQueryParameters != null)
+            {
+                pubAppBuilder.WithExtraQueryParameters(AdditionalQueryParameters.ToDictionary(kvp => kvp.Key, kvp => (kvp.Value.Value, kvp.Value.IncludeInCacheKey)));
             }
 
             return new ValueTask<IPublicClientApplication>(pubAppBuilder.Build());
@@ -134,6 +143,7 @@ namespace Azure.MyIdentity
                 builder.WithProofOfPossession(context.ProofOfPossessionNonce, new(context.ResourceRequestMethod), context.ResourceRequestUri);
             }
 
+            ApplyTokenRequestCallback(builder);
             return await builder
                 .ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
@@ -193,6 +203,7 @@ namespace Azure.MyIdentity
                 builder.WithProofOfPossession(context.ProofOfPossessionNonce, new(context.ResourceRequestMethod), context.ResourceRequestUri);
             }
 
+            ApplyTokenRequestCallback(builder);
             return await builder.ExecuteAsync(async, cancellationToken)
                            .ConfigureAwait(false);
         }
@@ -301,6 +312,7 @@ namespace Azure.MyIdentity
             {
                 builder.WithProofOfPossession(tokenRequestContext.ProofOfPossessionNonce, new(tokenRequestContext.ResourceRequestMethod), tokenRequestContext.ResourceRequestUri);
             }
+            ApplyTokenRequestCallback(builder);
             return await builder
                 .ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
@@ -329,6 +341,7 @@ namespace Azure.MyIdentity
             {
                 builder.WithTenantId(tenantId);
             }
+            ApplyTokenRequestCallback(builder);
             return await builder.ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -354,6 +367,7 @@ namespace Azure.MyIdentity
                 builder.WithTenantId(TenantId);
             }
 
+            ApplyTokenRequestCallback(builder);
             return await builder.ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -380,6 +394,7 @@ namespace Azure.MyIdentity
                 builder.WithTenantId(TenantId);
             }
 
+            ApplyTokenRequestCallback(builder);
             return await builder.ExecuteAsync(async, cancellationToken)
                 .ConfigureAwait(false);
         }

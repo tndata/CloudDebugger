@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 using Azure.Core;
 using Azure.Core.Pipeline;
 using System;
@@ -13,11 +16,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
     /// Enables authentication to Microsoft Entra ID using Azure PowerShell to obtain an access token.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     public class AzurePowerShellCredential : TokenCredential
     {
         private readonly CredentialPipeline _pipeline;

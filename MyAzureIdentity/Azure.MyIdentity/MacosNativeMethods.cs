@@ -1,10 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
 
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     internal static class MacosNativeMethods
@@ -75,13 +78,13 @@ namespace Azure.MyIdentity
             private const string CoreFoundationLibrary = "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation";
             private const string SecurityLibrary = "/System/Library/Frameworks/Security.framework/Security";
 
-            [DllImport (CoreFoundationLibrary, CharSet=CharSet.Unicode)]
+            [DllImport(CoreFoundationLibrary, CharSet = CharSet.Unicode)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
             public static extern void CFRelease(IntPtr cfRef);
 
-            [DllImport (SecurityLibrary)]
+            [DllImport(SecurityLibrary)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
-            public static extern int SecKeychainFindGenericPassword (
+            public static extern int SecKeychainFindGenericPassword(
                 IntPtr keychainOrArray,
                 int serviceNameLength,
                 byte[] serviceName,
@@ -91,9 +94,9 @@ namespace Azure.MyIdentity
                 out IntPtr passwordData,
                 out IntPtr itemRef);
 
-            [DllImport (SecurityLibrary)]
+            [DllImport(SecurityLibrary)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
-            public static extern int SecKeychainAddGenericPassword (
+            public static extern int SecKeychainAddGenericPassword(
                 IntPtr keychain,
                 int serviceNameLength,
                 byte[] serviceName,
@@ -103,17 +106,17 @@ namespace Azure.MyIdentity
                 byte[] passwordData,
                 out IntPtr itemRef);
 
-            [DllImport (SecurityLibrary)]
+            [DllImport(SecurityLibrary)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
             public static extern int SecKeychainItemDelete(IntPtr itemRef);
 
-            [DllImport (SecurityLibrary)]
+            [DllImport(SecurityLibrary)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
-            public static extern int SecKeychainItemFreeContent (IntPtr attrList, IntPtr data);
+            public static extern int SecKeychainItemFreeContent(IntPtr attrList, IntPtr data);
 
-            [DllImport (SecurityLibrary)]
+            [DllImport(SecurityLibrary)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
-            public static extern IntPtr SecCopyErrorMessageString (int status, IntPtr reserved);
+            public static extern IntPtr SecCopyErrorMessageString(int status, IntPtr reserved);
         }
     }
 }

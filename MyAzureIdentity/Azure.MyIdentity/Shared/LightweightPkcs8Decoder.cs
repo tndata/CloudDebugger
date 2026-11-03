@@ -1,12 +1,19 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+using Azure.Core;
+using Azure.Core.Pipeline;
+using Azure.Core.Diagnostics;
 
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 
+// Hack: Keep copied Azure.Core internals local to the diagnostic library.
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     /// <summary>
@@ -21,6 +28,7 @@ namespace Azure.MyIdentity
     ///
     /// This code is able to decode RSA keys (without any attributes) from well formed PKCS#8 blobs.
     /// </summary>
+    [UnsupportedOSPlatform("browser")]
     internal static partial class LightweightPkcs8Decoder
     {
         private static readonly byte[] s_derIntegerZero = { 0x02, 0x01, 0x00 };

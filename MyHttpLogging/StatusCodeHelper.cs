@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Net;
 
+// Hack: Keep the diagnostic implementation separate from framework HTTP logging.
 namespace Microsoft.AspNetCore.MyHttpLogging;
 
 internal static class StatusCodeHelper

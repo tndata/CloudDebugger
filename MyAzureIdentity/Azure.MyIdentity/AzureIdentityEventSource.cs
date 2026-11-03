@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
@@ -10,6 +10,7 @@ using Azure.Core;
 using Azure.Core.Diagnostics;
 using Microsoft.IdentityModel.Abstractions;
 
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
 namespace Azure.MyIdentity
 {
     [EventSource(Name = EventSourceName)]
@@ -43,6 +44,11 @@ namespace Azure.MyIdentity
         private const int ServiceFabricManagedIdentityRuntimeConfigurationNotSupportedEvent = 22;
         private const int ManagedIdentitySourceAttemptedEvent = 25;
         private const int ManagedIdentityCredentialSelectedEvent = 26;
+        private const int KubernetesProxyCaCertificateReloadSkippedEvent = 27;
+        private const int KubernetesProxyCaCertificateReloadFailedEvent = 28;
+        private const int KubernetesProxyCaCertificateReloadedEvent = 29;
+        private const int TokenBindingEvent = 30;
+        private const int ManagedIdentitySourcesUnavailableEvent = 31;
 
         internal const string TenantIdDiscoveredAndNotUsedEventMessage = "A token was request for a different tenant than was configured on the credential, but the configured value was used since multi tenant authentication has been disabled. Configured TenantId: {0}, Requested TenantId {1}";
         internal const string TenantIdDiscoveredAndUsedEventMessage = "A token was requested for a different tenant than was configured on the credential, and the requested tenant id was used to authenticate. Configured TenantId: {0}, Requested TenantId {1}";
@@ -53,6 +59,9 @@ namespace Azure.MyIdentity
         internal const string ServiceFabricManagedIdentityRuntimeConfigurationNotSupportedMessage = "Service Fabric user assigned managed identity ClientId or ResourceId is not configurable at runtime.";
         internal const string ManagedIdentitySourceAttemptedMessage = "ManagedIdentitySource {0} was attempted. IsSelected={1}.";
         internal const string ManagedIdentityCredentialSelectedMessage = "Managed Identity source selected: {0} with ID: {1}";
+        internal const string KubernetesProxyCaCertificateReloadSkippedMessage = "Kubernetes proxy CA certificate reload skipped. Reason: {0}";
+        internal const string KubernetesProxyCaCertificateReloadFailedMessage = "Kubernetes proxy CA certificate read failed. Error: {0}";
+        internal const string KubernetesProxyCaCertificateReloadedMessage = "Kubernetes proxy CA certificate changed, handler will be reloaded.";
 
         private AzureIdentityEventSource() : base(EventSourceName) { }
 
@@ -117,7 +126,8 @@ namespace Azure.MyIdentity
         {
             if (IsEnabled(EventLevel.Informational, EventKeywords.All))
             {
-                GetTokenSucceeded(method, FormatStringArray(context.Scopes), context.ParentRequestId, expiresOn.ToString("O", CultureInfo.InvariantCulture));
+                // Hack: Keep event-log expiry timestamps consistent with the learning UI.
+                GetTokenSucceeded(method, FormatStringArray(context.Scopes), context.ParentRequestId, IdentityDiagnosticLogging.FormatUtc(expiresOn));
             }
         }
 
@@ -196,6 +206,21 @@ namespace Azure.MyIdentity
         public void ImdsEndpointUnavailable(string uri, string error)
         {
             WriteEvent(ImdsEndpointUnavailableEvent, uri, error);
+        }
+
+        [NonEvent]
+        public void ManagedIdentitySourcesUnavailable(Exception e)
+        {
+            if (IsEnabled(EventLevel.Informational, EventKeywords.All))
+            {
+                ManagedIdentitySourcesUnavailable(FormatException(e));
+            }
+        }
+
+        [Event(ManagedIdentitySourcesUnavailableEvent, Level = EventLevel.Informational, Message = "No managed identity source is available. Error: {0}")]
+        public void ManagedIdentitySourcesUnavailable(string error)
+        {
+            WriteEvent(ManagedIdentitySourcesUnavailableEvent, error);
         }
 
         [NonEvent]
@@ -423,6 +448,42 @@ namespace Azure.MyIdentity
             if (IsEnabled(EventLevel.Informational, EventKeywords.All))
             {
                 WriteEvent(ManagedIdentityCredentialSelectedEvent, credentialType, id);
+            }
+        }
+
+        [Event(KubernetesProxyCaCertificateReloadSkippedEvent, Level = EventLevel.Informational, Message = KubernetesProxyCaCertificateReloadSkippedMessage)]
+        public void KubernetesProxyCaCertificateReloadSkipped(string reason)
+        {
+            if (IsEnabled(EventLevel.Informational, EventKeywords.All))
+            {
+                WriteEvent(KubernetesProxyCaCertificateReloadSkippedEvent, reason);
+            }
+        }
+
+        [Event(KubernetesProxyCaCertificateReloadFailedEvent, Level = EventLevel.Warning, Message = KubernetesProxyCaCertificateReloadFailedMessage)]
+        public void KubernetesProxyCaCertificateReloadFailed(string error)
+        {
+            if (IsEnabled(EventLevel.Warning, EventKeywords.All))
+            {
+                WriteEvent(KubernetesProxyCaCertificateReloadFailedEvent, error);
+            }
+        }
+
+        [Event(KubernetesProxyCaCertificateReloadedEvent, Level = EventLevel.Informational, Message = KubernetesProxyCaCertificateReloadedMessage)]
+        public void KubernetesProxyCaCertificateReloaded()
+        {
+            if (IsEnabled(EventLevel.Informational, EventKeywords.All))
+            {
+                WriteEvent(KubernetesProxyCaCertificateReloadedEvent);
+            }
+        }
+
+        [Event(TokenBindingEvent, Level = EventLevel.Verbose, Message = "TokenBinding: {0}")]
+        public void TokenBinding(string reason)
+        {
+            if (IsEnabled(EventLevel.Verbose, EventKeywords.All))
+            {
+                WriteEvent(TokenBindingEvent, reason);
             }
         }
     }

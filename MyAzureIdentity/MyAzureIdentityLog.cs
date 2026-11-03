@@ -1,4 +1,5 @@
-﻿namespace Azure.MyIdentity
+// Hack: Use a separate namespace so the instrumented library can coexist with Azure.Identity.
+namespace Azure.MyIdentity
 {
     /// <summary>
     /// This is a custom hack that incorporates a simple log into this library.
@@ -45,6 +46,7 @@
         }
     }
 
+    // Hack: Public diagnostic event model consumed by CloudDebugger.
     public class AzureIdentityLogEntry
     {
         public DateTime EntryTime { get; set; }
