@@ -163,7 +163,7 @@ public class EventGridController : Controller
                 ProductName = "Product " + eventId
             };
 
-            var @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewOrder", jsonSerializableData: product)
+            var @event = new CloudEvent(source: "CloudDebugger", type: "BusinessEvent.NewProduct", jsonSerializableData: product)
             {
                 Subject = "Product" + product.ProductId
             };

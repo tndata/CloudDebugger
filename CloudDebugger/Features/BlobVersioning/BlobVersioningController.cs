@@ -106,18 +106,23 @@ public class BlobVersioningController : Controller
     {
         var result = new List<BlobVersionDetails>();
 
-        var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
+        var container = client.GetBlobContainerClient(model.ContainerName?.Trim() ?? "");
+        var blobName = model.BlobName?.Trim() ?? "";
 
-        var blobVersions = container.GetBlobsAsync(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: model?.BlobName, cancellationToken: cancellationToken);
+        var blobVersions = container.GetBlobsAsync(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: blobName, cancellationToken: cancellationToken);
 
         await foreach (BlobItem version in blobVersions)
         {
+            // Azure lists by prefix; only show versions of the requested blob.
+            if (!string.Equals(version.Name, blobName, StringComparison.Ordinal))
+                continue;
+
             string blobContent = "";
 
             // Only download blob content for non-deleted blobs.
             if (!version.Deleted)
             {
-                var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
+                var blobClient = container.GetBlobClient(version.Name).WithVersion(version.VersionId);
                 BlobDownloadResult downloadResult = (await blobClient.DownloadContentAsync(cancellationToken)).Value;
                 blobContent = downloadResult.Content.ToString();
             }

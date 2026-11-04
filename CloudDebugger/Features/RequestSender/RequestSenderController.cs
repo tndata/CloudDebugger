@@ -86,7 +86,7 @@ public class RequestSenderController : Controller
             var headers = model.RequestHeaders.Split(separator, StringSplitOptions.None);
             foreach (var header in headers)
             {
-                var headerParts = header.Split(':');
+                var headerParts = header.Split(':', 2);
                 if (headerParts.Length == 2)
                 {
                     request.Headers.Add(headerParts[0].Trim(), headerParts[1].Trim());
