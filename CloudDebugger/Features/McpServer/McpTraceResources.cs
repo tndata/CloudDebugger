@@ -11,7 +11,7 @@ namespace CloudDebugger.Features.McpServer;
 public static class McpTraceResources
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+    private const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
 
 
     [McpServerResource(UriTemplate = "traces://service/CloudDebugger", Name = "All Traces", MimeType = "application/json")]
@@ -50,13 +50,7 @@ public static class McpTraceResources
 
         try
         {
-            if (string.IsNullOrWhiteSpace(traceId))
-            {
-                return CreateErrorResponse(new ArgumentException("Trace ID cannot be empty"), uri);
-            }
-
-            // Parse trace ID (handle both 32-char hex and GUID formats)
-            var parsedTraceId = ParseTraceId(traceId);
+            ActivityTraceId parsedTraceId = McpTraceIdParser.Parse(traceId);
 
             var traces = OpenTelemetryObserver.TraceItemsLog
                 .Where(activity => activity.TraceId == parsedTraceId)
@@ -83,6 +77,13 @@ public static class McpTraceResources
 
     private static object MapActivityToTrace(Activity activity)
     {
+        Dictionary<string, object?> tags = new(StringComparer.Ordinal);
+        foreach (KeyValuePair<string, object?> tag in activity.TagObjects)
+        {
+            // Activity permits repeated names; retain the last value in the existing JSON object.
+            tags[tag.Key] = tag.Value;
+        }
+
         return new
         {
             trace_id = activity.TraceId.ToString(),
@@ -94,21 +95,8 @@ public static class McpTraceResources
             status = activity.Status.ToString(),
             kind = activity.Kind.ToString(),
             source = activity.Source?.Name,
-            tags = activity.TagObjects.ToDictionary(t => t.Key, t => t.Value)
+            tags
         };
-    }
-
-    private static ActivityTraceId ParseTraceId(string traceId)
-    {
-        // Remove any dashes if present (GUID format)
-        var cleanId = traceId.Replace("-", "");
-
-        if (cleanId.Length != 32)
-        {
-            throw new FormatException($"Invalid trace ID format. Expected 32 hex characters, got {cleanId.Length}");
-        }
-
-        return ActivityTraceId.CreateFromString(cleanId.AsSpan());
     }
 
     private static TextResourceContents CreateResponse(object data, string uri)

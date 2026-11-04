@@ -49,17 +49,7 @@ public static class McpLogResources
 
         try
         {
-            if (string.IsNullOrWhiteSpace(traceId))
-            {
-                return CreateErrorResponse(
-                    new ArgumentException("Trace ID cannot be empty"),
-                    uri,
-                    new { provided_trace_id = traceId }
-                );
-            }
-
-            // Parse trace ID (handle both 32-char hex and GUID formats)
-            var parsedTraceId = ParseTraceId(traceId);
+            ActivityTraceId parsedTraceId = McpTraceIdParser.Parse(traceId);
 
             var allLogs = OpenTelemetryObserver.LogItemsLog;
             var logEntries = allLogs
@@ -176,19 +166,6 @@ public static class McpLogResources
         }
 
         return CreateResponse(errorResult, uri);
-    }
-
-    private static ActivityTraceId ParseTraceId(string traceId)
-    {
-        // Remove any dashes if present (GUID format)
-        var cleanId = traceId.Replace("-", "");
-
-        if (cleanId.Length != 32)
-        {
-            throw new FormatException($"Invalid trace ID format. Expected 32 hex characters, got {cleanId.Length}");
-        }
-
-        return ActivityTraceId.CreateFromString(cleanId.AsSpan());
     }
 
     private static Dictionary<string, object?> GetLogAttributes(LogRecord logRecord)
