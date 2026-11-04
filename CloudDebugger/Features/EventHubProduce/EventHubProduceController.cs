@@ -100,6 +100,9 @@ public class EventHubProduceController : Controller
     /// </summary>
     private static async Task SendEvent(EventHubProducerClient producerClient, EventData eventData, string partitionKey)
     {
+        // Azure maps each partition key to a partition; the same key stays together while the partition count is unchanged.
+        // Different keys can map to the same partition, so "order" and "product" do not guarantee separate columns.
+        // Use PartitionId instead of PartitionKey when explicit routing is required; they cannot be combined.
         var batchOptions = new CreateBatchOptions()
         {
             PartitionKey = partitionKey
@@ -116,7 +119,9 @@ public class EventHubProduceController : Controller
 
 
     /// <summary>
-    /// Generate sample events
+    /// Generate sample events: even IDs use the order key, odd IDs use the product key.
+    /// These readable keys are an exercise convention, not partition IDs.
+    /// Create the exercise hub with two partitions so the consumer view (partitions 0 and 1) shows all partitions.
     /// </summary>
     /// <param name="eventId"></param>
     /// <returns></returns>
