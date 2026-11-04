@@ -81,6 +81,11 @@ public class RequestSenderController : Controller
             RequestUri = new Uri(model.URL.Trim())
         };
 
+        if (!string.IsNullOrEmpty(model.RequestBody))
+        {
+            request.Content = new StringContent(model.RequestBody, Encoding.UTF8);
+        }
+
         if (!string.IsNullOrEmpty(model.RequestHeaders))
         {
             var headers = model.RequestHeaders.Split(separator, StringSplitOptions.None);
@@ -89,7 +94,20 @@ public class RequestSenderController : Controller
                 var headerParts = header.Split(':', 2);
                 if (headerParts.Length == 2)
                 {
-                    request.Headers.Add(headerParts[0].Trim(), headerParts[1].Trim());
+                    var name = headerParts[0].Trim();
+                    var value = headerParts[1].Trim();
+
+                    if (!request.Headers.TryAddWithoutValidation(name, value))
+                    {
+                        // Content headers belong to the body, including when the body is empty.
+                        request.Content ??= new ByteArrayContent([]);
+
+                        // An explicit Content-Type replaces StringContent's default text/plain.
+                        if (name.Equals("Content-Type", StringComparison.OrdinalIgnoreCase))
+                            request.Content.Headers.Remove(name);
+
+                        request.Content.Headers.Add(name, value);
+                    }
                 }
             }
         }
@@ -97,11 +115,6 @@ public class RequestSenderController : Controller
         if (!string.IsNullOrEmpty(model.AuthenticationToken))
         {
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", model.AuthenticationToken.Trim());
-        }
-
-        if (!string.IsNullOrEmpty(model.RequestBody))
-        {
-            request.Content = new StringContent(model.RequestBody, Encoding.UTF8);
         }
 
         return request;
@@ -116,7 +129,11 @@ public class RequestSenderController : Controller
     private static async Task ParseResponse(HttpResponseMessage response, RequestSenderModel model)
     {
         model.ResponseStatusCode = $"{(int)response.StatusCode} {response.StatusCode}";
-        model.ResponseHeaders = string.Join("\r\n", response.Headers.Select(h => $"{h.Key}: {string.Join(", ", h.Value)}"));
+        var headers = response.Headers.AsEnumerable();
+        if (response.Content != null)
+            headers = headers.Concat(response.Content.Headers);
+
+        model.ResponseHeaders = string.Join("\r\n", headers.Select(h => $"{h.Key}: {string.Join(", ", h.Value)}"));
 
         if (response.Content != null)
         {
