@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace CloudDebugger.Features.EventHubConsume;
 
 /// <summary>
+/// This exercise tool assumes two partitions. The view only displays partitions 0 and 1;
+/// events read from other partitions are not displayed.
+///
 /// Azure Event Hub client library for .NET
 /// https://learn.microsoft.com/en-us/azure/event-hubs/sdks
 /// 
