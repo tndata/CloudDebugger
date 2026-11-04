@@ -70,7 +70,7 @@ public class BlobStorageAccessTiersController : Controller
             string blobName = "";
             if (button.Contains(':'))
             {
-                var parts = button.Split(':');
+                var parts = button.Split(':', 2);
                 button = parts[0];
                 blobName = parts[1];
             }

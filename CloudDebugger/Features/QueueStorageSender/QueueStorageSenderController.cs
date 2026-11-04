@@ -78,7 +78,7 @@ public class QueueStorageSenderController : Controller
     public async Task<IActionResult> SendMessages(SendMessagesModel model)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+            return View(model);
 
         if (model == null)
             return View(new SendMessagesModel());

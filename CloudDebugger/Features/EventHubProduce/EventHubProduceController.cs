@@ -45,7 +45,7 @@ public class EventHubProduceController : Controller
     public async Task<IActionResult> ProduceEvents(ProduceEventHubModel model)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+            return View(model);
 
         if (model == null)
             return View(new ProduceEventHubModel());

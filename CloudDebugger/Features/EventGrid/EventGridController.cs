@@ -51,7 +51,7 @@ public class EventGridController : Controller
     public async Task<IActionResult> SendEvents(SendEventGridModel model, string button, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+            return View(model);
 
         if (model == null)
             return View(new SendEventGridModel());
@@ -229,11 +229,11 @@ public class EventGridController : Controller
 
             if (string.IsNullOrEmpty(clientId))
             {
-                ViewData[authenticationApproach] = "Tried to authenticate using system-assigned managed identity";
+                ViewData[authenticationApproach] = "Using DefaultAzureCredential";
             }
             else
             {
-                ViewData[authenticationApproach] = $"Tried to authenticate using-assigned managed identity, ClientId={clientId}";
+                ViewData[authenticationApproach] = $"Using DefaultAzureCredential with managed identity ClientId={clientId} configured";
                 defaultCredentialOptions.ManagedIdentityClientId = clientId;
             }
 

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace CloudDebugger.Features.QueueStorageSender;
 
@@ -30,7 +30,7 @@ public class SendMessagesModel
     /// <summary>
     /// Number of messages to send to the queue
     /// </summary>
-    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Enter a number of messages greater than zero.")]
     public int NumberOfMessagesToSend { get; set; } = 10;
 
     /// <summary>

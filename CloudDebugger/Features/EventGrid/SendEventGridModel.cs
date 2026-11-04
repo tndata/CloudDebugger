@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace CloudDebugger.Features.EventGrid;
 
@@ -19,7 +19,7 @@ public class SendEventGridModel
     /// <summary>
     /// The number of events to send
     /// </summary>
-    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Enter a number of events greater than zero.")]
     public int NumberOfEvents { get; set; } = 10;
 
     /// <summary>
