@@ -1,5 +1,6 @@
 ﻿using ModelContextProtocol.Server;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace CloudDebugger.Features.McpServer;
 
@@ -20,16 +21,18 @@ public static class McpHttpTools
 
     [McpServerTool(Name = "http_get")]
     [Description("Make an HTTP GET request to the specified URL and return the response")]
-    public static async Task<object> HttpGet(Uri targetUrl)
+    public static Task<object> HttpGet(Uri targetUrl, CancellationToken cancellationToken = default)
+        => HttpGetCoreAsync(targetUrl, _http, cancellationToken);
+
+    internal static async Task<object> HttpGetCoreAsync(Uri targetUrl, HttpClient httpClient, CancellationToken cancellationToken)
     {
         try
         {
-            var startTime = DateTime.UtcNow;
-            var response = await _http.GetAsync(targetUrl);
-            var endTime = DateTime.UtcNow;
-            var duration = endTime - startTime;
+            DateTime startTime = DateTime.UtcNow;
+            long startTimestamp = Stopwatch.GetTimestamp();
+            using HttpResponseMessage response = await httpClient.GetAsync(targetUrl, cancellationToken);
 
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             var headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
             var contentHeaders = response.Content.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
 
@@ -45,7 +48,7 @@ public static class McpHttpTools
                 content_type = response.Content.Headers.ContentType?.ToString(),
                 response_headers = headers,
                 content_headers = contentHeaders,
-                request_duration_ms = duration.TotalMilliseconds,
+                request_duration_ms = Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds,
                 timestamp = startTime
             };
         }
@@ -59,7 +62,12 @@ public static class McpHttpTools
                 exception_type = "HttpRequestException"
             };
         }
-        catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Let the MCP SDK observe cancellation of the agent's request.
+            throw;
+        }
+        catch (OperationCanceledException ex) when (ex.InnerException is TimeoutException)
         {
             return new
             {
@@ -69,14 +77,14 @@ public static class McpHttpTools
                 exception_type = "TimeoutException"
             };
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException ex)
         {
             return new
             {
                 success = false,
                 error = "Request was cancelled",
                 targetUrl,
-                exception_type = "TaskCanceledException"
+                exception_type = ex.GetType().Name
             };
         }
         catch (UriFormatException ex)
