@@ -1,5 +1,6 @@
 ﻿using ModelContextProtocol.Server;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace CloudDebugger.Features.McpServer;
 
@@ -20,7 +21,7 @@ public static class McpFileTools
     private const string ErrorPathEmpty = "Path cannot be empty";
     private const string ErrorAccessDenied = "Access denied";
     private const string ErrorIOOperation = "IO error";
-    private const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+    private const string DateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     // Exception type names
     private const string UnauthorizedAccessExceptionName = "UnauthorizedAccessException";
@@ -56,7 +57,7 @@ public static class McpFileTools
                         is_directory = !isFile,
                         is_file = isFile,
                         size = fileInfo?.Length ?? 0,
-                        last_modified = FormatDateTime(isFile ? File.GetLastWriteTime(entry) : Directory.GetLastWriteTime(entry))
+                        last_modified = FormatDateTime(isFile ? File.GetLastWriteTimeUtc(entry) : Directory.GetLastWriteTimeUtc(entry))
                     };
                 })
                 .ToList();
@@ -104,7 +105,7 @@ public static class McpFileTools
                 path,
                 content,
                 size_bytes = fileInfo.Length,
-                last_modified = FormatDateTime(fileInfo.LastWriteTime),
+                last_modified = FormatDateTime(fileInfo.LastWriteTimeUtc),
                 character_count = content.Length,
                 line_count = CountLines(content)
             };
@@ -154,13 +155,13 @@ public static class McpFileTools
             {
                 success = true,
                 path = args.Path,
-                bytes_written = args.Content.Length,
+                bytes_written = fileInfo.Length,
                 file_size_bytes = fileInfo.Length,
                 character_count = args.Content.Length,
                 line_count = CountLines(args.Content),
                 created_new_file = !existedBefore,
                 previous_size = previousSize,
-                last_modified = FormatDateTime(fileInfo.LastWriteTime)
+                last_modified = FormatDateTime(fileInfo.LastWriteTimeUtc)
             };
         }
         catch (UnauthorizedAccessException ex)
@@ -199,7 +200,7 @@ public static class McpFileTools
 
             var fileInfo = new FileInfo(path);
             var fileSize = fileInfo.Length;
-            var lastModified = fileInfo.LastWriteTime;
+            var lastModified = fileInfo.LastWriteTimeUtc;
 
             File.Delete(path);
 
@@ -255,9 +256,9 @@ public static class McpFileTools
                     type = "file",
                     name = fileInfo.Name,
                     size_bytes = fileInfo.Length,
-                    created = FormatDateTime(fileInfo.CreationTime),
-                    last_modified = FormatDateTime(fileInfo.LastWriteTime),
-                    last_accessed = FormatDateTime(fileInfo.LastAccessTime),
+                    created = FormatDateTime(fileInfo.CreationTimeUtc),
+                    last_modified = FormatDateTime(fileInfo.LastWriteTimeUtc),
+                    last_accessed = FormatDateTime(fileInfo.LastAccessTimeUtc),
                     extension = fileInfo.Extension,
                     is_readonly = fileInfo.IsReadOnly,
                     attributes = fileInfo.Attributes.ToString()
@@ -275,9 +276,9 @@ public static class McpFileTools
                     path,
                     type = "directory",
                     name = dirInfo.Name,
-                    created = FormatDateTime(dirInfo.CreationTime),
-                    last_modified = FormatDateTime(dirInfo.LastWriteTime),
-                    last_accessed = FormatDateTime(dirInfo.LastAccessTime),
+                    created = FormatDateTime(dirInfo.CreationTimeUtc),
+                    last_modified = FormatDateTime(dirInfo.LastWriteTimeUtc),
+                    last_accessed = FormatDateTime(dirInfo.LastAccessTimeUtc),
                     file_count = files.Length,
                     subdirectory_count = directories.Length,
                     total_entries = files.Length + directories.Length,
@@ -317,9 +318,9 @@ public static class McpFileTools
         };
     }
 
-    private static string FormatDateTime(DateTime dateTime)
+    private static string FormatDateTime(DateTimeOffset dateTime)
     {
-        return dateTime.ToString(DateTimeFormat);
+        return dateTime.UtcDateTime.ToString(DateTimeFormat, CultureInfo.InvariantCulture);
     }
 
     private static int CountLines(string content)
