@@ -158,12 +158,12 @@ public static class WebHookValidation
     private static void SendCallBackRequest(int hookId, Action<WebHookLogEntry> LogEventHandler, string callbackUrl, string comment)
     {
         //Call the callBackUrl to confirm the webhook
-        ThreadPool.QueueUserWorkItem(delegate (object? state)
+        _ = Task.Run(async () =>
         {
             // Event Grid requires the validation callback to be sent AFTER the original HTTP request completes.
             // If we call back too soon (while the original request is still in flight), Event Grid rejects it.
             // 5 seconds provides a safe margin for the HTTP response to fully complete and be processed.
-            Thread.Sleep(5000);
+            await Task.Delay(5000);
 
             var newLogEntry = new WebHookLogEntry()
             {
@@ -176,18 +176,15 @@ public static class WebHookValidation
 
             try
             {
-                var client = new HttpClient();
+                using var client = new HttpClient();
 
                 // Create the request
-                var request = new HttpRequestMessage(HttpMethod.Get, callbackUrl);
+                using var request = new HttpRequestMessage(HttpMethod.Get, callbackUrl);
                 // Send the request
-                var response = client.SendAsync(request).Result;
-
-                // Ensure to dispose the request after it's used
-                request.Dispose();
+                using var response = await client.SendAsync(request);
 
                 // Read the response content as string
-                var result = response.Content.ReadAsStringAsync().Result;
+                var result = await response.Content.ReadAsStringAsync();
 
                 // Determine Content Type and pretty-print response JSON if applicable
                 if (response.Content.Headers.ContentType?.MediaType == "application/json")

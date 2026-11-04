@@ -39,7 +39,7 @@ public class BlobVersioningController : Controller
 
 
     [HttpPost]
-    public IActionResult Index(BlobVersioningModel model, string button)
+    public async Task<IActionResult> Index(BlobVersioningModel model, string button, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid || model == null)
             return View(new BlobVersioningModel());
@@ -70,17 +70,21 @@ public class BlobVersioningController : Controller
                 switch (button)
                 {
                     case "createversionedblob":
-                        CreateVersionedBlob(model, client);
+                        await CreateVersionedBlobAsync(model, client, cancellationToken);
                         model.Message = "Blob created and overwritten 10 times.";
                         break;
                     case "readversionedblob":
-                        model.BlobVersions = ReadVersionedBlob(model, client);
+                        model.BlobVersions = await ReadVersionedBlobAsync(model, client, cancellationToken);
                         model.Message = "Read all blob versions.";
                         break;
                     default:
                         break;
                 }
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {
@@ -98,15 +102,15 @@ public class BlobVersioningController : Controller
     /// <param name="model"></param>
     /// <param name="client"></param>
     /// <returns></returns>
-    private static List<BlobVersionDetails>? ReadVersionedBlob(BlobVersioningModel model, BlobServiceClient client)
+    private static async Task<List<BlobVersionDetails>?> ReadVersionedBlobAsync(BlobVersioningModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         var result = new List<BlobVersionDetails>();
 
         var container = client.GetBlobContainerClient(model?.ContainerName?.Trim() ?? "");
 
-        var blobVersions = container.GetBlobs(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: model?.BlobName, default);
+        var blobVersions = container.GetBlobsAsync(BlobTraits.None, BlobStates.Version | BlobStates.Deleted, prefix: model?.BlobName, cancellationToken: cancellationToken);
 
-        foreach (BlobItem version in blobVersions)
+        await foreach (BlobItem version in blobVersions)
         {
             string blobContent = "";
 
@@ -114,7 +118,7 @@ public class BlobVersioningController : Controller
             if (!version.Deleted)
             {
                 var blobClient = container.GetBlobClient(model?.BlobName).WithVersion(version.VersionId);
-                BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+                BlobDownloadResult downloadResult = (await blobClient.DownloadContentAsync(cancellationToken)).Value;
                 blobContent = downloadResult.Content.ToString();
             }
             else
@@ -148,7 +152,7 @@ public class BlobVersioningController : Controller
     /// <param name="model"></param>
     /// <param name="client"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    private static void CreateVersionedBlob(BlobVersioningModel model, BlobServiceClient client)
+    private static async Task CreateVersionedBlobAsync(BlobVersioningModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(model.ContainerName))
             throw new ArgumentNullException(nameof(model), "model is null or empty.");
@@ -161,9 +165,9 @@ public class BlobVersioningController : Controller
 
             string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-            Thread.Sleep(1000);
+            await Task.Delay(1000, cancellationToken);
 
-            blobClient.UploadAsync(BinaryData.FromString(blobContents), overwrite: true).Wait();
+            await blobClient.UploadAsync(BinaryData.FromString(blobContents), overwrite: true, cancellationToken: cancellationToken);
         }
     }
 }

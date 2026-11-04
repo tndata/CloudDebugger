@@ -48,7 +48,7 @@ public class EventGridController : Controller
 
 
     [HttpPost]
-    public IActionResult SendEvents(SendEventGridModel model, string button)
+    public async Task<IActionResult> SendEvents(SendEventGridModel model, string button, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -75,14 +75,18 @@ public class EventGridController : Controller
             switch (button)
             {
                 case "eventgrid":
-                    SendEventGridEvents(model, client);
+                    await SendEventGridEventsAsync(model, client, cancellationToken);
                     break;
                 case "cloudevent":
-                    SendCloudEvents(model, client);
+                    await SendCloudEventsAsync(model, client, cancellationToken);
                     break;
                 default:
                     break;
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {
@@ -93,7 +97,7 @@ public class EventGridController : Controller
         return View(model);
     }
 
-    private void SendCloudEvents(SendEventGridModel model, EventGridPublisherClient client)
+    private async Task SendCloudEventsAsync(SendEventGridModel model, EventGridPublisherClient client, CancellationToken cancellationToken)
     {
         int eventId = model.StartNumber;
 
@@ -102,7 +106,7 @@ public class EventGridController : Controller
             CloudEvent? @event = CreateCloudEvent(eventId);
 
             // Send the event
-            client.SendEventAsync(@event).Wait();
+            await client.SendEventAsync(@event, cancellationToken);
 
             _logger.LogInformation("Sent event to Event Grid {Subject} using the CloudEvent schema", @event.Subject);
 
@@ -113,7 +117,7 @@ public class EventGridController : Controller
         model.Message = $"{model.NumberOfEvents} events sent using the CloudEvent schema!";
     }
 
-    private void SendEventGridEvents(SendEventGridModel model, EventGridPublisherClient client)
+    private async Task SendEventGridEventsAsync(SendEventGridModel model, EventGridPublisherClient client, CancellationToken cancellationToken)
     {
         int eventId = model.StartNumber;
 
@@ -122,7 +126,7 @@ public class EventGridController : Controller
             EventGridEvent? @event = CreateEventGridEvent(eventId);
 
             // Send the event
-            client.SendEventAsync(@event).Wait();
+            await client.SendEventAsync(@event, cancellationToken);
 
             _logger.LogInformation("Sent event to Event Grid {Subject} using the EventGrid schema", @event.Subject);
 

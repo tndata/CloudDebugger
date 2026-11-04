@@ -41,7 +41,7 @@ public class BlobStorageAccessTiersController : Controller
 
 
     [HttpPost]
-    public IActionResult Index(BlobStorageAccessTiersModel model, string button)
+    public async Task<IActionResult> Index(BlobStorageAccessTiersModel model, string button, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid || model == null)
             return View(new BlobStorageAccessTiersModel());
@@ -80,11 +80,11 @@ public class BlobStorageAccessTiersController : Controller
                 switch (button)
                 {
                     case "CreateBlobs":
-                        CreateSampleBlobs(model, client);
+                        await CreateSampleBlobsAsync(model, client, cancellationToken);
                         model.Message = "Created sample blobs.";
                         break;
                     case "ListBlobs":
-                        model.Blobs = ListAllBlobs(model, client);
+                        model.Blobs = await ListAllBlobsAsync(model, client, cancellationToken);
                         model.Message = "Read all blobs.";
                         break;
                     case HotTier:
@@ -92,9 +92,9 @@ public class BlobStorageAccessTiersController : Controller
                     case ColdTier:
                     case ArchiveTier:
 
-                        ChangeBlobTier(client, model.ContainerName, blobName, button);
+                        await ChangeBlobTierAsync(client, model.ContainerName, blobName, button, cancellationToken);
 
-                        model.Blobs = ListAllBlobs(model, client);
+                        model.Blobs = await ListAllBlobsAsync(model, client, cancellationToken);
 
                         model.Message = $"Blob {blobName} moved to {button} tier.";
                         break;
@@ -102,6 +102,10 @@ public class BlobStorageAccessTiersController : Controller
                         break;
                 }
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {
@@ -123,7 +127,7 @@ public class BlobStorageAccessTiersController : Controller
     /// <param name="tier">The desired access tier ("Hot", "Cool", "Cold", or "Archive").</param>
     /// <exception cref="ArgumentException">Thrown if any parameter is missing or invalid.</exception>
     /// <exception cref="RequestFailedException">Thrown if the operation fails (e.g., blob not found).</exception>
-    private static void ChangeBlobTier(BlobServiceClient client, string? containerName, string? blobName, string tier)
+    private static async Task ChangeBlobTierAsync(BlobServiceClient client, string? containerName, string? blobName, string tier, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(containerName))
             throw new ArgumentException("Container name is missing.", nameof(containerName));
@@ -146,7 +150,7 @@ public class BlobStorageAccessTiersController : Controller
             _ => throw new ArgumentException($"Invalid tier: {tier}", nameof(tier))
         };
 
-        blobClient.SetAccessTier(accessTier);
+        await blobClient.SetAccessTierAsync(accessTier, cancellationToken: cancellationToken);
     }
 
 
@@ -156,7 +160,7 @@ public class BlobStorageAccessTiersController : Controller
     /// <param name="model"></param>
     /// <param name="client"></param>
     /// <returns></returns>
-    private static List<BlobDetails> ListAllBlobs(BlobStorageAccessTiersModel model, BlobServiceClient client)
+    private static async Task<List<BlobDetails>> ListAllBlobsAsync(BlobStorageAccessTiersModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(model.ContainerName))
             throw new ArgumentException("Container name is missing.", nameof(model));
@@ -167,20 +171,20 @@ public class BlobStorageAccessTiersController : Controller
 
         var container = client.GetBlobContainerClient(containerName);
 
-        var blobs = container.GetBlobs(new GetBlobsOptions
+        var blobs = container.GetBlobsAsync(new GetBlobsOptions
         {
             Traits = BlobTraits.None,
             States = BlobStates.None
-        });
+        }, cancellationToken);
 
-        foreach (BlobItem blob in blobs)
+        await foreach (BlobItem blob in blobs)
         {
             string blobContent = "";
 
             if (blob.Properties.AccessTier != ArchiveTier)
             {
                 var blobClient = container.GetBlobClient(blob.Name);
-                BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+                BlobDownloadResult downloadResult = (await blobClient.DownloadContentAsync(cancellationToken)).Value;
                 blobContent = downloadResult.Content.ToString();
             }
             else
@@ -228,7 +232,7 @@ public class BlobStorageAccessTiersController : Controller
     /// <param name="model"></param>
     /// <param name="client"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    private static void CreateSampleBlobs(BlobStorageAccessTiersModel model, BlobServiceClient client)
+    private static async Task CreateSampleBlobsAsync(BlobStorageAccessTiersModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(model.ContainerName))
             throw new ArgumentNullException(nameof(model), "model.ContainerName is null or empty.");
@@ -243,7 +247,7 @@ public class BlobStorageAccessTiersController : Controller
 
             string blobContents = $"Sample blob data #{i}, written at " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-            blobClient.UploadAsync(BinaryData.FromString(blobContents), overwrite: true).Wait();
+            await blobClient.UploadAsync(BinaryData.FromString(blobContents), overwrite: true, cancellationToken: cancellationToken);
         }
     }
 }

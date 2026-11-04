@@ -38,7 +38,7 @@ public class BlobStorageEditorController : Controller
     }
 
     [HttpPost]
-    public IActionResult AccessBlobs(BlobStorageModel model, string button)
+    public async Task<IActionResult> AccessBlobs(BlobStorageModel model, string button, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -77,18 +77,22 @@ public class BlobStorageEditorController : Controller
                     case "loadblob":
 
                         _logger.LogInformation("BlobStorage.LoadBlob");
-                        var (blobDetails, blobContent) = LoadBlob(model, client);
+                        var (blobDetails, blobContent) = await LoadBlobAsync(model, client, cancellationToken);
                         model.Blob = blobDetails;
                         model.BlobContent = blobContent;
                         break;
                     case "writeblob":
                         _logger.LogInformation("BlobStorage.WriteBlob");
-                        WriteBlob(model, client);
+                        await WriteBlobAsync(model, client, cancellationToken);
                         break;
                     default:
                         break;
                 }
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {
@@ -100,7 +104,11 @@ public class BlobStorageEditorController : Controller
         {
             //Always try to get the content, even if the above fails
             if (client != null)
-                model.ContainerContent = TryGetContainerContent(model, client);
+                model.ContainerContent = await TryGetContainerContentAsync(model, client, cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {
@@ -117,7 +125,7 @@ public class BlobStorageEditorController : Controller
     /// </summary>
     /// <param name="model"></param>
     /// <returns>Returns an empty list if it can't access the content</returns>
-    private static List<(string name, string size)> TryGetContainerContent(BlobStorageModel model, BlobServiceClient client)
+    private static async Task<List<(string name, string size)>> TryGetContainerContentAsync(BlobStorageModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         var result = new List<(string name, string size)>();
 
@@ -129,25 +137,25 @@ public class BlobStorageEditorController : Controller
 
             if (model.HierarchicalNamespaceEnabled)
             {
-                GetAllBlobsInHierachialBlogStorage(model, result, container);
+                await GetAllBlobsInHierachialBlogStorageAsync(model, result, container, cancellationToken);
             }
             else
             {
-                GetBlogsInNormalStorageAccount(model, result, container);
+                await GetBlogsInNormalStorageAccountAsync(model, result, container, cancellationToken);
             }
         }
 
         return result;
     }
 
-    private static void GetBlogsInNormalStorageAccount(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container)
+    private static async Task GetBlogsInNormalStorageAccountAsync(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container, CancellationToken cancellationToken)
     {
-        var blobs = container.GetBlobs(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path, default).ToList();
+        var blobs = container.GetBlobsAsync(traits: BlobTraits.Metadata, states: BlobStates.None, prefix: model.Path, cancellationToken: cancellationToken);
 
         // Always add an root element to the list, for easier navigation.
         result.Add(("/", ""));
 
-        foreach (var blob in blobs)
+        await foreach (var blob in blobs)
         {
             // Is it a folder?
             if (blob.Metadata.TryGetValue("hdi_isfolder", out var isFolder) && isFolder == "true")
@@ -162,13 +170,13 @@ public class BlobStorageEditorController : Controller
         }
     }
 
-    private static void GetAllBlobsInHierachialBlogStorage(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container)
+    private static async Task GetAllBlobsInHierachialBlogStorageAsync(BlobStorageModel model, List<(string name, string size)> result, BlobContainerClient container, CancellationToken cancellationToken)
     {
-        var blobs = container.GetBlobsByHierarchy(traits: BlobTraits.Metadata, states: BlobStates.None, delimiter: "/", prefix: model.Path).ToList();
+        var blobs = container.GetBlobsByHierarchyAsync(traits: BlobTraits.Metadata, states: BlobStates.None, delimiter: "/", prefix: model.Path, cancellationToken: cancellationToken);
 
         result.Add(("/", ""));
 
-        foreach (var blob in blobs)
+        await foreach (var blob in blobs)
         {
             // Is it a folder?
             if (blob.IsPrefix)
@@ -183,7 +191,7 @@ public class BlobStorageEditorController : Controller
         }
     }
 
-    private static (BlobDetails? blobDetails, string? blobContent) LoadBlob(BlobStorageModel model, BlobServiceClient client)
+    private static async Task<(BlobDetails? blobDetails, string? blobContent)> LoadBlobAsync(BlobStorageModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(model.ContainerName))
             throw new ArgumentNullException(nameof(model), "model.ContainerName is null or empty.");
@@ -193,7 +201,7 @@ public class BlobStorageEditorController : Controller
         var container = client.GetBlobContainerClient(model.ContainerName.Trim());
         BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());
 
-        BlobDownloadResult downloadResult = blobClient.DownloadContentAsync().Result;
+        BlobDownloadResult downloadResult = (await blobClient.DownloadContentAsync(cancellationToken)).Value;
 
         var lastAccessed = "[Not set]";
         if (downloadResult.Details.LastAccessed != DateTimeOffset.MinValue)
@@ -219,7 +227,7 @@ public class BlobStorageEditorController : Controller
     }
 
 
-    private static void WriteBlob(BlobStorageModel model, BlobServiceClient client)
+    private static async Task WriteBlobAsync(BlobStorageModel model, BlobServiceClient client, CancellationToken cancellationToken)
     {
         if (model != null)
         {
@@ -231,7 +239,7 @@ public class BlobStorageEditorController : Controller
             var container = client.GetBlobContainerClient(model.ContainerName.Trim());
             BlobClient blobClient = container.GetBlobClient(model.BlobName.Trim());
 
-            blobClient.UploadAsync(BinaryData.FromString(model.BlobContent ?? "Empty"), overwrite: true).Wait();
+            await blobClient.UploadAsync(BinaryData.FromString(model.BlobContent ?? "Empty"), overwrite: true, cancellationToken: cancellationToken);
         }
     }
 }
