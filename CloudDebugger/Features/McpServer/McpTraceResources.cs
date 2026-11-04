@@ -1,4 +1,4 @@
-﻿using CloudDebugger.Infrastructure.OpenTelemetry;
+using CloudDebugger.Infrastructure.OpenTelemetry;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
@@ -13,12 +13,10 @@ public static class McpTraceResources
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
     private const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
 
-
     [McpServerResource(UriTemplate = "traces://service/CloudDebugger", Name = "All Traces", MimeType = "application/json")]
     [Description("All available trace entries from OpenTelemetry activities")]
     public static TextResourceContents GetAllTraces()
     {
-
         try
         {
             var traces = OpenTelemetryObserver.TraceItemsLog
@@ -26,13 +24,9 @@ public static class McpTraceResources
                 .Select(activity => MapActivityToTrace(activity))
                 .ToList();
 
-            var result = new
-            {
-                service = "CloudDebugger",
-                timestamp = DateTime.UtcNow.ToString(DateTimeFormat),
-                count = traces.Count,
-                traces
-            };
+            McpTracesResponse result = new(
+                Timestamp: DateTime.UtcNow.ToString(DateTimeFormat),
+                Traces: traces);
 
             return CreateResponse(result, "traces://service/CloudDebugger");
         }
@@ -58,14 +52,10 @@ public static class McpTraceResources
                 .Select(activity => MapActivityToTrace(activity))
                 .ToList();
 
-            var result = new
-            {
-                service = "CloudDebugger",
-                trace_id = traceId,
-                timestamp = DateTime.UtcNow.ToString(DateTimeFormat),
-                count = traces.Count,
-                traces
-            };
+            McpTracesResponse result = new(
+                Timestamp: DateTime.UtcNow.ToString(DateTimeFormat),
+                Traces: traces,
+                TraceId: traceId);
 
             return CreateResponse(result, uri);
         }
@@ -75,7 +65,7 @@ public static class McpTraceResources
         }
     }
 
-    private static object MapActivityToTrace(Activity activity)
+    private static McpTraceEntry MapActivityToTrace(Activity activity)
     {
         Dictionary<string, object?> tags = new(StringComparer.Ordinal);
         foreach (KeyValuePair<string, object?> tag in activity.TagObjects)
@@ -84,22 +74,20 @@ public static class McpTraceResources
             tags[tag.Key] = tag.Value;
         }
 
-        return new
-        {
-            trace_id = activity.TraceId.ToString(),
-            span_id = activity.SpanId.ToString(),
-            parent_span_id = activity.ParentSpanId.ToString(),
-            operation_name = activity.DisplayName ?? activity.OperationName ?? "Unknown",
-            start_time = activity.StartTimeUtc.ToString(DateTimeFormat),
-            duration_ms = activity.Duration.TotalMilliseconds,
-            status = activity.Status.ToString(),
-            kind = activity.Kind.ToString(),
-            source = activity.Source?.Name,
-            tags
-        };
+        return new McpTraceEntry(
+            TraceId: activity.TraceId.ToString(),
+            SpanId: activity.SpanId.ToString(),
+            ParentSpanId: activity.ParentSpanId.ToString(),
+            OperationName: activity.DisplayName ?? activity.OperationName ?? "Unknown",
+            StartTime: activity.StartTimeUtc.ToString(DateTimeFormat),
+            DurationMs: activity.Duration.TotalMilliseconds,
+            Status: activity.Status.ToString(),
+            Kind: activity.Kind.ToString(),
+            Source: activity.Source?.Name,
+            Tags: tags);
     }
 
-    private static TextResourceContents CreateResponse(object data, string uri)
+    private static TextResourceContents CreateResponse<T>(T data, string uri)
     {
         return new TextResourceContents
         {
@@ -111,14 +99,10 @@ public static class McpTraceResources
 
     private static TextResourceContents CreateErrorResponse(Exception ex, string uri)
     {
-        var error = new
-        {
-            service = "CloudDebugger",
-            error = true,
-            message = ex.Message,
-            type = ex.GetType().Name,
-            timestamp = DateTime.UtcNow.ToString(DateTimeFormat)
-        };
+        McpTraceErrorResponse error = new(
+            Message: ex.Message,
+            Type: ex.GetType().Name,
+            Timestamp: DateTime.UtcNow.ToString(DateTimeFormat));
 
         return CreateResponse(error, uri);
     }

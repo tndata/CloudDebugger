@@ -1,4 +1,4 @@
-﻿using CloudDebugger.Infrastructure.OpenTelemetry;
+using CloudDebugger.Infrastructure.OpenTelemetry;
 using global::OpenTelemetry.Logs;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
@@ -63,72 +63,50 @@ public static class McpLogResources
                 filterValue: traceId,
                 logEntries: logEntries,
                 totalAvailable: allLogs.Count,
-                additionalInfo: new { trace_id_parsed = parsedTraceId.ToString() }
+                traceIdParsed: parsedTraceId.ToString()
             );
 
             return CreateResponse(result, uri);
         }
         catch (Exception ex)
         {
-            return CreateErrorResponse(ex, uri, new { provided_trace_id = traceId });
+            return CreateErrorResponse(ex, uri, traceId);
         }
     }
 
-    private static object CreateLogEntry(LogRecord logRecord)
+    private static McpLogEntry CreateLogEntry(LogRecord logRecord)
     {
-        return new
-        {
-            timestamp = logRecord.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-            level = logRecord.LogLevel.ToString(),
-            category = logRecord.CategoryName ?? "Unknown",
-            message = logRecord.FormattedMessage ?? logRecord.Body?.ToString() ?? "",
-            exception = logRecord.Exception?.ToString(),
-            exception_type = logRecord.Exception?.GetType().Name,
-            trace_id = logRecord.TraceId.ToString(),
-            span_id = logRecord.SpanId.ToString(),
-            event_id = logRecord.EventId.Id,
-            event_name = logRecord.EventId.Name,
-            attributes = GetLogAttributes(logRecord)
-        };
+        return new McpLogEntry(
+            Timestamp: logRecord.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            Level: logRecord.LogLevel.ToString(),
+            Category: logRecord.CategoryName ?? "Unknown",
+            Message: logRecord.FormattedMessage ?? logRecord.Body?.ToString() ?? "",
+            Exception: logRecord.Exception?.ToString(),
+            ExceptionType: logRecord.Exception?.GetType().Name,
+            TraceId: logRecord.TraceId.ToString(),
+            SpanId: logRecord.SpanId.ToString(),
+            EventId: logRecord.EventId.Id,
+            EventName: logRecord.EventId.Name,
+            Attributes: GetLogAttributes(logRecord));
     }
 
-    private static Dictionary<string, object> CreateLogResult(
+    private static McpLogsResponse CreateLogResult(
         string filterType,
         string filterValue,
-        List<object> logEntries,
+        IReadOnlyList<McpLogEntry> logEntries,
         int totalAvailable,
-        object? additionalInfo = null)
+        string? traceIdParsed = null)
     {
-        var result = new Dictionary<string, object>
-        {
-            ["service"] = "CloudDebugger",
-            ["log_file"] = "app.log",
-            ["filter_type"] = filterType,
-            ["filter_value"] = filterValue,
-            ["timestamp"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-            ["total_entries"] = logEntries.Count,
-            ["total_available_entries"] = totalAvailable,
-            ["logs"] = logEntries
-        };
-
-        // Merge additional info if provided
-        if (additionalInfo != null)
-        {
-            foreach (var prop in additionalInfo.GetType().GetProperties())
-            {
-                var value = prop.GetValue(additionalInfo);
-                if (value != null)
-                {
-                    // Ensure we only add non-null values
-                    result[prop.Name] = value;
-                }
-            }
-        }
-
-        return result;
+        return new McpLogsResponse(
+            FilterType: filterType,
+            FilterValue: filterValue,
+            Timestamp: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            TotalAvailableEntries: totalAvailable,
+            Logs: logEntries,
+            TraceIdParsed: traceIdParsed);
     }
 
-    private static TextResourceContents CreateResponse(object data, string uri)
+    private static TextResourceContents CreateResponse<T>(T data, string uri)
     {
         return new TextResourceContents
         {
@@ -138,34 +116,15 @@ public static class McpLogResources
         };
     }
 
-    private static TextResourceContents CreateErrorResponse(
-        Exception ex,
-        string uri,
-        object? additionalInfo = null)
+    private static TextResourceContents CreateErrorResponse(Exception ex, string uri, string? providedTraceId = null)
     {
-        var errorResult = new Dictionary<string, object>
-        {
-            ["service"] = "CloudDebugger",
-            ["error"] = true,
-            ["error_message"] = ex.Message,
-            ["exception_type"] = ex.GetType().Name,
-            ["timestamp"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-        };
+        McpLogErrorResponse error = new(
+            ErrorMessage: ex.Message,
+            ExceptionType: ex.GetType().Name,
+            Timestamp: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            ProvidedTraceId: providedTraceId);
 
-        // Merge additional info if provided
-        if (additionalInfo != null)
-        {
-            foreach (var prop in additionalInfo.GetType().GetProperties())
-            {
-                var value = prop.GetValue(additionalInfo);
-                if (value != null)
-                {
-                    errorResult[prop.Name] = value;
-                }
-            }
-        }
-
-        return CreateResponse(errorResult, uri);
+        return CreateResponse(error, uri);
     }
 
     private static Dictionary<string, object?> GetLogAttributes(LogRecord logRecord)
