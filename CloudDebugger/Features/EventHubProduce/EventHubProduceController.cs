@@ -61,7 +61,7 @@ public class EventHubProduceController : Controller
 
         try
         {
-            var producerClient = GetProducerClient(connectionString);
+            await using var producerClient = GetProducerClient(connectionString);
 
             int eventId = model.StartNumber;
 
@@ -107,7 +107,8 @@ public class EventHubProduceController : Controller
 
         using (EventDataBatch eventBatch = await producerClient.CreateBatchAsync(batchOptions))
         {
-            eventBatch.TryAdd(eventData);
+            if (!eventBatch.TryAdd(eventData))
+                throw new InvalidOperationException("The event is too large to fit in an Event Hub batch.");
 
             await producerClient.SendAsync(eventBatch);
         }

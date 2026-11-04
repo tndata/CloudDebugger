@@ -37,7 +37,7 @@ public class RequestSenderController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Index(RequestSenderModel model)
+    public async Task<IActionResult> Index(RequestSenderModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -53,10 +53,14 @@ public class RequestSenderController : Controller
         {
             using (var request = BuildRequest(model))
             {
-                var response = await SendRequestAsync(request);
+                using var response = await SendRequestAsync(request, cancellationToken);
 
-                await ParseResponse(response, model);
+                await ParseResponse(response, model, cancellationToken);
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {
@@ -119,14 +123,14 @@ public class RequestSenderController : Controller
 
         return request;
     }
-    private static async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+    private static async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         using (var client = new HttpClient())
         {
-            return await client.SendAsync(request);
+            return await client.SendAsync(request, cancellationToken);
         }
     }
-    private static async Task ParseResponse(HttpResponseMessage response, RequestSenderModel model)
+    private static async Task ParseResponse(HttpResponseMessage response, RequestSenderModel model, CancellationToken cancellationToken)
     {
         model.ResponseStatusCode = $"{(int)response.StatusCode} {response.StatusCode}";
         var headers = response.Headers.AsEnumerable();
@@ -137,7 +141,7 @@ public class RequestSenderController : Controller
 
         if (response.Content != null)
         {
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
             model.ResponseBody = responseBody;
         }
     }

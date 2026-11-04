@@ -10,7 +10,7 @@ public class RedisModel
     [Required]
     public string? Value { get; set; }
 
-    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Enter an expiration greater than zero seconds.")]
     public int ExpireSeconds { get; set; } = 30;
 
     /// <summary>

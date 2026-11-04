@@ -67,6 +67,7 @@
 
         <tr>
             <th>Key</th>
+            <th>Type</th>
             <th>Value</th>
             <th>Expires in</th>
         </tr>
@@ -75,19 +76,25 @@
         {
             <tr>
                 <td class="col-md-2">@key.Key</td>
-                <td class="col-md-8">@key.Value</td>
+                <td class="col-md-2">@key.Type</td>
+                <td class="col-md-6">@key.Value</td>
                 <td class="col-md-2">
                     @if(key.Expiration.HasValue)
                     {
-                        @key.Expiration.Value.Seconds @:(sec)
+                        @((long)Math.Ceiling(key.Expiration.Value.TotalSeconds)) @:(sec)
+                    }
+                    else
+                    {
+                        <text>No expiration</text>
                     }
                 </td>
             </tr>
         }
     </table>
 
-    @:(<a href="/Redis/ReadWriteKeys">refresh</a>)
 }
+
+<a href="/Redis/ReadWriteKeys">Refresh</a>
 
 
 

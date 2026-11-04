@@ -84,22 +84,21 @@ public class RedisController : Controller
 
 
     /// <summary>
-    /// Return a list of the 100 first keys found in redis that matches the provided pattern. 
+    /// Return all keys found in Redis that match the provided pattern.
     /// </summary>
     /// <param name="pattern"></param>
     /// <param name="connectionString"></param>
     /// <returns></returns>
     private static async Task<List<RedisKeyInfo>> ScanKeys(string pattern, string connectionString)
     {
-        ConnectionMultiplexer connection = await GetRedisConnection(connectionString);
+        using ConnectionMultiplexer connection = await GetRedisConnection(connectionString);
         var server = connection.GetServer(connection.GetEndPoints()[0]);
         IDatabase db = connection.GetDatabase();
 
         var keys = new List<RedisKey>();
-        long cursor;
+        long cursor = 0L;
         do
         {
-            cursor = 0L;
             var result = await server.ExecuteAsync("SCAN", cursor.ToString(), "MATCH", pattern, "COUNT", "100");
             if (result != null)
             {
@@ -118,17 +117,24 @@ public class RedisController : Controller
 
         // Convert the result to a list of RedisKeyInfo
         var resultingKeyList = new List<RedisKeyInfo>();
-        foreach (var key in keys)
+        foreach (var key in keys.Distinct())
         {
             string keyString = key.ToString();
             if (keyString != null)
             {
-                var value = await db.StringGetAsync(keyString);
+                var type = await db.KeyTypeAsync(keyString);
+                if (type == RedisType.None)
+                    continue; // The key may have expired since SCAN returned it.
+
+                string? value = type == RedisType.String
+                    ? (string?)await db.StringGetAsync(keyString)
+                    : "Value preview unavailable for this type.";
                 TimeSpan? expiration = await db.KeyTimeToLiveAsync(keyString);
 
                 resultingKeyList.Add(new RedisKeyInfo
                 {
                     Key = keyString,
+                    Type = type.ToString(),
                     Value = value,
                     Expiration = expiration
                 });
@@ -148,7 +154,7 @@ public class RedisController : Controller
     /// <returns></returns>
     private static async Task<string> WriteKeyToRedis(string key, string value, int expire, string connectionString)
     {
-        ConnectionMultiplexer connection = await GetRedisConnection(connectionString);
+        using ConnectionMultiplexer connection = await GetRedisConnection(connectionString);
         IDatabase db = connection.GetDatabase();
 
         TimeSpan expiration = TimeSpan.FromSeconds(expire);
