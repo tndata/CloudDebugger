@@ -94,7 +94,7 @@ public static class McpTraceResources
             status = activity.Status.ToString(),
             kind = activity.Kind.ToString(),
             source = activity.Source?.Name,
-            tags = activity.Tags?.ToDictionary(t => t.Key, t => t.Value)
+            tags = activity.TagObjects.ToDictionary(t => t.Key, t => t.Value)
         };
     }
 
