@@ -1,18 +1,17 @@
 # Deploy files to App Service
 # https://learn.microsoft.com/en-us/azure/app-service/deploy-zip
 
+# Stop on PowerShell errors; native commands are checked explicitly below.
+$ErrorActionPreference = 'Stop'
+
 . .\_Settings.ps1
 
 # Step 1: Build and publish the project for Linux
 Write-Host "`n`nBuilding and publishing the project for Linux."
 dotnet publish ../CloudDebugger.sln -r linux-x64
+Assert-NativeCommandSuccess "dotnet publish"
 
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "Publish succeeded."
-} else {
-    Write-Host "Publish failed with exit code $LASTEXITCODE. .NET 10 SDK not installed?" -ForegroundColor Red
-    exit 1
-}
+Write-Host "Publish succeeded."
 
 # Step 2: Compress the published files
 Write-Host "`nCompressing the published files."
@@ -26,6 +25,8 @@ Write-Host "Zip file created at ${zipFolder}/publish-linux.zip"
 # Step 3: Create the resource group
 Write-Host "`nCreating resource group '${rgname}'."
 $resGroup = az group create --name $rgname --location $location | ConvertFrom-Json
+Assert-NativeCommandSuccess "az group create"
+
 $resId = $resGroup.id
 Write-Host "Resource group created with id: ${resId}"
 
@@ -34,6 +35,8 @@ Write-Host "`nCreating a user-assigned managed identity '${identityName}'."
 $identity = az identity create --name $identityName `
                    --resource-group $rgname `
                    --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az identity create"
+
 $identityId = $identity.id
 $principalId = $identity.principalId
 $clientId = $identity.clientId
@@ -49,6 +52,8 @@ $servicePlan = az appservice plan create --name $AppServicePlan_linux `
                                          --is-linux `
                                          --sku $AppServicePlanSKU_Linux `
                                          --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az appservice plan create"
+
 $planId = $servicePlan.id
 Write-Host "Linux App Service Plan created with id: ${planId}"
 
@@ -60,6 +65,7 @@ $AppService = az webapp create --name $AppServiceName_linux `
                                           --runtime 'DOTNETCORE:10.0' `
                                           --assign-identity $identityId `
                                           --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp create"
 
                                           $appServiceID = $AppService.id
 $hostName = $AppService.defaultHostName
@@ -70,6 +76,7 @@ $tmp = az webapp config appsettings set --name $AppServiceName_linux `
 	--resource-group $rgname `
 	--settings AZURE_CLIENT_ID=$clientId `
 	--output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp config appsettings set"
 
 
 # Step 8: Enable Application Logging (Filesystem)
@@ -79,6 +86,7 @@ $res1 = az webapp log config --name $AppServiceName_linux `
                              --application-logging filesystem `
                              --level verbose `
                              --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp log config"
 
 
 # Step 9: Deploy the ZIP file to the App Service
@@ -88,6 +96,7 @@ $deployResult = az webapp deploy --resource-group $rgname `
                                  --type zip `
                                  --src-path "${zipFolder}/publish-linux.zip" `
                                  --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp deploy"
 
 $deploymentId = $deployResult.id
 $deploymentProvisioningState = $deployResult.provisioningState
@@ -96,6 +105,7 @@ Write-Host "App Service deployment completed with id: ${deploymentId}, provision
 # Step 10: Assign the User-Assigned Identity to the Web App
 Write-Host "`nAssigning the User-Assigned Identity to the Web App."
 $tmp1 = az webapp identity assign --name $AppServiceName_linux --resource-group $rgname --identities $identityId
+Assert-NativeCommandSuccess "az webapp identity assign"
 
 # Final Output
 Write-Host "`n`nLinux App Service hostname: https://${hostName}`n`n" -ForegroundColor Green

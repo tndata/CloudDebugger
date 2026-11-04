@@ -1,4 +1,5 @@
 # Run all the deployment scripts
+$ErrorActionPreference = 'Stop'
 
 Write-Host "Deploying CloudDebugger to Azure App Services (Linux, Windows, Linux container) , Container Instanes and Container Apps"
 

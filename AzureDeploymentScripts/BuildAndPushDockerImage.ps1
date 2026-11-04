@@ -11,29 +11,25 @@
 # 4. Tag the container image
 # 5. Push it to the container registry
 
+# Stop on PowerShell errors; native commands are checked explicitly below.
+$ErrorActionPreference = 'Stop'
+
 . .\_Settings.ps1
 
 # Step 1: Create the resource group
 Write-Host "`n`nCreating resource group '${rgname}'."
 $resgroup = az group create --name $rgname --location $location | ConvertFrom-Json
+Assert-NativeCommandSuccess "az group create"
+
 $resId = $resgroup.id
 Write-Host "Resource group created, id: ${resId}"
 
 # Step 2: Create Azure Container Registry
 Write-Host "`n`nCreating Azure Container Registry named '${ACRName}'."
 
-$acrOutput = az acr create --resource-group $rgname --name $ACRName --sku Basic --admin-enabled true 2>&1
-if ($LASTEXITCODE -ne 0) {
-    if ($acrOutput -match "AlreadyInUse") {
-        Write-Host "ERROR: The registry name '${ACRName}' is already in use. Please choose a different name." -ForegroundColor Red
-    } else {
-        Write-Host "ERROR: Failed to create Azure Container Registry." -ForegroundColor Red
-        Write-Host $acrOutput -ForegroundColor Yellow
-    }
-    exit 1
-}
-# If successful, parse and continue
-$acr = $acrOutput | ConvertFrom-Json
+$acr = az acr create --resource-group $rgname --name $ACRName --sku Basic --admin-enabled true | ConvertFrom-Json
+Assert-NativeCommandSuccess "az acr create"
+
 $acrid = $acr.id
 Write-Host "Azure Container Registry created, id: ${acrid}"
 
@@ -43,21 +39,25 @@ Write-Host "Azure Container Registry created, id: ${acrid}"
 Write-Host "`n`nLogging into Azure Container Registry '${ACRName}'."
 Write-Host "If this steps hangs, ensure Docker is running locally."
 az acr login --name $ACRName
+Assert-NativeCommandSuccess "az acr login"
 
 # Step 4: Build the local Docker image
 $dockerfilePath = "../Dockerfile"
 $contextPath = "../."
 Write-Host "`n`nBuilding the local Docker image '${imageName}'."
 docker build -t $imageName -f $dockerfilePath $contextPath --progress=plain
+Assert-NativeCommandSuccess "docker build"
 
 # Step 5: Tag the local Docker image with the registry server name of your ACR
 $taggedImage = "${ACRName}.azurecr.io/${imageName}:latest"
 Write-Host "`n`nTagging the Docker image '${imageName}' with '${taggedImage}'."
 docker tag $imageName $taggedImage
+Assert-NativeCommandSuccess "docker tag"
 
 # Step 6: Push the local image to Azure Container Registry
 Write-Host "`n`nPushing the Docker image '${taggedImage}' to Azure Container Registry."
 docker push $taggedImage
+Assert-NativeCommandSuccess "docker push"
 
 # Final Output
 Write-Host "`n`nYou can now use this image and push it to your container hosting service."

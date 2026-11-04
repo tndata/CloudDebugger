@@ -1,3 +1,11 @@
+# Call immediately after az, docker, or dotnet (also works after a JSON pipeline).
+# Throwing stops the deployment, including when called by BuildAndDeployAll.ps1.
+function Assert-NativeCommandSuccess([string] $Operation) {
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Operation failed (exit code $LASTEXITCODE). See the command output above."
+    }
+}
+
 
 #--------------------------------------------
 # Generates a globally unique and stable Azure Container Registry name based on the current Azure user and local machine name.
@@ -6,6 +14,8 @@
 function GetUniqueRegistryName($prefix) {
     # Get Azure username (UPN)
     $azureAccount = az account show | ConvertFrom-Json
+    Assert-NativeCommandSuccess "az account show (check that you have run az login)"
+
     $upn = $azureAccount.user.name
 
     # Get computer name

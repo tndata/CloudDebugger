@@ -8,12 +8,16 @@
 # Deploy a container to Azure App Services using Azure CLI and user-assigned managed identity
 # https://nestenius.se/2024/08/27/deploy-a-container-to-azure-app-services-using-azure-cli-and-user-assigned-managed-identity/ 
 
-. .\_Settings.ps1
+# Stop on PowerShell errors; native commands are checked explicitly below.
+$ErrorActionPreference = 'Stop'
 
+. .\_Settings.ps1
 
 # Step 1: Create the resource group
 Write-Host "`nCreating resource group '${rgname}'."
 $resGroup = az group create --name $rgname --location $location | ConvertFrom-Json
+Assert-NativeCommandSuccess "az group create"
+
 $resId = $resGroup.id
 Write-Host "Resource group created with id: ${resId}"
 
@@ -23,6 +27,8 @@ $identity = az identity create `
         --name $identityName `
         --resource-group $rgname `
         --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az identity create"
+
 $identityId = $identity.id
 $principalId = $identity.principalId
 $clientId = $identity.clientId
@@ -40,6 +46,8 @@ $servicePlan = az appservice plan create `
     --is-linux `
     --sku $AppServicePlanSKU_Linux `
     --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az appservice plan create"
+
 $planId = $servicePlan.id
 Write-Host "App Service Plan created with id: ${planId}"
 
@@ -56,6 +64,8 @@ $containerRegistry = az acr show `
     --name $acrName `
     --resource-group $rgname `
     --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az acr show"
+
 $acrId = $containerRegistry.id
 Write-Host "Azure Container Registry ID: ${acrid}"
 
@@ -68,6 +78,7 @@ $role = az role assignment create `
         --scope $acrid `
         --output json `
         --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az role assignment create"
 
 # Step 6: Create App Service and deploy the default .NET 10 runtime, we deploy the container at the end of the script.
 Write-Host "`n`nCreating the App Service with the default runtime 'DOTNETCORE:10.0'."
@@ -79,6 +90,8 @@ $AppService = az webapp create `
     --runtime 'DOTNETCORE:10.0' `
     --assign-identity $identityId `
     --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp create"
+
 $hostName = $AppService.defaultHostName
 $appServiceID = $AppService.id
 Write-Host "App Service created, id: ${appServiceID}"
@@ -90,6 +103,7 @@ $tmp = az webapp config appsettings set `
 	--resource-group $rgname `
 	--settings AZURE_CLIENT_ID=$clientId `
 	--output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp config appsettings set"
 
 # Step 8: Set the AcrUserManagedIdentityID using  
 Write-Host "`nSet the identity in the App Service for accessing the ACR."
@@ -99,6 +113,7 @@ $tmp = az webapp config set `
     --name $AppServiceName_container_linux `
     --generic-configurations $data `
     --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp config set"
 
 
 # Step 9: Verify the ACR access settings  
@@ -106,6 +121,8 @@ $settings = az webapp config show `
     --resource-group $rgname `
     --name $AppServiceName_container_linux `
     --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp config show"
+
 Write-Host "`nThese two settings must be set for successful ACR pull:"
 Write-Host "acrUseManagedIdentityCreds='$($settings.acrUseManagedIdentityCreds)'"
 Write-Host "acrUserManagedIdentityID='$($settings.acrUserManagedIdentityId)'"
@@ -120,6 +137,7 @@ $tmp = az webapp log config `
     --docker-container-logging filesystem `
     --level verbose `
     --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp log config"
                              
 
 #  Step 11: Now, when everything is setup correctly, we can switch to use the container image instead.
@@ -130,6 +148,7 @@ az webapp config container set `
   --resource-group $rgname `
   --container-image-name $imagePath `
   --output json | ConvertFrom-Json
+Assert-NativeCommandSuccess "az webapp config container set"
 
 
 # Final Output
