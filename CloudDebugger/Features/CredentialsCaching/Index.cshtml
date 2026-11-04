@@ -1,4 +1,5 @@
-﻿@model CloudDebugger.Features.CredentialsCaching.CredentialCachingModel
+@using CloudDebugger.SharedCode.Credentials
+@model CloudDebugger.Features.CredentialsCaching.CredentialCachingModel
 @{
     ViewData["Title"] = "Cloud Debugger - Exploring Token Caching";
 }
@@ -52,136 +53,136 @@ This page demonstrates the caching behavior of access token requests.
                 @* Not all credentials are supported for various reasons *@
                 @*      <a href="Index?Credential=1">AuthorizationCodeCredential</a><br>*@
 
-                @if (Model.CurrentCredentialId == 2)
+                @if (Model.CurrentCredentialType == CredentialType.AzureCliCredential)
                 {
-                    <button type="submit" name="CredentialId" value="2" class="btn btn-link"><b>AzureCliCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzureCliCredential)" class="btn btn-link"><b>AzureCliCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="2" class="btn btn-link">AzureCliCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzureCliCredential)" class="btn btn-link">AzureCliCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 3)
+                @if (Model.CurrentCredentialType == CredentialType.AzureDeveloperCliCredential)
                 {
-                    <button type="submit" name="CredentialId" value="3" class="btn btn-link"><b>AzureDeveloperCliCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzureDeveloperCliCredential)" class="btn btn-link"><b>AzureDeveloperCliCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="3" class="btn btn-link">AzureDeveloperCliCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzureDeveloperCliCredential)" class="btn btn-link">AzureDeveloperCliCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 5)
+                @if (Model.CurrentCredentialType == CredentialType.AzurePipelinesCredential)
                 {
-                    <button type="submit" name="CredentialId" value="5" class="btn btn-link"><b>AzurePipelinesCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzurePipelinesCredential)" class="btn btn-link"><b>AzurePipelinesCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="5" class="btn btn-link">AzurePipelinesCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzurePipelinesCredential)" class="btn btn-link">AzurePipelinesCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 4)
+                @if (Model.CurrentCredentialType == CredentialType.AzurePowerShellCredential)
                 {
-                    <button type="submit" name="CredentialId" value="4" class="btn btn-link"><b>AzurePowerShellCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzurePowerShellCredential)" class="btn btn-link"><b>AzurePowerShellCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="4" class="btn btn-link">AzurePowerShellCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.AzurePowerShellCredential)" class="btn btn-link">AzurePowerShellCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 20)
+                @if (Model.CurrentCredentialType == CredentialType.BrokerCredential)
                 {
-                    <button type="submit" name="CredentialId" value="20" class="btn btn-link"><b>BrokerCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.BrokerCredential)" class="btn btn-link"><b>BrokerCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="20" class="btn btn-link">BrokerCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.BrokerCredential)" class="btn btn-link">BrokerCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 9)
+                @if (Model.CurrentCredentialType == CredentialType.DefaultAzureCredential)
                 {
-                    <button type="submit" name="CredentialId" value="9" class="btn btn-link"><b>DefaultAzureCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.DefaultAzureCredential)" class="btn btn-link"><b>DefaultAzureCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="9" class="btn btn-link">DefaultAzureCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.DefaultAzureCredential)" class="btn btn-link">DefaultAzureCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 11)
+                @if (Model.CurrentCredentialType == CredentialType.EnvironmentCredential)
                 {
-                    <button type="submit" name="CredentialId" value="11" class="btn btn-link"><b>EnvironmentCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.EnvironmentCredential)" class="btn btn-link"><b>EnvironmentCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="11" class="btn btn-link">EnvironmentCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.EnvironmentCredential)" class="btn btn-link">EnvironmentCredential</button>
                     <br>
                 }
 @* 
                 ** This credentials makes no sense here, as it launches the browser each time**
-                @if (Model.CurrentCredentialId == 12)
+                @if (Model.CurrentCredentialType == CredentialType.InteractiveBrowserCredential)
                 {
-                    <button type="submit" name="CredentialId" value="12" class="btn btn-link"><b>InteractiveBrowserCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.InteractiveBrowserCredential)" class="btn btn-link"><b>InteractiveBrowserCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="12" class="btn btn-link">InteractiveBrowserCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.InteractiveBrowserCredential)" class="btn btn-link">InteractiveBrowserCredential</button>
                     <br>
                 } *@
 
-                @if (Model.CurrentCredentialId == 13)
+                @if (Model.CurrentCredentialType == CredentialType.ManagedIdentityCredential)
                 {
-                    <button type="submit" name="CredentialId" value="13" class="btn btn-link"><b>ManagedIdentityCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.ManagedIdentityCredential)" class="btn btn-link"><b>ManagedIdentityCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="13" class="btn btn-link">ManagedIdentityCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.ManagedIdentityCredential)" class="btn btn-link">ManagedIdentityCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 17)
+                @if (Model.CurrentCredentialType == CredentialType.VisualStudioCodeCredential)
                 {
-                    <button type="submit" name="CredentialId" value="17" class="btn btn-link"><b>VisualStudioCodeCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.VisualStudioCodeCredential)" class="btn btn-link"><b>VisualStudioCodeCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="17" class="btn btn-link">VisualStudioCodeCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.VisualStudioCodeCredential)" class="btn btn-link">VisualStudioCodeCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 18)
+                @if (Model.CurrentCredentialType == CredentialType.VisualStudioCredential)
                 {
-                    <button type="submit" name="CredentialId" value="18" class="btn btn-link"><b>VisualStudioCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.VisualStudioCredential)" class="btn btn-link"><b>VisualStudioCredential</b></button>
                     <br>
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="18" class="btn btn-link">VisualStudioCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.VisualStudioCredential)" class="btn btn-link">VisualStudioCredential</button>
                     <br>
                 }
 
-                @if (Model.CurrentCredentialId == 19)
+                @if (Model.CurrentCredentialType == CredentialType.WorkloadIdentityCredential)
                 {
-                    <button type="submit" name="CredentialId" value="19" class="btn btn-link"><b>WorkloadIdentityCredential</b></button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.WorkloadIdentityCredential)" class="btn btn-link"><b>WorkloadIdentityCredential</b></button>
                     <br />
                 }
                 else
                 {
-                    <button type="submit" name="CredentialId" value="19" class="btn btn-link">WorkloadIdentityCredential</button>
+                    <button type="submit" name="CredentialId" value="@((int)CredentialType.WorkloadIdentityCredential)" class="btn btn-link">WorkloadIdentityCredential</button>
                     <br />
                 }
             </td>

@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using CloudDebugger.SharedCode.Credentials;
 
 namespace CloudDebugger.Features.TokenCredentialsExplorer;
 
@@ -19,7 +20,7 @@ public class TokenCredentialsExplorerModel
     /// </summary>
     public string? CredentialMessage { get; set; }
     public string? CredentialName { get; set; }
-    public int CurrentCredentialId { get; set; }
+    public CredentialType CurrentCredentialType { get; set; }
 
 
     public string? ErrorMessage { get; set; }

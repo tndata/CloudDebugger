@@ -10,35 +10,35 @@ namespace CloudDebugger.SharedCode.Credentials;
 public static class CredentialsFactory
 {
     /// <summary>
-    /// Create the TokenCredential instance based on the selected credential Id.
+    /// Create the TokenCredential instance based on the selected credential type.
     /// </summary>
-    /// <param name="credentialId">The credential type ID</param>
+    /// <param name="credentialType">The selected credential type</param>
     /// <param name="clientId">Optional client ID for credentials that support it</param>
     /// <returns>CredentialResult containing the credential and any messages</returns>
-    public static CredentialResult? CreateTokenCredentialInstance(int credentialId, string? clientId = null)
+    public static CredentialResult? CreateTokenCredentialInstance(CredentialType credentialType, string? clientId = null)
     {
-        CredentialResult? result = credentialId switch
+        CredentialResult? result = credentialType switch
         {
-            1 => CreateAuthorizationCodeCredential(),
-            2 => CreateAzureCliCredential(),
-            3 => CreateAzureDeveloperCliCredential(),
-            4 => CreateAzurePowerShellCredential(),
-            5 => CreateAzurePipelinesCredential(),
-            6 => CreateClientAssertionCredential(),
-            7 => CreateClientCertificateCredential(),
-            8 => CreateClientSecretCredential(),
-            9 => CreateDefaultAzureCredential(clientId),
-            10 => CreateDeviceCodeCredential(),
-            11 => CreateEnvironmentCredential(),
-            12 => CreateInteractiveBrowserCredential(),
-            13 => CreateManagedIdentityCredential(clientId),
-            14 => CreateOnBehalfOfCredential(),
-            15 => CreateSharedTokenCacheCredential(),
-            16 => CreateUsernamePasswordCredential(),
-            17 => CreateVisualStudioCodeCredential(),
-            18 => CreateVisualStudioCredential(),
-            19 => CreateWorkloadIdentityCredential(),
-            20 => CreateBrokerCredential(),
+            CredentialType.AuthorizationCodeCredential => CreateAuthorizationCodeCredential(),
+            CredentialType.AzureCliCredential => CreateAzureCliCredential(),
+            CredentialType.AzureDeveloperCliCredential => CreateAzureDeveloperCliCredential(),
+            CredentialType.AzurePowerShellCredential => CreateAzurePowerShellCredential(),
+            CredentialType.AzurePipelinesCredential => CreateAzurePipelinesCredential(),
+            CredentialType.ClientAssertionCredential => CreateClientAssertionCredential(),
+            CredentialType.ClientCertificateCredential => CreateClientCertificateCredential(),
+            CredentialType.ClientSecretCredential => CreateClientSecretCredential(),
+            CredentialType.DefaultAzureCredential => CreateDefaultAzureCredential(clientId),
+            CredentialType.DeviceCodeCredential => CreateDeviceCodeCredential(),
+            CredentialType.EnvironmentCredential => CreateEnvironmentCredential(),
+            CredentialType.InteractiveBrowserCredential => CreateInteractiveBrowserCredential(),
+            CredentialType.ManagedIdentityCredential => CreateManagedIdentityCredential(clientId),
+            CredentialType.OnBehalfOfCredential => CreateOnBehalfOfCredential(),
+            CredentialType.SharedTokenCacheCredential => CreateSharedTokenCacheCredential(),
+            CredentialType.UsernamePasswordCredential => CreateUsernamePasswordCredential(),
+            CredentialType.VisualStudioCodeCredential => CreateVisualStudioCodeCredential(),
+            CredentialType.VisualStudioCredential => CreateVisualStudioCredential(),
+            CredentialType.WorkloadIdentityCredential => CreateWorkloadIdentityCredential(),
+            CredentialType.BrokerCredential => CreateBrokerCredential(),
             _ => null
         };
 

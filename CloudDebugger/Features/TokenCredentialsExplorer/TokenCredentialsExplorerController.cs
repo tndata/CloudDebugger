@@ -28,9 +28,11 @@ public class TokenCredentialsExplorerController : Controller
             clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
         }
 
+        var credentialType = (CredentialType)credentialId;
+
         var model = new TokenCredentialsExplorerModel()
         {
-            CurrentCredentialId = credentialId,
+            CurrentCredentialType = credentialType,
             ClientId = clientId
         };
 
@@ -42,7 +44,7 @@ public class TokenCredentialsExplorerController : Controller
         CredentialResult? cred = null;
         try
         {
-            cred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+            cred = CredentialsFactory.CreateTokenCredentialInstance(credentialType, clientId);
 
             if (cred != null && cred.Credential != null)
             {

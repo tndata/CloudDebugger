@@ -34,9 +34,11 @@ public partial class CredentialsCachingController : Controller
             clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
         }
 
+        var credentialType = (CredentialType)credentialId;
+
         var model = new CredentialCachingModel()
         {
-            CurrentCredentialId = credentialId,
+            CurrentCredentialType = credentialType,
             ClientId = clientId
         };
 
@@ -44,11 +46,11 @@ public partial class CredentialsCachingController : Controller
         CredentialResult? cred = null;
         try
         {
-            cred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+            cred = CredentialsFactory.CreateTokenCredentialInstance(credentialType, clientId);
 
             if (cred?.Credential != null)
             {
-                await RunCredentialCachingTests(credentialId, clientId, model, result, cred);
+                await RunCredentialCachingTests(credentialType, clientId, model, result, cred);
             }
             else
             {
@@ -70,19 +72,19 @@ public partial class CredentialsCachingController : Controller
         return View(model);
     }
 
-    private static async Task RunCredentialCachingTests(int credentialId, string? clientId, CredentialCachingModel model, List<string> result, CredentialResult cred)
+    private static async Task RunCredentialCachingTests(CredentialType credentialType, string? clientId, CredentialCachingModel model, List<string> result, CredentialResult cred)
     {
         model.CredentialMessage = cred.Message;
         model.CredentialName = cred.Credential?.GetType().Name ?? "Uknown";
 
-        var log1 = await TestSingleInstance(credentialId, clientId);
+        var log1 = await TestSingleInstance(credentialType, clientId);
         result.Add(log1);
 
-        var log2 = await TestMultipleInstances(credentialId, clientId);
+        var log2 = await TestMultipleInstances(credentialType, clientId);
         result.Add(log2);
 
         // Get sample access token
-        var sampleCred = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+        var sampleCred = CredentialsFactory.CreateTokenCredentialInstance(credentialType, clientId);
         if (sampleCred != null)
         {
             model.AccessToken = await GetAccessTokenAsync(sampleCred.Credential, testScopes);
@@ -94,17 +96,17 @@ public partial class CredentialsCachingController : Controller
         }
     }
 
-    private static async Task<string> TestSingleInstance(int credentialId, string? clientId)
+    private static async Task<string> TestSingleInstance(CredentialType credentialType, string? clientId)
     {
         StringBuilder sb = new();
 
 
 
-        var credential = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+        var credential = CredentialsFactory.CreateTokenCredentialInstance(credentialType, clientId);
 
         if (credential == null || credential.Credential == null)
         {
-            return "Failed to create credential instance. credentialId=" + credentialId;
+            return "Failed to create credential instance. credentialType=" + credentialType;
         }
 
         var credName = credential.Credential.GetType().Name;
@@ -139,15 +141,15 @@ public partial class CredentialsCachingController : Controller
     }
 
 
-    private static async Task<string> TestMultipleInstances(int credentialId, string? clientId)
+    private static async Task<string> TestMultipleInstances(CredentialType credentialType, string? clientId)
     {
         StringBuilder sb = new();
 
-        var warmupCredential = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+        var warmupCredential = CredentialsFactory.CreateTokenCredentialInstance(credentialType, clientId);
 
         if (warmupCredential == null || warmupCredential.Credential == null)
         {
-            return "Failed to create credential instance. credentialId=" + credentialId;
+            return "Failed to create credential instance. credentialType=" + credentialType;
         }
 
         var credName = warmupCredential.Credential.GetType().Name;
@@ -167,7 +169,7 @@ public partial class CredentialsCachingController : Controller
         {
             var sw = Stopwatch.StartNew();
 
-            var credential = CredentialsFactory.CreateTokenCredentialInstance(credentialId, clientId);
+            var credential = CredentialsFactory.CreateTokenCredentialInstance(credentialType, clientId);
 
             var token = await GetAccessTokenAsync(credential?.Credential, testScopes);
             var hash = token.Token.GetHashCode();

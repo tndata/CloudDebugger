@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using CloudDebugger.SharedCode.Credentials;
 
 namespace CloudDebugger.Features.CredentialsCaching;
 
@@ -30,7 +31,7 @@ public class CredentialCachingModel
     /// </summary>
     public string? CredentialMessage { get; set; }
     public string? CredentialName { get; set; }
-    public int CurrentCredentialId { get; set; }
+    public CredentialType CurrentCredentialType { get; set; }
 
     public List<string>? Log { get; set; }
 
