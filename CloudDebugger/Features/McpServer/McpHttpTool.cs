@@ -36,31 +36,24 @@ public static class McpHttpTools
             var headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
             var contentHeaders = response.Content.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
 
-            return new
-            {
-                success = true,
-                targetUrl,
-                status_code = (int)response.StatusCode,
-                status_text = response.StatusCode.ToString(),
-                is_success = response.IsSuccessStatusCode,
-                content,
-                content_length = content.Length,
-                content_type = response.Content.Headers.ContentType?.ToString(),
-                response_headers = headers,
-                content_headers = contentHeaders,
-                request_duration_ms = Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds,
-                timestamp = startTime
-            };
+            return new McpHttpSuccessResponse(
+                TargetUrl: targetUrl,
+                StatusCode: (int)response.StatusCode,
+                StatusText: response.StatusCode.ToString(),
+                IsSuccess: response.IsSuccessStatusCode,
+                Content: content,
+                ContentType: response.Content.Headers.ContentType?.ToString(),
+                ResponseHeaders: headers,
+                ContentHeaders: contentHeaders,
+                RequestDurationMs: Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds,
+                Timestamp: startTime);
         }
         catch (HttpRequestException ex)
         {
-            return new
-            {
-                success = false,
-                error = $"HTTP request failed: {ex.Message}",
-                targetUrl,
-                exception_type = "HttpRequestException"
-            };
+            return new McpHttpErrorResponse(
+                Error: $"HTTP request failed: {ex.Message}",
+                TargetUrl: targetUrl,
+                ExceptionType: nameof(HttpRequestException));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -69,43 +62,31 @@ public static class McpHttpTools
         }
         catch (OperationCanceledException ex) when (ex.InnerException is TimeoutException)
         {
-            return new
-            {
-                success = false,
-                error = "Request timed out after 30 seconds",
-                targetUrl,
-                exception_type = "TimeoutException"
-            };
+            return new McpHttpErrorResponse(
+                Error: "Request timed out after 30 seconds",
+                TargetUrl: targetUrl,
+                ExceptionType: nameof(TimeoutException));
         }
         catch (OperationCanceledException ex)
         {
-            return new
-            {
-                success = false,
-                error = "Request was cancelled",
-                targetUrl,
-                exception_type = ex.GetType().Name
-            };
+            return new McpHttpErrorResponse(
+                Error: "Request was cancelled",
+                TargetUrl: targetUrl,
+                ExceptionType: ex.GetType().Name);
         }
         catch (UriFormatException ex)
         {
-            return new
-            {
-                success = false,
-                error = $"Invalid URL format: {ex.Message}",
-                targetUrl,
-                exception_type = "UriFormatException"
-            };
+            return new McpHttpErrorResponse(
+                Error: $"Invalid URL format: {ex.Message}",
+                TargetUrl: targetUrl,
+                ExceptionType: nameof(UriFormatException));
         }
         catch (Exception ex)
         {
-            return new
-            {
-                success = false,
-                error = $"Unexpected error: {ex.Message}",
-                targetUrl,
-                exception_type = ex.GetType().Name
-            };
+            return new McpHttpErrorResponse(
+                Error: $"Unexpected error: {ex.Message}",
+                TargetUrl: targetUrl,
+                ExceptionType: ex.GetType().Name);
         }
     }
 }
