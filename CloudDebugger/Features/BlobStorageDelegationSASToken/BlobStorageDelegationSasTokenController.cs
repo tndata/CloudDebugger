@@ -84,7 +84,7 @@ public class BlobStorageDelegationSasTokenController : Controller
                 BlobContainerName = containerName,
                 BlobName = blobName,
                 Resource = "b",
-                StartsOn = DateTimeOffset.UtcNow,
+                StartsOn = startsOn,
                 ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
                 CorrelationId = model.CorrelationId
             };
@@ -95,7 +95,7 @@ public class BlobStorageDelegationSasTokenController : Controller
             // Step #6, Build the SAS token
             model.SASToken = sasBuilder.ToSasQueryParameters(userDelegationKey, storageAccountName).ToString();
 
-            model.BlobUrl = $"https://{storageAccountName}.blob.core.windows.net/{containerName}/{blobName}";
+            model.BlobUrl = client.GetBlobContainerClient(containerName).GetBlobClient(blobName).Uri.AbsoluteUri;
         }
         catch (Exception exc)
         {

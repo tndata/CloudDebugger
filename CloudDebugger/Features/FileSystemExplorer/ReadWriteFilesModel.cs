@@ -6,6 +6,9 @@ public class ReadWriteFilesModel
     public string? FileName { get; set; } = "test.txt";
     public string? FileContent { get; set; } = "Current time is " + DateTime.UtcNow;
 
+    public bool IsPreviewTruncated { get; set; }
+    public bool ConfirmTruncatedSave { get; set; }
+
     public string? HomePath { get; set; }
     public string? AppPath { get; set; }
 

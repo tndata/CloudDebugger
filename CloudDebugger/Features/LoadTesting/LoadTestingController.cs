@@ -24,7 +24,7 @@ public class LoadTestingController : Controller
     }
 
     [HttpPost]
-    public IActionResult SendData(LoadTestingModel model)
+    public async Task<IActionResult> SendData(LoadTestingModel model)
     {
         if (ModelState.IsValid && model != null)
         {
@@ -38,7 +38,7 @@ public class LoadTestingController : Controller
                 // Ensure the nullable integers have values before passing them
                 if (model.TotalNumberOfRequests.HasValue && model.NumberOfConcurrentRequests.HasValue)
                 {
-                    string result = SendRequests(model.TargetURL, model.TotalNumberOfRequests.Value, model.NumberOfConcurrentRequests.Value);
+                    string result = await SendRequests(model.TargetURL, model.TotalNumberOfRequests.Value, model.NumberOfConcurrentRequests.Value);
                     model.Message = result;
                 }
                 else
@@ -59,60 +59,38 @@ public class LoadTestingController : Controller
     private const int RequestTimeoutSeconds = 5;
     private const int CancellationTimeoutSeconds = 180;
 
-    private static string SendRequests(string targetURL, int totalNumberOfRequests, int numberOfConcurrentRequests)
+    private static async Task<string> SendRequests(string targetURL, int totalNumberOfRequests, int numberOfConcurrentRequests)
     {
-        int totalNumberOfRequestsSent = 0;
-        int totalNumberOfSuccessFullRequests = 0;
-        int totalNumberOfFailedRequests = 0;
-        var random = new Random();
-
-        using (var client = new HttpClient())
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalNumberOfRequests);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(numberOfConcurrentRequests);
+        int sent = 0, successful = 0, failed = 0, nextRequest = 0;
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(RequestTimeoutSeconds) };
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(CancellationTimeoutSeconds));
+        async Task RunWorker()
         {
-            client.Timeout = TimeSpan.FromSeconds(RequestTimeoutSeconds);
-            List<Task> tasks = [];
-            using (CancellationTokenSource cts = new(TimeSpan.FromSeconds(CancellationTimeoutSeconds)))
+            while (!cts.IsCancellationRequested)
             {
-                int requestsPerTask = totalNumberOfRequests / numberOfConcurrentRequests;
-
-                // Ensure the thread pool has enough threads
-                ThreadPool.SetMinThreads(numberOfConcurrentRequests, numberOfConcurrentRequests);
-
-                for (int i = 0; i < numberOfConcurrentRequests; i++)
+                if (Interlocked.Increment(ref nextRequest) > totalNumberOfRequests)
+                    break;
+                var url = new Uri(targetURL.Replace("$ID", Random.Shared.Next(1, 101).ToString()));
+                if (cts.IsCancellationRequested)
+                    break;
+                Interlocked.Increment(ref sent);
+                try
                 {
-                    tasks.Add(Task.Run(async () =>
-                    {
-                        for (int j = 0; j < requestsPerTask; j++)
-                        {
-                            try
-                            {
-                                string targetUrlWithId = targetURL.Replace("$ID", random.Next(1, 101).ToString()); //(1 - 100)
-                                HttpResponseMessage response = await client.GetAsync(new Uri(targetUrlWithId), cts.Token);
-
-                                if (response.IsSuccessStatusCode)
-                                {
-                                    Interlocked.Increment(ref totalNumberOfSuccessFullRequests);
-                                }
-                                else
-                                {
-                                    Interlocked.Increment(ref totalNumberOfFailedRequests);
-                                }
-                            }
-                            catch
-                            {
-                                Interlocked.Increment(ref totalNumberOfFailedRequests);
-                            }
-                            finally
-                            {
-                                Interlocked.Increment(ref totalNumberOfRequestsSent);
-                            }
-                        }
-                    }, cts.Token));
+                    using var response = await client.GetAsync(url, cts.Token);
+                    if (response.IsSuccessStatusCode)
+                        Interlocked.Increment(ref successful);
+                    else
+                        Interlocked.Increment(ref failed);
                 }
-
-                Task.WaitAll(tasks.ToArray());
+                catch
+                {
+                    Interlocked.Increment(ref failed);
+                }
             }
         }
-
-        return $"Total Requests Sent: {totalNumberOfRequestsSent}, Successful Requests: {totalNumberOfSuccessFullRequests}, Failed Requests: {totalNumberOfFailedRequests}";
+        await Task.WhenAll(Enumerable.Range(0, Math.Min(numberOfConcurrentRequests, totalNumberOfRequests)).Select(_ => RunWorker()));
+        return $"Total Requests Sent: {sent}, Successful Requests: {successful}, Failed Requests: {failed}";
     }
 }

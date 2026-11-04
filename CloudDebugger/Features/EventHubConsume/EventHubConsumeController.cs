@@ -37,7 +37,7 @@ public class EventHubConsumeController : Controller
     public async Task<IActionResult> ConsumeEvents(ConsumeEventHubModel model)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+            return View(model);
 
         if (model == null)
             return View(new ConsumeEventHubModel());
@@ -55,7 +55,9 @@ public class EventHubConsumeController : Controller
 
         try
         {
-            EventHubConsumerClient consumerClient = GetConsumerClient(ConnectionString, consumerGroup);
+            await using EventHubConsumerClient consumerClient = GetConsumerClient(ConnectionString, consumerGroup);
+            using var readCancellation = CancellationTokenSource.CreateLinkedTokenSource(HttpContext.RequestAborted);
+            readCancellation.CancelAfter(TimeSpan.FromSeconds(30));
 
             var options = new ReadEventOptions()
             {
@@ -68,7 +70,7 @@ public class EventHubConsumeController : Controller
             // subset of partitions.
             // https://learn.microsoft.com/en-us/dotnet/api/azure.messaging.eventhubs.consumer.eventhubconsumerclient.readeventsasync
             await foreach (PartitionEvent @event in consumerClient.ReadEventsAsync(startReadingAtEarliestEvent: true,
-                                                                        readOptions: options))
+                                                                        readOptions: options, cancellationToken: readCancellation.Token))
             {
                 // Exit when we receive an emtpty event
                 if (@event.Data == null)
@@ -77,6 +79,14 @@ public class EventHubConsumeController : Controller
                 var entry = ParseEvent(@event);
                 model.Events.Add(entry);
             }
+        }
+        catch (OperationCanceledException) when (!HttpContext.RequestAborted.IsCancellationRequested)
+        {
+            model.Message = "Reading stopped after the 30-second time limit.";
+        }
+        catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exc)
         {

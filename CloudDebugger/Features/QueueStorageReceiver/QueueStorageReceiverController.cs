@@ -94,11 +94,14 @@ public class QueueStorageReceiverController : Controller
 
                 var client = queueServiceClient.GetQueueClient(queueName);
 
-                using (var CTS = new CancellationTokenSource(WaitForMessagesTimeout))
+                using (var CTS = CancellationTokenSource.CreateLinkedTokenSource(HttpContext.RequestAborted))
                 {
+                    CTS.CancelAfter(WaitForMessagesTimeout);
                     QueueMessage[] messages = await client.ReceiveMessagesAsync(maxMessages: MaxNumberOfMessagesToRetrieve, cancellationToken: CTS.Token);
 
                     model.ReceivedMessages = [];
+                    if (messages.Length == 0)
+                        model.Message = "No messages available";
 
                     foreach (QueueMessage receivedMessage in messages)
                     {
@@ -127,7 +130,7 @@ public class QueueStorageReceiverController : Controller
                             // the message and it can be safely deleted.
 
                             //If the message is not deleted, the message will be invisible for default 30 seconds. (visibility timeout)
-                            await client.DeleteMessageAsync(receivedMessage.MessageId, receivedMessage.PopReceipt);
+                            await client.DeleteMessageAsync(receivedMessage.MessageId, receivedMessage.PopReceipt, cancellationToken: CTS.Token);
                         }
                     }
                 }

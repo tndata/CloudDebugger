@@ -5,12 +5,14 @@ namespace CloudDebugger.Features.LoadTesting;
 public class LoadTestingModel
 {
     [Required]
+    [Range(1, int.MaxValue)]
     /// <summary>
     /// Gets or sets the total number of requests to be sent during the load test.
     /// </summary>
     public int? TotalNumberOfRequests { get; set; }
 
     [Required]
+    [Range(1, int.MaxValue)]
     /// <summary>
     /// Gets or sets the number of concurrent requests to be sent during the load test.
     /// </summary>

@@ -66,7 +66,10 @@ public class FileSystemExplorerController : Controller
                     model.FileContent = GetFileContent(model);
                     break;
                 case "writefile":
-                    CreateFile(model);
+                    if (model.IsPreviewTruncated && !model.ConfirmTruncatedSave)
+                        model.ErrorMessage = "Confirm replacement with truncated content before saving.";
+                    else
+                        CreateFile(model);
                     break;
                 default:
                     break;
@@ -92,6 +95,8 @@ public class FileSystemExplorerController : Controller
 
             System.IO.File.WriteAllText(filePath, model.FileContent);
             model.Message = "File created";
+            model.IsPreviewTruncated = false;
+            model.ConfirmTruncatedSave = false;
         }
         else
         {
@@ -107,14 +112,18 @@ public class FileSystemExplorerController : Controller
 
             if (System.IO.File.Exists(filePath))
             {
-                var content = System.IO.File.ReadAllText(filePath);
-                if (content.Length > 10000)
-                    content = $"{content.Substring(0, 10000)}\r\n\r\nDisplaying the first 10,000 characters....";
-                return content;
+                using var reader = System.IO.File.OpenText(filePath);
+                var buffer = new char[10001];
+                int count = reader.ReadBlock(buffer, 0, buffer.Length);
+                model.IsPreviewTruncated = count > 10000;
+                model.ConfirmTruncatedSave = false;
+                return new string(buffer, 0, Math.Min(count, 10000));
             }
             else
             {
-                return "File not found.";
+                model.ErrorMessage = "File not found.";
+                model.IsPreviewTruncated = false;
+                return "";
             }
         }
         else
@@ -178,12 +187,12 @@ public class FileSystemExplorerController : Controller
             string name = file.Name;
             long fileSize = file.Length;
 
-            result.Add((name, fileSize.ToString()));
-            if (count++ > 25)
+            if (count++ >= 25)
             {
                 result.Add(("Displaying the first 25 files.......", ""));
                 break;
             }
+            result.Add((name, fileSize.ToString()));
         }
 
         return result;
@@ -198,12 +207,12 @@ public class FileSystemExplorerController : Controller
         {
             string name = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
 
-            result.Add(("\\" + name, ""));
-            if (count++ > 25)
+            if (count++ >= 25)
             {
                 result.Add(("\\Displaying the first 25 folders.......", ""));
                 break;
             }
+            result.Add(("\\" + name, ""));
         }
         return result;
     }
