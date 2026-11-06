@@ -11,11 +11,11 @@ namespace CloudDebugger.SharedCode.QueueStorage;
 /// 
 /// * Storage account access key
 /// * Storage account connection string
-///   String that starts with BlobEndpoint=https://mystorageaccount12322.blob.core.windows.net/;QueueEndpoint=https://mystorageaccount12322.queue.core.windows.net/;FileEndpoint=https://mystorageaccount12322.file.core.windows.net/;TableEndpoint=https://mystorageaccount12322.table.core.windows.net/;SharedAccessSignature=sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2024-12-11T20:02:33Z&st=2024-12-11T12:02:33Z&spr=https&sig=IBvTtzj3Pf1CJxtdS0Tjlj9JpF6Pn2QjFGlbQ4covDY%3D
+///   String that starts with BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/;SharedAccessSignature=sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=&lt;expiry&gt;&st=&lt;start&gt;&spr=https&sig=&lt;signature&gt;
 /// * SAS Token
-///   like "sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2024-12-11T20:02:33Z&st=2024-12-11T12:02:33Z&spr=https&sig=IBvTtzj3Pf1CJxtdS0Tjlj9JpF6Pn2QjFGlbQ4covDY%3D" 
+///   like "sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=&lt;expiry&gt;&st=&lt;start&gt;&spr=https&sig=&lt;signature&gt;"
 /// * Queue SAS URL
-///   like "https://mystorageaccount12322.queue.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2024-12-11T20:02:33Z&st=2024-12-11T12:02:33Z&spr=https&sig=IBvTtzj3Pf1CJxtdS0Tjlj9JpF6Pn2QjFGlbQ4covDY%3D..."
+///   like "https://mystorageaccount.queue.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=&lt;expiry&gt;&st=&lt;start&gt;&spr=https&sig=&lt;signature&gt;"
 /// </summary>
 public static class QueueStorageClientBuilder
 {
