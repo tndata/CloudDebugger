@@ -66,7 +66,7 @@ public class FileSystemExplorerController : Controller
                     model.FileContent = GetFileContent(model);
                     break;
                 case "writefile":
-                    if (model.IsPreviewTruncated && !model.ConfirmTruncatedSave)
+                    if (model.IsPreviewTruncated == true && model.ConfirmTruncatedSave != true)
                         model.ErrorMessage = "Confirm replacement with truncated content before saving.";
                     else
                         CreateFile(model);

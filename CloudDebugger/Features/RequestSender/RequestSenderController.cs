@@ -92,28 +92,7 @@ public class RequestSenderController : Controller
 
         if (!string.IsNullOrEmpty(model.RequestHeaders))
         {
-            var headers = model.RequestHeaders.Split(separator, StringSplitOptions.None);
-            foreach (var header in headers)
-            {
-                var headerParts = header.Split(':', 2);
-                if (headerParts.Length == 2)
-                {
-                    var name = headerParts[0].Trim();
-                    var value = headerParts[1].Trim();
-
-                    if (!request.Headers.TryAddWithoutValidation(name, value))
-                    {
-                        // Content headers belong to the body, including when the body is empty.
-                        request.Content ??= new ByteArrayContent([]);
-
-                        // An explicit Content-Type replaces StringContent's default text/plain.
-                        if (name.Equals("Content-Type", StringComparison.OrdinalIgnoreCase))
-                            request.Content.Headers.Remove(name);
-
-                        request.Content.Headers.Add(name, value);
-                    }
-                }
-            }
+            ApplyHeaders(request, model.RequestHeaders);
         }
 
         if (!string.IsNullOrEmpty(model.AuthenticationToken))
@@ -123,6 +102,37 @@ public class RequestSenderController : Controller
 
         return request;
     }
+
+    /// <summary>
+    /// Add each "Name: Value" line of the header text to the request. Lines without a colon are ignored.
+    /// </summary>
+    private static void ApplyHeaders(HttpRequestMessage request, string requestHeaders)
+    {
+        foreach (var header in requestHeaders.Split(separator, StringSplitOptions.None))
+        {
+            var headerParts = header.Split(':', 2);
+            if (headerParts.Length != 2)
+                continue;
+
+            AddHeader(request, headerParts[0].Trim(), headerParts[1].Trim());
+        }
+    }
+
+    private static void AddHeader(HttpRequestMessage request, string name, string value)
+    {
+        if (request.Headers.TryAddWithoutValidation(name, value))
+            return;
+
+        // Content headers belong to the body, including when the body is empty.
+        request.Content ??= new ByteArrayContent([]);
+
+        // An explicit Content-Type replaces StringContent's default text/plain.
+        if (name.Equals("Content-Type", StringComparison.OrdinalIgnoreCase))
+            request.Content.Headers.Remove(name);
+
+        request.Content.Headers.Add(name, value);
+    }
+
     private static async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         using (var client = new HttpClient())

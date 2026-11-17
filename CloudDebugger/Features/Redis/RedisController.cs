@@ -95,53 +95,68 @@ public class RedisController : Controller
         var server = connection.GetServer(connection.GetEndPoints()[0]);
         IDatabase db = connection.GetDatabase();
 
-        var keys = new List<RedisKey>();
-        long cursor = 0L;
-        do
-        {
-            var result = await server.ExecuteAsync("SCAN", cursor.ToString(), "MATCH", pattern, "COUNT", "100");
-            if (result != null)
-            {
-                var innerResult = (RedisResult[])result!;
-                if (innerResult != null && innerResult.Length > 1)
-                {
-                    cursor = (long)innerResult[0];
-                    var keysResult = (RedisKey[])innerResult[1]!;
-                    if (keysResult != null)
-                    {
-                        keys.AddRange(keysResult);
-                    }
-                }
-            }
-        } while (cursor != 0);
+        var keys = await ScanMatchingKeys(server, pattern);
 
         // Convert the result to a list of RedisKeyInfo
         var resultingKeyList = new List<RedisKeyInfo>();
         foreach (var key in keys.Distinct())
         {
-            string keyString = key.ToString();
-            if (keyString != null)
+            var info = await ReadKeyInfo(db, key.ToString());
+            if (info != null)
             {
-                var type = await db.KeyTypeAsync(keyString);
-                if (type == RedisType.None)
-                    continue; // The key may have expired since SCAN returned it.
-
-                string? value = type == RedisType.String
-                    ? (string?)await db.StringGetAsync(keyString)
-                    : "Value preview unavailable for this type.";
-                TimeSpan? expiration = await db.KeyTimeToLiveAsync(keyString);
-
-                resultingKeyList.Add(new RedisKeyInfo
-                {
-                    Key = keyString,
-                    Type = type.ToString(),
-                    Value = value,
-                    Expiration = expiration
-                });
+                resultingKeyList.Add(info);
             }
         }
 
         return resultingKeyList;
+    }
+
+    /// <summary>
+    /// Run SCAN repeatedly until the cursor wraps around, and collect every matching key.
+    /// </summary>
+    private static async Task<List<RedisKey>> ScanMatchingKeys(IServer server, string pattern)
+    {
+        var keys = new List<RedisKey>();
+        long cursor = 0L;
+        do
+        {
+            var result = await server.ExecuteAsync("SCAN", cursor.ToString(), "MATCH", pattern, "COUNT", "100");
+            var innerResult = result != null ? (RedisResult[])result! : null;
+            if (innerResult != null && innerResult.Length > 1)
+            {
+                cursor = (long)innerResult[0];
+                var keysResult = (RedisKey[])innerResult[1]!;
+                if (keysResult != null)
+                {
+                    keys.AddRange(keysResult);
+                }
+            }
+        } while (cursor != 0);
+
+        return keys;
+    }
+
+    /// <summary>
+    /// Read type, value preview and expiration for one key. Returns null if the key has expired since SCAN returned it.
+    /// </summary>
+    private static async Task<RedisKeyInfo?> ReadKeyInfo(IDatabase db, string keyString)
+    {
+        var type = await db.KeyTypeAsync(keyString);
+        if (type == RedisType.None)
+            return null;
+
+        string? value = type == RedisType.String
+            ? (string?)await db.StringGetAsync(keyString)
+            : "Value preview unavailable for this type.";
+        TimeSpan? expiration = await db.KeyTimeToLiveAsync(keyString);
+
+        return new RedisKeyInfo
+        {
+            Key = keyString,
+            Type = type.ToString(),
+            Value = value,
+            Expiration = expiration
+        };
     }
 
     /// <summary>

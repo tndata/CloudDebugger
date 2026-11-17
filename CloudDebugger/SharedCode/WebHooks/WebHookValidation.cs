@@ -174,80 +174,97 @@ public static class WebHookValidation
                 Comment = comment
             };
 
-            try
-            {
-                using var client = new HttpClient();
-
-                // Create the request
-                using var request = new HttpRequestMessage(HttpMethod.Get, callbackUrl);
-                // Send the request
-                using var response = await client.SendAsync(request);
-
-                // Read the response content as string
-                var result = await response.Content.ReadAsStringAsync();
-
-                // Determine Content Type and pretty-print response JSON if applicable
-                if (response.Content.Headers.ContentType?.MediaType == "application/json")
-                {
-                    try
-                    {
-                        // Attempt to parse and pretty-print JSON
-                        var parsedJson = JToken.Parse(result).ToString(Formatting.Indented);
-                        result = parsedJson;
-                    }
-                    catch
-                    {
-                        // If parsing fails, keep the original result
-                    }
-                }
-
-                // Check if the response was successful
-                if (response.IsSuccessStatusCode)
-                {
-                    StringBuilder logEntry = new();
-
-                    logEntry.AppendLine($"Called the webhook validation URL:");
-                    logEntry.AppendLine($"{callbackUrl}");
-                    logEntry.AppendLine();
-                    logEntry.AppendLine($"Response status code: {(int)response.StatusCode} ({response.StatusCode})");
-                    logEntry.AppendLine();
-                    logEntry.AppendLine("Response headers:");
-
-                    //Add the response headers to the log
-                    foreach (var header in response.Headers)
-                    {
-                        logEntry.AppendLine($"{header.Key}: {string.Join(",", header.Value)}");
-                    }
-
-                    if (result.Length > 2000)
-                    {
-                        result = result.Substring(0, 2000) + "...";
-                    }
-
-                    logEntry.AppendLine("\r\nResponse body:");
-                    logEntry.AppendLine($"\r\n{result}\r\n");
-
-                    newLogEntry.Body = logEntry.ToString();
-                }
-                else
-                {
-                    // Handle non-success status codes
-                    newLogEntry.Body = $"Webhook validation URL call failed with status code {response.StatusCode}.\r\n\r\nResponse body:\r\n\r\n'{result}'";
-                }
-            }
-            catch (HttpRequestException exc)
-            {
-                // Handle the case where the request couldn't be sent or no response was received
-                newLogEntry.Body = $"\r\n### Exception: {exc.Message}\r\nCalling the webhook validation URL failed. No response was received.";
-            }
-            catch (Exception exc)
-            {
-                // Handle other exceptions
-                newLogEntry.Body = $"\r\n### Exception: {exc.Message}\r\nAn unexpected error occurred while calling the webhook validation URL.";
-            }
+            newLogEntry.Body = await CallValidationUrl(callbackUrl);
 
             // Add an extra entry in the log about this validation request.
             LogEventHandler(newLogEntry);
         });
+    }
+
+    /// <summary>
+    /// Call the validation URL and return the text for the log entry: the response, or a description of what went wrong.
+    /// </summary>
+    private static async Task<string> CallValidationUrl(string callbackUrl)
+    {
+        try
+        {
+            using var client = new HttpClient();
+
+            // Create the request
+            using var request = new HttpRequestMessage(HttpMethod.Get, callbackUrl);
+            // Send the request
+            using var response = await client.SendAsync(request);
+
+            // Read the response content as string
+            var result = await response.Content.ReadAsStringAsync();
+
+            // Determine Content Type and pretty-print response JSON if applicable
+            if (response.Content.Headers.ContentType?.MediaType == "application/json")
+            {
+                result = PrettyPrintJson(result);
+            }
+
+            // Check if the response was successful
+            if (response.IsSuccessStatusCode)
+            {
+                return FormatSuccessfulCallback(callbackUrl, response, result);
+            }
+
+            // Handle non-success status codes
+            return $"Webhook validation URL call failed with status code {response.StatusCode}.\r\n\r\nResponse body:\r\n\r\n'{result}'";
+        }
+        catch (HttpRequestException exc)
+        {
+            // Handle the case where the request couldn't be sent or no response was received
+            return $"\r\n### Exception: {exc.Message}\r\nCalling the webhook validation URL failed. No response was received.";
+        }
+        catch (Exception exc)
+        {
+            // Handle other exceptions
+            return $"\r\n### Exception: {exc.Message}\r\nAn unexpected error occurred while calling the webhook validation URL.";
+        }
+    }
+
+    /// <summary>
+    /// Attempt to parse and pretty-print JSON. If parsing fails, keep the original text.
+    /// </summary>
+    private static string PrettyPrintJson(string json)
+    {
+        try
+        {
+            return JToken.Parse(json).ToString(Formatting.Indented);
+        }
+        catch
+        {
+            return json;
+        }
+    }
+
+    private static string FormatSuccessfulCallback(string callbackUrl, HttpResponseMessage response, string result)
+    {
+        StringBuilder logEntry = new();
+
+        logEntry.AppendLine($"Called the webhook validation URL:");
+        logEntry.AppendLine($"{callbackUrl}");
+        logEntry.AppendLine();
+        logEntry.AppendLine($"Response status code: {(int)response.StatusCode} ({response.StatusCode})");
+        logEntry.AppendLine();
+        logEntry.AppendLine("Response headers:");
+
+        //Add the response headers to the log
+        foreach (var header in response.Headers)
+        {
+            logEntry.AppendLine($"{header.Key}: {string.Join(",", header.Value)}");
+        }
+
+        if (result.Length > 2000)
+        {
+            result = result.Substring(0, 2000) + "...";
+        }
+
+        logEntry.AppendLine("\r\nResponse body:");
+        logEntry.AppendLine($"\r\n{result}\r\n");
+
+        return logEntry.ToString();
     }
 }
