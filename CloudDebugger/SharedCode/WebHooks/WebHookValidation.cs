@@ -165,16 +165,15 @@ public static class WebHookValidation
             // 5 seconds provides a safe margin for the HTTP response to fully complete and be processed.
             await Task.Delay(5000);
 
-            var newLogEntry = new WebHookLogEntry()
+            var newLogEntry = new WebHookLogEntry
             {
                 HookId = hookId,
                 EntryTime = DateTime.UtcNow,
                 Url = callbackUrl,
                 HttpMethod = "GET",
-                Comment = comment
+                Comment = comment,
+                Body = await CallValidationUrl(callbackUrl)
             };
-
-            newLogEntry.Body = await CallValidationUrl(callbackUrl);
 
             // Add an extra entry in the log about this validation request.
             LogEventHandler(newLogEntry);
